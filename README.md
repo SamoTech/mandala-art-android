@@ -1,145 +1,188 @@
 <!--
-  Mandala Art — Official product page
-  Keep product claims aligned with the current app implementation.
+  Mandala Art — official product README.
+  Keep product claims and download instructions aligned with the shipped app.
 -->
 
 <div align="center">
 
-<img src="docs/images/mandala-art-readme-banner.png" alt="Mandala Art — Color, Relax, Create" width="100%" />
+<img src="docs/images/mandala-art-readme-banner.png" alt="Mandala Art — Color. Relax. Create." width="100%" />
 
 <br />
 
-# Mandala Art
+# MANDALA ART
 
-### Color. Relax. Create.
+### Find your colors. Follow the pattern. Make it yours.
 
-A little space for creativity, calm, and color.
+**A mindful little coloring studio for Android.**
 
-<br />
-
-[![Latest version](https://img.shields.io/github/v/release/SamoTech/mandala-art-android?display_name=tag&style=for-the-badge&label=LATEST%20VERSION)](https://github.com/SamoTech/mandala-art-android/releases/latest)
-[![Android CI](https://img.shields.io/github/actions/workflow/status/SamoTech/mandala-art-android/android-ci.yml?branch=main&style=for-the-badge&label=BUILD)](https://github.com/SamoTech/mandala-art-android/actions/workflows/android-ci.yml)
-![Android](https://img.shields.io/badge/ANDROID-7.0%2B-3DDC84?style=for-the-badge&logo=android&logoColor=white)
+A collection of intricate mandala designs, expressive color choices, and room to slow down for a moment.
 
 <br />
 
-## Make room for a little color
-
-Explore mandala designs, experiment with color palettes, and build a collection of artwork that feels like yours.
+[![Latest release](https://img.shields.io/github/v/release/SamoTech/mandala-art-android?display_name=tag&style=for-the-badge&label=LATEST%20RELEASE&color=8B5CF6)](https://github.com/SamoTech/mandala-art-android/releases/latest)
+[![Build status](https://img.shields.io/github/actions/workflow/status/SamoTech/mandala-art-android/android-ci.yml?branch=main&style=for-the-badge&label=AUTOMATED%20BUILD)](https://github.com/SamoTech/mandala-art-android/actions/workflows/android-ci.yml)
+![Platform](https://img.shields.io/badge/MADE%20FOR-ANDROID-3DDC84?style=for-the-badge&logo=android&logoColor=white)
 
 <br />
 
-[ **GET THE LATEST APK** ](https://github.com/SamoTech/mandala-art-android/releases/latest)
-
-[Release notes](https://github.com/SamoTech/mandala-art-android/releases) · [Report an issue](https://github.com/SamoTech/mandala-art-android/issues) · [Explore the project](https://github.com/SamoTech/mandala-art-android)
+<a href="https://github.com/SamoTech/mandala-art-android/releases/latest"><strong>↓ &nbsp; GET MANDALA ART</strong></a>
+&nbsp;&nbsp; · &nbsp;&nbsp;
+<a href="#the-experience">Discover the experience</a>
+&nbsp;&nbsp; · &nbsp;&nbsp;
+<a href="#for-developers">Developer guide</a>
 
 </div>
 
 ---
-
-## Your creative pause
-
-Mandala Art is an Android coloring experience made for creative downtime. Choose a design, color it your way, and return to your artwork whenever you want another moment to create.
-
-<table>
-  <tr>
-    <td width="33%" align="center">
-      <h3>✦ Explore</h3>
-      Browse mandala designs and collections.
-    </td>
-    <td width="33%" align="center">
-      <h3>✎ Color</h3>
-      Use coloring tools and palettes to make a design your own.
-    </td>
-    <td width="33%" align="center">
-      <h3>♡ Keep creating</h3>
-      Revisit your personal artwork collection and continue refining your creations.
-    </td>
-  </tr>
-</table>
-
-## Designed around creativity
-
-- **Mandala gallery** — discover designs and collections.
-- **Color palettes** — make each design your own.
-- **Personal artwork** — keep track of your creations in the app.
-- **Undo and redo** — step back and refine your work while editing.
-- **Free designs** — standard designs are available without watching an ad.
-- **Optional bonus designs** — rewarded ads may be used to unlock additional designs.
-
-> Features can evolve between releases. Check the latest release notes for changes and fixes.
-
----
-
-## Get Mandala Art
 
 <div align="center">
 
-### Ready to color?
+## A calmer kind of screen time
 
-Download the latest production APK from GitHub Releases.
+**Choose a pattern. Add a little color. Take a breath.**
 
-[ **DOWNLOAD LATEST VERSION** ](https://github.com/SamoTech/mandala-art-android/releases/latest)
-
-<sub>On the release page, open **Assets** and select the file named <code>Mandala-Art-*.apk</code>. Download only releases published by this repository.</sub>
+No artistic experience needed. Start with a mandala, explore your palette, and turn a detailed line-art design into something personal.
 
 </div>
 
-### Install on Android
+## The Mandala Art experience
 
-1. Open the [latest release](https://github.com/SamoTech/mandala-art-android/releases/latest).
-2. Expand **Assets** and download the APK file.
-3. Open the downloaded APK on your Android device.
-4. If Android asks, allow installation from that source, then follow the on-screen prompts.
+<table>
+<tr>
+<td width="50%" valign="top">
 
-**Compatibility:** Android 7.0 (API 24) or later. Android may show a security prompt when installing apps from outside Google Play.
+### ◉ A gallery of patterns
 
-### Verify your download
+Explore **24 original algorithmic mandala designs**, from floral geometry to intricate symmetrical forms.
 
-Production releases include a `SHA256SUMS.txt` file. Use it to verify the APK checksum if you have a checksum utility available. A checksum confirms file integrity; it does not independently prove who published the file, so download from this repository's release page.
+</td>
+<td width="50%" valign="top">
+
+### ◌ Your colors, your style
+
+Bring each design to life with color choices that reflect your mood and imagination.
+
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+
+### ↶ Create with confidence
+
+Use **undo and redo** while working, so you can experiment and refine your artwork as you go.
+
+</td>
+<td width="50%" valign="top">
+
+### ♡ Keep your artwork close
+
+Return to your personal creations and continue enjoying the designs you have colored.
+
+</td>
+</tr>
+</table>
+
+## Explore the collection
+
+A few of the designs included in Mandala Art:
+
+| Design | Inspiration |
+|:--|:--|
+| **Lotus Bloom** | Petal-like symmetry |
+| **Sunburst Harmony** | Radiating geometry |
+| **Zen Wheel** | Balanced circular forms |
+| **Four Seasons** | Nature-inspired detail |
+| **Mystic Daisy** | Floral repetition |
+| **Sacred Geometry** | Structured patterns |
+| **Celestial Dahlia** | Layered floral shapes |
+| **Arabesque Rosette** | Ornamental curves |
+
+*The app includes additional designs. Availability and unlock behavior may vary by release.*
+
+## Get started in a minute
+
+<div align="center">
+
+### Your next creative pause is one download away.
+
+Download the **latest production APK** directly from this repository.
+
+<br />
+
+<a href="https://github.com/SamoTech/mandala-art-android/releases/latest"><strong>DOWNLOAD THE LATEST VERSION →</strong></a>
+
+<br />
+
+<sub>Open the release page, expand <strong>Assets</strong>, and choose the file named <code>Mandala-Art-*.apk</code>.</sub>
+
+</div>
+
+### Install the app
+
+1. Open [Latest Releases](https://github.com/SamoTech/mandala-art-android/releases/latest).
+2. Expand **Assets** and download the APK.
+3. Open the downloaded file on your Android device.
+4. If prompted, allow your browser or file manager to install apps from that source, then follow Android's instructions.
+
+**Minimum requirement:** Android 7.0 (API 24) or later. Installing an APK outside Google Play can trigger an Android security warning; only install releases linked from this official repository.
+
+### Check the APK checksum
+
+Production releases include a `SHA256SUMS.txt` file when published. If you use a checksum utility, compare the APK's SHA-256 hash against that file. A matching checksum helps verify that the file has not changed; download the APK and checksum from the same official release.
 
 ---
 
-## Product details
+## Product at a glance
 
-| Detail | Information |
-|---|---|
-| Product | Mandala Art — Color, Relax, Create |
-| Platform | Android |
-| Minimum Android version | Android 7.0 (API 24) |
-| App technology | Kotlin, Jetpack Compose |
-| Distribution | APK through GitHub Releases |
-| Latest version | [View latest release](https://github.com/SamoTech/mandala-art-android/releases/latest) |
+| | |
+|:--|:--|
+| **App** | Mandala Art — Color. Relax. Create. |
+| **Experience** | Mandala coloring and personal artwork |
+| **Platform** | Android |
+| **Minimum OS** | Android 7.0 (API 24) |
+| **Built with** | Kotlin · Jetpack Compose |
+| **Distribution** | Production APK via GitHub Releases |
+| **Maintained by** | [SamoTech](https://github.com/SamoTech) |
 
-## Privacy and ads
+## Privacy, permissions & advertising
 
-The app includes Google Mobile Ads integration, including optional rewarded ads for bonus designs. Advertising behavior, data handling, and consent requirements may vary by configuration and release. Review the app's current implementation and the applicable policies before making privacy assumptions. Do not assume that no data is transmitted.
+Mandala Art integrates Google Mobile Ads, including optional rewarded advertising that may unlock additional designs. The app requests network access for online services and ads, and includes the Android advertising ID permission.
 
-## About this project
+Read the project's [Privacy Policy](PRIVACY_POLICY.md) for more information. Advertising and data-handling behavior can change as SDKs and app versions change; consult the policy and the specific release you install rather than assuming the app operates entirely offline or collects no data.
 
-Mandala Art is maintained by [SamoTech](https://github.com/SamoTech). The repository includes the Android app source, automated build and test workflow, and production release process.
+## Project links
 
-- [Latest release and changelog](https://github.com/SamoTech/mandala-art-android/releases/latest)
-- [All releases](https://github.com/SamoTech/mandala-art-android/releases)
-- [Build status and workflow](https://github.com/SamoTech/mandala-art-android/actions/workflows/android-ci.yml)
-- [Issues and feedback](https://github.com/SamoTech/mandala-art-android/issues)
+<div align="center">
+
+[**Latest download**](https://github.com/SamoTech/mandala-art-android/releases/latest) &nbsp; · &nbsp;
+[Release history](https://github.com/SamoTech/mandala-art-android/releases) &nbsp; · &nbsp;
+[Privacy policy](PRIVACY_POLICY.md) &nbsp; · &nbsp;
+[Report a problem](https://github.com/SamoTech/mandala-art-android/issues) &nbsp; · &nbsp;
+[Build workflow](https://github.com/SamoTech/mandala-art-android/actions/workflows/android-ci.yml)
+
+</div>
+
+---
 
 <details>
-<summary><strong>For developers: build and test locally</strong></summary>
+<summary><strong>For developers — build, test, and contribute</strong></summary>
+
+<a id="for-developers"></a>
 
 ### Requirements
 
-- Android Studio and a compatible Android SDK.
-- A JDK compatible with the project's Gradle configuration.
+- Android Studio
+- Android SDK compatible with the project
+- A JDK compatible with the Gradle configuration
 
-### Clone the repository
+### Get the source
 
 ```bash
 git clone https://github.com/SamoTech/mandala-art-android.git
 cd mandala-art-android
 ```
 
-Open the project in Android Studio and allow Gradle sync to complete.
+Open the project in Android Studio and allow Gradle sync to finish.
 
 ### Build a debug APK
 
@@ -161,18 +204,24 @@ Open the project in Android Studio and allow Gradle sync to complete.
 ./gradlew :app:testDebugUnitTest
 ```
 
-On Windows, use ` .\gradlew.bat ` in place of ` ./gradlew `. The debug APK is normally generated at `app/build/outputs/apk/debug/app-debug.apk`.
+On Windows, run ` .\gradlew.bat :app:testDebugUnitTest ` instead.
 
-Debug builds are for development and testing. They use the debug signing configuration and test ad IDs; they are not the recommended download for end users. Production builds are signed and published by the main-branch GitHub Actions workflow after the required checks succeed.
+The debug APK is normally generated at `app/build/outputs/apk/debug/app-debug.apk`. Debug builds are intended for development and testing, use the debug signing configuration, and are not the recommended download for end users. Production builds are handled by the repository's GitHub Actions workflow.
+
+### License
+
+See [LICENSE.md](LICENSE.md) for the project's code and artwork license and notices for third-party dependencies.
 
 </details>
 
----
-
 <div align="center">
 
-**Mandala Art** · A little space to color, relax, and create.
+---
 
-Maintained with care by [SamoTech](https://github.com/SamoTech).
+### Make a little space for color.
+
+**Mandala Art** · Color. Relax. Create.
+
+Crafted by [SamoTech](https://github.com/SamoTech).
 
 </div>
