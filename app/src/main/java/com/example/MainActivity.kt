@@ -115,6 +115,8 @@ fun MandalaApp(
     val unlockedDesigns by appSettings.unlockedDesigns.collectAsState()
 
     var bonusToUnlock by remember { mutableStateOf<String?>(null) }
+    var adUnavailableTarget by remember { mutableStateOf<String?>(null) }
+    var isAdRequestInProgress by remember { mutableStateOf(false) }
 
     fun navigateTo(screen: Screen) {
         screenStack.add(screen)
@@ -227,7 +229,11 @@ fun MandalaApp(
     bonusToUnlock?.let { targetId ->
         val targetDesign = MandalaLibrary.getDesignById(targetId)
         AlertDialog(
-            onDismissRequest = { bonusToUnlock = null },
+            onDismissRequest = {
+                if (!isAdRequestInProgress) {
+                    bonusToUnlock = null
+                }
+            },
             title = {
                 Text(
                     text = "Unlock Bonus Artwork",
@@ -236,30 +242,54 @@ fun MandalaApp(
             },
             text = {
                 Text(
-                    text = "Would you like to watch a short sponsored video to unlock \"${targetDesign.title}\" permanently? You can also continue enjoying the 22 free designs anytime."
+                    text = "Would you like to watch a short sponsored video to unlock \"${targetDesign.title}\" permanently? You can also continue enjoying all 22 free designs anytime."
                 )
             },
             confirmButton = {
                 Button(
                     onClick = {
+                        if (isAdRequestInProgress) return@Button
+                        isAdRequestInProgress = true
+                        val idToUnlock = targetId
                         bonusToUnlock = null
+
+                        val designTitle = targetDesign.title
+                        val rewardGranted = java.util.concurrent.atomic.AtomicBoolean(false)
+                        val navigated = java.util.concurrent.atomic.AtomicBoolean(false)
+
                         adMobManager.showRewardedAd(
                             activity = activity,
-                            onUserEarnedReward = {
-                                appSettings.unlockDesign(targetId)
-                                Toast.makeText(context, "Unlocked \"${targetDesign.title}\"!", Toast.LENGTH_SHORT).show()
-                                navigateTo(Screen.Editor(targetId))
-                            },
-                            onAdClosed = {
-                                // If offline or ad failed to load, gracefully unlock as a gift so user is never blocked
-                                if (!appSettings.isDesignUnlocked(targetId)) {
-                                    appSettings.unlockDesign(targetId)
-                                    Toast.makeText(context, "Bonus design unlocked! Enjoy.", Toast.LENGTH_SHORT).show()
-                                    navigateTo(Screen.Editor(targetId))
+                            onUserEarnedReward = { _ ->
+                                if (rewardGranted.compareAndSet(false, true)) {
+                                    appSettings.unlockDesign(idToUnlock)
+                                    Toast.makeText(context, "Unlocked \"$designTitle\"! Enjoy coloring.", Toast.LENGTH_SHORT).show()
+                                    if (navigated.compareAndSet(false, true)) {
+                                        navigateTo(Screen.Editor(idToUnlock))
+                                    }
                                 }
+                            },
+                            onAdClosed = { earned ->
+                                isAdRequestInProgress = false
+                                if (!earned && !appSettings.isDesignUnlocked(idToUnlock)) {
+                                    // Ad was closed or dismissed without earning reward: NEVER unlock bonus design
+                                    Toast.makeText(
+                                        context,
+                                        "Video was not completed. Watch the full video to unlock \"$designTitle\", or enjoy all 22 free designs anytime.",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            },
+                            onAdUnavailable = {
+                                isAdRequestInProgress = false
+                                adUnavailableTarget = idToUnlock
+                            },
+                            onAdFailedToShow = { _ ->
+                                isAdRequestInProgress = false
+                                adUnavailableTarget = idToUnlock
                             }
                         )
                     },
+                    enabled = !isAdRequestInProgress,
                     colors = ButtonDefaults.buttonColors(containerColor = PinkAccent),
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.testTag("btn_watch_rewarded_ad")
@@ -275,10 +305,64 @@ fun MandalaApp(
             },
             dismissButton = {
                 TextButton(
-                    onClick = { bonusToUnlock = null },
+                    onClick = {
+                        if (!isAdRequestInProgress) {
+                            bonusToUnlock = null
+                        }
+                    },
                     modifier = Modifier.testTag("btn_dismiss_unlock_dialog")
                 ) {
                     Text("Later")
+                }
+            }
+        )
+    }
+
+    // Ad Unavailable / Retry Dialog
+    adUnavailableTarget?.let { targetId ->
+        val targetDesign = MandalaLibrary.getDesignById(targetId)
+        AlertDialog(
+            onDismissRequest = { adUnavailableTarget = null },
+            title = {
+                Text(
+                    text = "Video Ad Unavailable",
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Text(
+                    text = "The sponsored video for \"${targetDesign.title}\" is not ready yet. Please check your internet connection and try again in a few moments.\n\nAll 22 standard mandala designs remain free and open to color without ads!"
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        val retryId = targetId
+                        adUnavailableTarget = null
+                        adMobManager.loadRewarded(activity)
+                        if (adMobManager.isRewardedAdReady) {
+                            bonusToUnlock = retryId
+                        } else {
+                            Toast.makeText(
+                                context,
+                                "Requesting video ad... Please try again in a moment.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = PinkAccent),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.testTag("btn_retry_ad")
+                ) {
+                    Text("Retry", fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { adUnavailableTarget = null },
+                    modifier = Modifier.testTag("btn_dismiss_unavailable_dialog")
+                ) {
+                    Text("Explore Free Designs")
                 }
             }
         )

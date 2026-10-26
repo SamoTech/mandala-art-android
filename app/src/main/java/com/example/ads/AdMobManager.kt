@@ -283,56 +283,74 @@ class AdMobManager(private val context: Context) {
 
     /**
      * Shows a rewarded ad voluntarily chosen by the user.
-     * @param onUserEarnedReward callback invoked when user earns reward.
-     * @param onAdClosed callback invoked when ad finishes or fails to show.
+     *
+     * @param activity The host Activity
+     * @param onUserEarnedReward Callback invoked ONLY when the user legitimately earns the reward
+     * @param onAdClosed Callback invoked when the ad is closed or fails to show. Parameter [rewardEarned] indicates whether reward was granted.
+     * @param onAdUnavailable Callback invoked if the ad is not ready / not loaded or offline
+     * @param onAdFailedToShow Callback invoked if the ad fails during the show call
      */
     fun showRewardedAd(
         activity: Activity,
         onUserEarnedReward: (RewardItem) -> Unit,
-        onAdClosed: () -> Unit
+        onAdClosed: (rewardEarned: Boolean) -> Unit = {},
+        onAdUnavailable: () -> Unit = {},
+        onAdFailedToShow: (AdError) -> Unit = {}
     ) {
         if (activity.isFinishing || activity.isDestroyed) {
             Log.w(TAG, "Activity is finishing or destroyed; skipping rewarded ad")
-            onAdClosed()
+            onAdClosed(false)
             return
         }
 
         val ad = rewardedAd
-        if (ad != null) {
-            ad.fullScreenContentCallback = object : FullScreenContentCallback() {
-                override fun onAdDismissedFullScreenContent() {
-                    Log.d(TAG, "Rewarded ad dismissed")
-                    rewardedAd = null
-                    loadRewarded(activity)
-                    onAdClosed()
-                }
-
-                override fun onAdFailedToShowFullScreenContent(adError: AdError) {
-                    Log.w(TAG, "Rewarded ad failed to show [${adError.code}]: ${adError.message}")
-                    rewardedAd = null
-                    loadRewarded(activity)
-                    onAdClosed()
-                }
-
-                override fun onAdShowedFullScreenContent() {
-                    Log.d(TAG, "Rewarded ad showed")
-                    rewardedAd = null
-                }
-            }
-            try {
-                ad.show(activity) { rewardItem ->
-                    onUserEarnedReward(rewardItem)
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "Exception during rewarded ad.show", e)
-                rewardedAd = null
-                onAdClosed()
-            }
-        } else {
-            // If offline or ad wasn't available, notify completion
+        if (ad == null) {
             Log.d(TAG, "Rewarded ad not ready")
             loadRewarded(activity)
-            onAdClosed()
+            onAdUnavailable()
+            onAdClosed(false)
+            return
+        }
+
+        val rewardEarned = AtomicBoolean(false)
+
+        ad.fullScreenContentCallback = object : FullScreenContentCallback() {
+            override fun onAdDismissedFullScreenContent() {
+                val earned = rewardEarned.get()
+                Log.d(TAG, "Rewarded ad dismissed. Reward earned: $earned")
+                rewardedAd = null
+                loadRewarded(activity)
+                onAdClosed(earned)
+            }
+
+            override fun onAdFailedToShowFullScreenContent(adError: AdError) {
+                Log.w(TAG, "Rewarded ad failed to show [${adError.code}]: ${adError.message}")
+                rewardedAd = null
+                loadRewarded(activity)
+                onAdFailedToShow(adError)
+                onAdClosed(rewardEarned.get())
+            }
+
+            override fun onAdShowedFullScreenContent() {
+                Log.d(TAG, "Rewarded ad showed")
+                rewardedAd = null
+            }
+        }
+
+        try {
+            ad.show(activity) { rewardItem ->
+                // Ensure reward is only granted once per ad impression
+                if (rewardEarned.compareAndSet(false, true)) {
+                    Log.d(TAG, "User earned reward: ${rewardItem.type} (${rewardItem.amount})")
+                    onUserEarnedReward(rewardItem)
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Exception during rewarded ad.show", e)
+            rewardedAd = null
+            loadRewarded(activity)
+            onAdFailedToShow(AdError(0, e.message ?: "Failed to display ad", "Internal"))
+            onAdClosed(rewardEarned.get())
         }
     }
 }
