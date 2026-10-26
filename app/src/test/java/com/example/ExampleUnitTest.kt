@@ -25,13 +25,21 @@ class ExampleUnitTest {
         // Must always be running in test ad mode during development/testing
         assertTrue("USE_TEST_ADS must be true in development", AdMobConstants.USE_TEST_ADS)
 
-        // Verify standard official Google Mobile Ads test IDs
+        // Verify standard official Google Mobile Ads test IDs in debug variant
         assertEquals("ca-app-pub-3940256099942544/9214589741", AdMobConstants.bannerAdUnitId)
         assertEquals("ca-app-pub-3940256099942544/1033173712", AdMobConstants.interstitialAdUnitId)
         assertEquals("ca-app-pub-3940256099942544/5224354917", AdMobConstants.rewardedAdUnitId)
+        assertEquals("ca-app-pub-3940256099942544~3347511713", AdMobConstants.adMobAppId)
 
-        // Official publisher ID
+        // Verified production AdMob configuration constants
         assertEquals("pub-3703596518277340", AdMobConstants.PUBLISHER_ID)
+        assertEquals("ca-app-pub-3703596518277340~5699100454", AdMobConstants.PROD_ADMOB_APP_ID)
+        assertEquals("ca-app-pub-3703596518277340/5892552476", AdMobConstants.PROD_REWARDED_AD_UNIT_ID)
+
+        // Verified rewarded ad unit metadata
+        assertEquals("Mandala_Rewarded_Unlock", AdMobConstants.REWARDED_UNIT_NAME)
+        assertEquals("Design Unlock", AdMobConstants.REWARD_ITEM_TYPE)
+        assertEquals(1, AdMobConstants.REWARD_AMOUNT)
     }
 
     @Test

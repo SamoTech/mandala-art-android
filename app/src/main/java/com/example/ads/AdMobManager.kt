@@ -3,6 +3,7 @@ package com.example.ads
 import android.app.Activity
 import android.content.Context
 import android.util.Log
+import com.example.BuildConfig
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.FullScreenContentCallback
@@ -14,6 +15,7 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.gms.ads.rewarded.RewardItem
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
+import com.google.android.ump.ConsentDebugSettings
 import com.google.android.ump.ConsentInformation
 import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.UserMessagingPlatform
@@ -51,23 +53,39 @@ class AdMobManager(private val context: Context) {
      */
     fun initializeConsentAndAds(activity: Activity) {
         try {
-            val params = ConsentRequestParameters.Builder()
+            val paramsBuilder = ConsentRequestParameters.Builder()
                 .setTagForUnderAgeOfConsent(false)
-                .build()
 
+            // Safe consent-flow testing configuration: only enabled in debug builds, never in production
+            if (BuildConfig.DEBUG) {
+                val debugSettings = ConsentDebugSettings.Builder(activity).build()
+                paramsBuilder.setConsentDebugSettings(debugSettings)
+            }
+
+            val params = paramsBuilder.build()
             val consentInformation = UserMessagingPlatform.getConsentInformation(activity)
+
+            Log.d(TAG, "Requesting consent info update [isDebug=${BuildConfig.DEBUG}]")
 
             consentInformation.requestConsentInfoUpdate(
                 activity,
                 params,
                 {
+                    Log.d(
+                        TAG,
+                        "Consent info updated. Status: ${consentInformation.consentStatus}, canRequestAds: ${consentInformation.canRequestAds()}"
+                    )
                     if (!activity.isFinishing && !activity.isDestroyed) {
                         UserMessagingPlatform.loadAndShowConsentFormIfRequired(activity) { formError ->
                             if (formError != null) {
                                 Log.w(TAG, "Consent form error [${formError.errorCode}]: ${formError.message}")
+                            } else {
+                                Log.d(TAG, "Consent form completed or not required")
                             }
                             if (consentInformation.canRequestAds()) {
                                 initializeMobileAds(activity)
+                            } else {
+                                Log.w(TAG, "Ads cannot be requested under current consent status")
                             }
                         }
                     } else if (consentInformation.canRequestAds()) {
@@ -75,14 +93,17 @@ class AdMobManager(private val context: Context) {
                     }
                 },
                 { requestConsentError ->
-                    Log.w(TAG, "Consent request error [${requestConsentError.errorCode}]: ${requestConsentError.message}")
+                    Log.w(
+                        TAG,
+                        "Consent request error [${requestConsentError.errorCode}]: ${requestConsentError.message}"
+                    )
                     if (consentInformation.canRequestAds()) {
                         initializeMobileAds(activity)
                     }
                 }
             )
 
-            // If consent was previously granted, initialize immediately
+            // If consent was previously granted, initialize immediately without waiting for network update
             if (consentInformation.canRequestAds()) {
                 initializeMobileAds(activity)
             }
@@ -143,11 +164,17 @@ class AdMobManager(private val context: Context) {
                 .build()
             MobileAds.setRequestConfiguration(requestConfig)
 
+            Log.d(
+                TAG,
+                "Initializing MobileAds SDK [App ID: ${AdMobConstants.adMobAppId}, TestMode: ${AdMobConstants.USE_TEST_ADS}]"
+            )
+
             // Initialize AdMob
             MobileAds.initialize(appContext) { status ->
-                Log.d(TAG, "AdMob SDK Initialized: ${status.adapterStatusMap}")
-                // Preload interstitial and rewarded ads in background
-                loadInterstitial(appContext)
+                Log.d(TAG, "AdMob SDK Initialized. Adapter status: ${status.adapterStatusMap}")
+                if (AdMobConstants.interstitialAdUnitId.isNotEmpty()) {
+                    loadInterstitial(appContext)
+                }
                 loadRewarded(appContext)
             }
         } catch (e: Exception) {
@@ -156,10 +183,14 @@ class AdMobManager(private val context: Context) {
     }
 
     // ==========================================
-    // INTERSTITIAL ADS
+    // INTERSTITIAL ADS (DISABLED IN RELEASE IN THIS PHASE)
     // ==========================================
 
     fun loadInterstitial(context: Context) {
+        val unitId = AdMobConstants.interstitialAdUnitId
+        if (unitId.isEmpty()) {
+            return // Not active in this phase
+        }
         if (interstitialAd != null || isInterstitialLoading) return
         isInterstitialLoading = true
 
@@ -167,7 +198,7 @@ class AdMobManager(private val context: Context) {
             val adRequest = AdRequest.Builder().build()
             InterstitialAd.load(
                 context.applicationContext,
-                AdMobConstants.interstitialAdUnitId,
+                unitId,
                 adRequest,
                 object : InterstitialAdLoadCallback() {
                     override fun onAdLoaded(ad: InterstitialAd) {
@@ -196,8 +227,7 @@ class AdMobManager(private val context: Context) {
      * ensuring that gameplay and navigation are NEVER blocked.
      */
     fun showInterstitialIfAvailable(activity: Activity, onDismiss: () -> Unit) {
-        if (activity.isFinishing || activity.isDestroyed) {
-            Log.w(TAG, "Activity is finishing or destroyed; skipping interstitial ad")
+        if (AdMobConstants.interstitialAdUnitId.isEmpty() || activity.isFinishing || activity.isDestroyed) {
             onDismiss()
             return
         }
@@ -248,31 +278,49 @@ class AdMobManager(private val context: Context) {
     // ==========================================
 
     fun loadRewarded(context: Context) {
-        if (rewardedAd != null || isRewardedLoading) return
+        val unitId = AdMobConstants.rewardedAdUnitId
+        if (unitId.isBlank()) {
+            Log.w(TAG, "Rewarded ad unit ID is blank, skipping load")
+            return
+        }
+        if (rewardedAd != null || isRewardedLoading) {
+            Log.d(
+                TAG,
+                "Rewarded ad request skipped (already loaded: ${rewardedAd != null}, loading: $isRewardedLoading)"
+            )
+            return
+        }
         isRewardedLoading = true
+        Log.d(
+            TAG,
+            "Requesting rewarded ad [unit: $unitId, unitName: ${AdMobConstants.REWARDED_UNIT_NAME}, isTestMode: ${AdMobConstants.USE_TEST_ADS}]"
+        )
 
         try {
             val adRequest = AdRequest.Builder().build()
             RewardedAd.load(
                 context.applicationContext,
-                AdMobConstants.rewardedAdUnitId,
+                unitId,
                 adRequest,
                 object : RewardedAdLoadCallback() {
                     override fun onAdLoaded(ad: RewardedAd) {
-                        Log.d(TAG, "Rewarded ad loaded successfully")
+                        Log.d(TAG, "Rewarded ad loaded successfully [unit: $unitId]")
                         rewardedAd = ad
                         isRewardedLoading = false
                     }
 
                     override fun onAdFailedToLoad(loadAdError: LoadAdError) {
-                        Log.w(TAG, "Rewarded ad failed to load [${loadAdError.code}]: ${loadAdError.message}")
+                        Log.w(
+                            TAG,
+                            "Rewarded ad failed to load [code: ${loadAdError.code}, domain: ${loadAdError.domain}]: ${loadAdError.message}"
+                        )
                         rewardedAd = null
                         isRewardedLoading = false
                     }
                 }
             )
         } catch (e: Exception) {
-            Log.e(TAG, "Exception while initiating rewarded ad load", e)
+            Log.e(TAG, "Exception while initiating rewarded ad load: ${e.message}", e)
             rewardedAd = null
             isRewardedLoading = false
         }
@@ -305,7 +353,7 @@ class AdMobManager(private val context: Context) {
 
         val ad = rewardedAd
         if (ad == null) {
-            Log.d(TAG, "Rewarded ad not ready")
+            Log.d(TAG, "Rewarded ad not ready for display (isLoading: $isRewardedLoading). Reloading.")
             loadRewarded(activity)
             onAdUnavailable()
             onAdClosed(false)
@@ -317,14 +365,17 @@ class AdMobManager(private val context: Context) {
         ad.fullScreenContentCallback = object : FullScreenContentCallback() {
             override fun onAdDismissedFullScreenContent() {
                 val earned = rewardEarned.get()
-                Log.d(TAG, "Rewarded ad dismissed. Reward earned: $earned")
+                Log.d(TAG, "Rewarded ad dismissed full screen. Reward earned: $earned")
                 rewardedAd = null
                 loadRewarded(activity)
                 onAdClosed(earned)
             }
 
             override fun onAdFailedToShowFullScreenContent(adError: AdError) {
-                Log.w(TAG, "Rewarded ad failed to show [${adError.code}]: ${adError.message}")
+                Log.w(
+                    TAG,
+                    "Rewarded ad failed to show [code: ${adError.code}, domain: ${adError.domain}]: ${adError.message}"
+                )
                 rewardedAd = null
                 loadRewarded(activity)
                 onAdFailedToShow(adError)
@@ -332,21 +383,25 @@ class AdMobManager(private val context: Context) {
             }
 
             override fun onAdShowedFullScreenContent() {
-                Log.d(TAG, "Rewarded ad showed")
+                Log.d(TAG, "Rewarded ad displayed full screen")
                 rewardedAd = null
             }
         }
 
         try {
+            Log.d(TAG, "Presenting rewarded ad to user for voluntary unlock")
             ad.show(activity) { rewardItem ->
                 // Ensure reward is only granted once per ad impression
                 if (rewardEarned.compareAndSet(false, true)) {
-                    Log.d(TAG, "User earned reward: ${rewardItem.type} (${rewardItem.amount})")
+                    Log.d(
+                        TAG,
+                        "Confirmed user earned reward: ${rewardItem.type} (${rewardItem.amount}). Granting unlock."
+                    )
                     onUserEarnedReward(rewardItem)
                 }
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Exception during rewarded ad.show", e)
+            Log.e(TAG, "Exception during rewarded ad.show: ${e.message}", e)
             rewardedAd = null
             loadRewarded(activity)
             onAdFailedToShow(AdError(0, e.message ?: "Failed to display ad", "Internal"))

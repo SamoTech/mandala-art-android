@@ -26,6 +26,12 @@ import com.google.android.gms.ads.LoadAdError
 fun BannerAdView(
     modifier: Modifier = Modifier
 ) {
+    val configuredBannerId = AdMobConstants.bannerAdUnitId
+    if (configuredBannerId.isEmpty()) {
+        // Banner format is disabled in this phase (no production banner unit configured)
+        return
+    }
+
     val context = LocalContext.current
     var adViewInstance by remember { mutableStateOf<AdView?>(null) }
     var isAdLoaded by remember { mutableStateOf(false) }
@@ -53,7 +59,7 @@ fun BannerAdView(
                 try {
                     AdView(ctx).apply {
                         adViewInstance = this
-                        adUnitId = AdMobConstants.bannerAdUnitId
+                        setAdUnitId(configuredBannerId)
 
                         // Calculate adaptive banner width based on screen width
                         val displayMetrics: DisplayMetrics = ctx.resources.displayMetrics

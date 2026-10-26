@@ -1,14 +1,15 @@
 package com.example.ads
 
+import com.example.BuildConfig
 import com.google.android.gms.ads.RequestConfiguration
 
 /**
  * AdMob configuration and ad unit IDs.
  *
- * NOTE: As required by Google AdMob guidelines:
- * - Test ad unit IDs are used during development and testing to prevent policy violations.
- * - Production AdMob App ID and Ad Unit IDs must be configured here when publishing to Google Play.
- * - The Publisher ID (pub-3703596518277340) is kept distinct from Ad Unit IDs and Application IDs.
+ * NOTE: Separated cleanly between Debug and Release variants via Gradle BuildConfig:
+ * - Debug: Uses Google's official test App ID and test Rewarded ad unit ID.
+ * - Release: Uses verified production AdMob App ID and Rewarded ad unit ID.
+ * - In this phase, only the Rewarded format (Mandala_Rewarded_Unlock) is active.
  */
 object AdMobConstants {
 
@@ -19,34 +20,56 @@ object AdMobConstants {
     const val PUBLISHER_ID = "pub-3703596518277340"
 
     /**
-     * Whether the application is running in test ad mode.
-     * Always set to true during development to avoid policy strikes.
+     * Official Rewarded Ad Unit Name and reward metadata configured in Google AdMob:
+     * Unit Name: Mandala_Rewarded_Unlock
+     * Reward Item: Design Unlock
+     * Reward Amount: 1
      */
-    const val USE_TEST_ADS = true
+    const val REWARDED_UNIT_NAME = "Mandala_Rewarded_Unlock"
+    const val REWARD_ITEM_TYPE = "Design Unlock"
+    const val REWARD_AMOUNT = 1
+
+    /**
+     * Official production identifiers (used for release builds & verification)
+     */
+    const val PROD_ADMOB_APP_ID = "ca-app-pub-3703596518277340~5699100454"
+    const val PROD_REWARDED_AD_UNIT_ID = "ca-app-pub-3703596518277340/5892552476"
+
+    /**
+     * Official Google test identifiers (used for debug builds & testing)
+     */
+    const val TEST_ADMOB_APP_ID = "ca-app-pub-3940256099942544~3347511713"
+    const val TEST_REWARDED_AD_UNIT_ID = "ca-app-pub-3940256099942544/5224354917"
+
+    /**
+     * Whether the application is running in test ad mode.
+     * Evaluated from BuildConfig to guarantee test IDs in debug and real IDs in release.
+     */
+    val USE_TEST_ADS: Boolean
+        get() = BuildConfig.USE_TEST_ADS
+
+    /**
+     * AdMob App ID configured for the current build variant.
+     */
+    val adMobAppId: String
+        get() = BuildConfig.ADMOB_APP_ID
+
+    /**
+     * Rewarded ad unit ID configured for the current build variant.
+     */
+    val rewardedAdUnitId: String
+        get() = BuildConfig.REWARDED_AD_UNIT_ID
 
     // ==========================================
-    // OFFICIAL GOOGLE TEST AD UNIT IDS (Android)
+    // BANNER & INTERSTITIAL (DISABLED IN RELEASE IN THIS PHASE)
     // ==========================================
-    private const val TEST_BANNER_AD_UNIT_ID = "ca-app-pub-3940256099942544/9214589741" // Adaptive banner test ID
-    private const val TEST_INTERSTITIAL_AD_UNIT_ID = "ca-app-pub-3940256099942544/1033173712" // Interstitial test ID
-    private const val TEST_REWARDED_AD_UNIT_ID = "ca-app-pub-3940256099942544/5224354917" // Rewarded test ID
-
-    // ==========================================
-    // PRODUCTION AD UNIT PLACEHOLDERS
-    // Replace with your real AdMob unit IDs when deploying to production
-    // ==========================================
-    private const val PROD_BANNER_AD_UNIT_ID = "ca-app-pub-3703596518277340/YOUR_BANNER_ID"
-    private const val PROD_INTERSTITIAL_AD_UNIT_ID = "ca-app-pub-3703596518277340/YOUR_INTERSTITIAL_ID"
-    private const val PROD_REWARDED_AD_UNIT_ID = "ca-app-pub-3703596518277340/YOUR_REWARDED_ID"
-
+    // In this phase, only the Rewarded format is active in production.
+    // In debug mode, test IDs are supplied for local layout inspection; in release they are empty.
     val bannerAdUnitId: String
-        get() = if (USE_TEST_ADS) TEST_BANNER_AD_UNIT_ID else PROD_BANNER_AD_UNIT_ID
+        get() = if (USE_TEST_ADS) "ca-app-pub-3940256099942544/9214589741" else ""
 
     val interstitialAdUnitId: String
-        get() = if (USE_TEST_ADS) TEST_INTERSTITIAL_AD_UNIT_ID else PROD_INTERSTITIAL_AD_UNIT_ID
-
-    val rewardedAdUnitId: String
-        get() = if (USE_TEST_ADS) TEST_REWARDED_AD_UNIT_ID else PROD_REWARDED_AD_UNIT_ID
+        get() = if (USE_TEST_ADS) "ca-app-pub-3940256099942544/1033173712" else ""
 
     /**
      * Content rating suitable for general audiences (G rating for calming art app).

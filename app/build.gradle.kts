@@ -20,6 +20,12 @@ android {
     versionName = "1.0"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+    // Default AdMob placeholders & fields
+    manifestPlaceholders["adMobAppId"] = "ca-app-pub-3940256099942544~3347511713"
+    buildConfigField("String", "ADMOB_APP_ID", "\"ca-app-pub-3940256099942544~3347511713\"")
+    buildConfigField("String", "REWARDED_AD_UNIT_ID", "\"ca-app-pub-3940256099942544/5224354917\"")
+    buildConfigField("Boolean", "USE_TEST_ADS", "true")
   }
 
   // Do not remove or modify these signingConfigs. They are necessary for building, installing,
@@ -48,11 +54,23 @@ android {
       // Do not remove or modify this signingConfig assignment. It is necessary for Android apps in
       // AI Studio.
       signingConfig = signingConfigs.getByName("release")
+
+      // Production AdMob configuration for release builds
+      manifestPlaceholders["adMobAppId"] = "ca-app-pub-3703596518277340~5699100454"
+      buildConfigField("String", "ADMOB_APP_ID", "\"ca-app-pub-3703596518277340~5699100454\"")
+      buildConfigField("String", "REWARDED_AD_UNIT_ID", "\"ca-app-pub-3703596518277340/5892552476\"")
+      buildConfigField("Boolean", "USE_TEST_ADS", "false")
     }
     debug {
       // Do not remove or modify this signingConfig assignment. It is necessary for Android apps in
       // AI Studio.
       signingConfig = signingConfigs.getByName("debugConfig")
+
+      // Official Google test AdMob configuration for debug builds
+      manifestPlaceholders["adMobAppId"] = "ca-app-pub-3940256099942544~3347511713"
+      buildConfigField("String", "ADMOB_APP_ID", "\"ca-app-pub-3940256099942544~3347511713\"")
+      buildConfigField("String", "REWARDED_AD_UNIT_ID", "\"ca-app-pub-3940256099942544/5224354917\"")
+      buildConfigField("Boolean", "USE_TEST_ADS", "true")
     }
   }
   compileOptions {
