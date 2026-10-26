@@ -59,6 +59,7 @@ import com.example.R
 import com.example.ui.theme.PinkAccent
 import com.example.ui.theme.PurplePrimary
 import com.example.util.AppSettings
+import com.example.ads.AdMobManager
 import com.example.util.ImageSharer
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -80,6 +81,8 @@ fun EditorScreen(
 
     var showResetDialog by remember { mutableStateOf(false) }
     var showColorPicker by remember { mutableStateOf(false) }
+    var lockedColorToUnlock by remember { mutableStateOf<Long?>(null) }
+    var colorAdInProgress by remember { mutableStateOf(false) }
 
     BackHandler {
         onNavigateBack()
@@ -212,6 +215,8 @@ fun EditorScreen(
                 onOpenColorPicker = {
                     showColorPicker = true
                 },
+                isColorUnlocked = { color -> appSettings.isColorUnlocked(color) },
+                onRequestUnlockColor = { color -> lockedColorToUnlock = color },
                 modifier = Modifier.navigationBarsPadding()
             )
         }
@@ -312,6 +317,46 @@ fun EditorScreen(
                     Text(stringResource(R.string.dialog_cancel))
                 }
             }
+        )
+    }
+
+
+    lockedColorToUnlock?.let { color ->
+        AlertDialog(
+            onDismissRequest = { if (!colorAdInProgress) lockedColorToUnlock = null },
+            title = { Text("Unlock Premium Color", fontWeight = FontWeight.Bold) },
+            text = { Text("Watch a rewarded video to unlock this color permanently on this device.") },
+            confirmButton = {
+                Button(enabled = !colorAdInProgress, onClick = {
+                    val activity = context as? android.app.Activity
+                    if (activity == null) {
+                        Toast.makeText(context, "Unable to show ad right now.", Toast.LENGTH_SHORT).show()
+                    } else {
+                        colorAdInProgress = true
+                        AdMobManager.getInstance(context).showRewardedAd(
+                            activity = activity,
+                            onUserEarnedReward = { _ ->
+                                appSettings.unlockColor(color)
+                                viewModel.setSelectedColor(color)
+                                lockedColorToUnlock = null
+                            },
+                            onAdClosed = { earned ->
+                                colorAdInProgress = false
+                                if (!earned) Toast.makeText(context, "Complete the video to unlock this color.", Toast.LENGTH_SHORT).show()
+                            },
+                            onAdUnavailable = {
+                                colorAdInProgress = false
+                                Toast.makeText(context, "Video ad is not ready. Try again shortly.", Toast.LENGTH_LONG).show()
+                            },
+                            onAdFailedToShow = { _ ->
+                                colorAdInProgress = false
+                                Toast.makeText(context, "Unable to show the ad. Please try again.", Toast.LENGTH_LONG).show()
+                            }
+                        )
+                    }
+                }, colors = ButtonDefaults.buttonColors(containerColor = PinkAccent)) { Text("Watch Video") }
+            },
+            dismissButton = { TextButton(onClick = { if (!colorAdInProgress) lockedColorToUnlock = null }) { Text("Cancel") } }
         )
     }
 
