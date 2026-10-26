@@ -32,10 +32,12 @@ android {
   // and updating Android apps in AI Studio.
   signingConfigs {
     create("release") {
+      // CI restores the upload keystore to KEYSTORE_PATH from GitHub Actions secrets.
+      // Never commit the keystore or passwords to the repository.
       val keystorePath = System.getenv("KEYSTORE_PATH") ?: "${rootDir}/my-upload-key.jks"
       storeFile = file(keystorePath)
-      storePassword = System.getenv("STORE_PASSWORD")
-      keyAlias = "upload"
+      storePassword = System.getenv("KEYSTORE_PASSWORD")
+      keyAlias = System.getenv("KEY_ALIAS") ?: "mandala-upload"
       keyPassword = System.getenv("KEY_PASSWORD")
     }
     create("debugConfig") {
