@@ -32,7 +32,6 @@ jobs:
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
-          # Avoid the obsolete "tools" SDK package; current command-line tools are installed on the runner.
         with:
           packages: platform-tools
 
@@ -46,6 +45,21 @@ jobs:
 
       - name: Generate missing Gradle Wrapper
         run: gradle wrapper --gradle-version 9.3.1 --distribution-type bin
+
+      - name: Generate CI debug keystore
+        shell: bash
+        run: |
+          if [ ! -f debug.keystore ]; then
+            keytool -genkeypair -v \
+              -keystore debug.keystore \
+              -storepass android \
+              -alias androiddebugkey \
+              -keypass android \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000 \
+              -dname "CN=Android Debug,O=Android,C=US"
+          fi
 
       - name: Build debug APK
         run: ./gradlew --no-daemon assembleDebug
