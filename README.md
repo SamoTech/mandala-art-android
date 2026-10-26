@@ -45,6 +45,43 @@ No artistic experience needed. Start with a mandala, explore your palette, and t
 
 </div>
 
+## A look inside the app
+
+<div align="center">
+<table>
+<tr>
+<td align="center" width="33%">
+<img src="docs/images/Main%20Screen%20Mandala%20Art.jpg" alt="Mandala Art main screen" width="220" />
+<br /><sub><strong>Home screen</strong></sub>
+</td>
+<td align="center" width="33%">
+<img src="docs/images/Mandala%20Gallery%20Mandala%20Art.jpg" alt="Mandala Art mandala gallery" width="220" />
+<br /><sub><strong>Mandala gallery</strong></sub>
+</td>
+<td align="center" width="33%">
+<img src="docs/images/Mystic%20Daisy%20Mandala%20Art.jpg" alt="Mystic Daisy mandala design" width="220" />
+<br /><sub><strong>Mystic Daisy</strong></sub>
+</td>
+</tr>
+<tr>
+<td align="center" width="33%">
+<img src="docs/images/Mystic%20Daisy%20some%20color%20Mandala%20Art.jpg" alt="Mystic Daisy mandala with color applied" width="220" />
+<br /><sub><strong>Color in progress</strong></sub>
+</td>
+<td align="center" width="33%">
+<img src="docs/images/Setting%20Mandala%20Art.jpg" alt="Mandala Art settings screen" width="220" />
+<br /><sub><strong>Settings</strong></sub>
+</td>
+<td align="center" width="33%">
+<img src="docs/images/mandala-art-readme-banner.png" alt="Mandala Art brand banner" width="220" />
+<br /><sub><strong>App identity</strong></sub>
+</td>
+</tr>
+</table>
+</div>
+
+*Screenshots and artwork are from the repository's `docs/images` folder.*
+
 ## The Mandala Art experience
 
 <table>
