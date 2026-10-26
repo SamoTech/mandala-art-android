@@ -16,8 +16,10 @@ android {
     applicationId = "com.aistudio.mandalaart.mrvyka"
     minSdk = 24
     targetSdk = 36
-    versionCode = 1
-    versionName = "1.0"
+    // CI injects monotonically increasing values for each production release.
+    // Keep stable defaults for local development builds.
+    versionCode = providers.environmentVariable("VERSION_CODE").orElse("1").get().toInt()
+    versionName = providers.environmentVariable("VERSION_NAME").orElse("1.0").get()
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
