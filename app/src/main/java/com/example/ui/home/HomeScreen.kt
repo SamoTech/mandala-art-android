@@ -317,7 +317,7 @@ fun HomeScreen(
                                 fontSize = 14.sp
                             )
                             Text(
-                                text = "24 Designs",
+                                text = "${MandalaLibrary.designs.size} Designs",
                                 fontSize = 11.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
