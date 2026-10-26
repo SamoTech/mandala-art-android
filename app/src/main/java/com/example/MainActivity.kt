@@ -25,6 +25,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -72,6 +73,7 @@ class MainActivity : ComponentActivity() {
         val database = MandalaDatabase.getInstance(applicationContext)
         val repository = MandalaRepository(database.mandalaDao())
         val appSettings = AppSettings(applicationContext)
+        AnalyticsTracker.initialize(applicationContext)
         val adMobManager = AdMobManager.getInstance(applicationContext)
 
         // Initialize Google UMP Consent and AdMob SDK
@@ -228,7 +230,9 @@ fun MandalaApp(
 
     // Rewarded Ad Voluntary Unlock Dialog
     bonusToUnlock?.let { targetId ->
-        AnalyticsTracker.logEvent("rewarded_ad_offered", "content_type", "design")
+        LaunchedEffect(targetId) {
+            AnalyticsTracker.logEvent("rewarded_ad_offered", "content_type", "design")
+        }
         val targetDesign = MandalaLibrary.getDesignById(targetId)
         AlertDialog(
             onDismissRequest = {
