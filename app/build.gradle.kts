@@ -36,7 +36,7 @@ android {
       // Never commit the keystore or passwords to the repository.
       val keystorePath = System.getenv("KEYSTORE_PATH") ?: "${rootDir}/my-upload-key.jks"
       storeFile = file(keystorePath)
-      storePassword = System.getenv("KEYSTORE_PASSWORD")
+      storePassword = System.getenv("KEYSTORE_PASSWORD") ?: System.getenv("STORE_PASSWORD")
       keyAlias = System.getenv("KEY_ALIAS") ?: "mandala-upload"
       keyPassword = System.getenv("KEY_PASSWORD")
     }

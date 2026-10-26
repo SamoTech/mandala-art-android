@@ -3,7 +3,6 @@
     <cloud-backup>
         <include domain="database" path="mandala_art_db" />
         <include domain="sharedpref" path="mandala_app_prefs.xml" />
-        <exclude domain="root" path="artwork" />
     </cloud-backup>
     <device-transfer>
         <include domain="database" path="mandala_art_db" />
