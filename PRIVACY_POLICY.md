@@ -2,57 +2,69 @@
 
 **Last Updated:** October 26, 2026
 
-Mandala Art ("the Application") is committed to protecting user privacy. This Privacy Policy outlines what information is processed when you use the Application, how it is used, and the choices available to you.
+Mandala Art ("the Application") is an offline-first coloring app. This policy explains what the app stores on your device, what information may be processed by its advertising services, and the choices available to you.
 
 ---
 
-### 1. Zero Direct Personal Data Collection
-Mandala Art is designed as a relaxing, offline-first coloring studio:
-- The Application **does not require account creation, login, or registration**.
-- The Application **does not collect or store your name, email address, physical address, phone number, contact list, or financial details**.
-- All coloring progress, custom color choices, favorites, and settings are stored locally on your device in an isolated local database using Android Room / SQLite.
-- Exported and shared mandala PNG images are saved locally to your device's private cache directory and shared only through Android's system share sheet when you choose to share.
+### 1. Information Stored by the Application
+
+- The Application does not require account creation, login, or registration.
+- The Application does not ask you to provide your name, email address, physical address, phone number, contacts, or payment details.
+- Coloring progress, custom color choices, favorites, app settings, and related artwork records are stored locally on your device using Android Room / SQLite and SharedPreferences.
+- The app's own functionality is designed to keep coloring progress and artwork on your device; it does not require a Mandala Art account or app-operated cloud service to use these features.
+- Exported mandala PNG images are prepared in the app's private cache and shared only when you choose to use Android's system share interface. Once shared, the receiving app or service handles the image under its own policies.
 
 ---
 
 ### 2. Third-Party Services and Advertising
-To support ongoing development while keeping the application free, Mandala Art integrates the **Google Mobile Ads SDK (Google AdMob)** and the **Google User Messaging Platform (UMP)**.
 
-When the Application connects to the internet to request advertisements:
-- **Google AdMob** may collect and process device-specific information, including:
-  - Mobile Advertising Identifiers (such as the Google Advertising ID / GAID on Android).
-  - Coarse location (inferred from IP address at city/regional level).
-  - Diagnostic and performance telemetry (ad impressions, clicks, load latency, and fraud-detection signals).
-- For details regarding Google’s data practices, please consult Google's Privacy & Terms:
-  [https://policies.google.com/technologies/ads](https://policies.google.com/technologies/ads)
+The Application integrates the **Google Mobile Ads SDK (Google AdMob)** and **Google User Messaging Platform (UMP)**. The app may request an advertisement, including an optional rewarded ad used to unlock designs.
 
----
+When the advertising SDK operates, Google Mobile Ads may automatically collect or share information such as:
+- IP address, which may be used to estimate general location.
+- Advertising and other device identifiers, where available.
+- Interactions with the app and ads, such as app launches, taps, ad views, and clicks.
+- Diagnostic and performance information, including information used to help detect fraud and abuse.
 
-### 3. User Consent and Privacy Controls (GDPR / UK GDPR / CCPA)
-- **European Economic Area (EEA), UK, and Switzerland**: Before loading advertisements, Google's certified Consent Management Platform (UMP) displays a consent dialogue allowing you to consent to, reject, or customize personalized advertising and cookie/identifier usage.
-- **Revoking Consent**: You can reopen and modify your advertising consent choices at any time inside the app by navigating to **Settings > Manage Ad & Privacy Consent**.
-- **Android System Controls**: You can reset or delete your Android Advertising ID at any time in your device settings under **Settings > Privacy > Ads**.
+These practices are controlled in part by Google and may vary with SDK version, device settings, consent status, and the features used. The app does not receive all information processed by the advertising SDK. Review Google's [Google Mobile Ads data disclosure](https://developers.google.com/admob/android/privacy/play-data-disclosure) and [Advertising Privacy Policy](https://policies.google.com/technologies/ads) for more information.
 
 ---
 
-### 4. Children’s Privacy and Families Policy Compliance
-- Mandala Art is rated for general audiences (Content Rating: Everyone / PEGI 3).
-- Advertisements in Mandala Art are configured with a maximum ad content rating of **G (General Audiences)** via Google Mobile Ads `RequestConfiguration.MAX_AD_CONTENT_RATING_G`.
-- The Application does not knowingly collect personal identifiable information from children under 13 (or under the applicable age of consent in your jurisdiction).
+### 3. Consent and Privacy Controls
+
+- **Consent choices:** UMP manages advertising consent and privacy options where required by Google's consent configuration and applicable regulations. The options and notices shown can vary by region and circumstances.
+- **In-app controls:** Where available, you can reopen the consent and privacy options from **Settings > Manage Ad & Privacy Consent**.
+- **Android advertising ID:** You can reset or delete your advertising ID using your device's Android privacy or ads settings. The exact path varies by Android version and manufacturer. This affects the advertising ID; it does not necessarily stop all advertising or prevent use of other signals.
+
+---
+
+### 4. Children and Content Rating
+
+The app configures Google Mobile Ads requests with a maximum ad content rating of **G (General Audiences)**. This limits the requested ad content rating; it does not mean that every ad is guaranteed to be suitable for every child or that the app is certified under a particular store rating or family program.
+
+The Application does not require children or other users to submit personal details to use its local coloring features. Advertising services may process the device and ad-related information described in Section 2. Parents and guardians should review Google's policies and the app's available consent settings when deciding whether the app is appropriate for a child.
 
 ---
 
 ### 5. Data Retention, Backup, and Deletion
-- **Local Storage**: Your coloring data remains on your device for as long as the Application remains installed.
-- **Data Deletion**: You can delete all your coloring progress anytime by using the "Reset" option within the Coloring Editor, deleting items from "My Art", or clearing Application storage via **Android Settings > Apps > Mandala Art > Storage > Clear Data**.
-- **Backups**: If enabled by your Android system settings, your local coloring progress and preferences are included in Android Auto-Backup so your artwork can be restored upon switching devices.
+
+- **Local storage:** App data remains in the app's local storage until it is deleted or the app is uninstalled, subject to Android's backup and restore behavior.
+- **Delete one artwork's progress:** Use **Reset** in that mandala's editor to clear its saved progress, or delete the relevant saved artwork from **My Art**.
+- **Delete all app-local data:** Open **Android Settings > Apps > Mandala Art > Storage** and select **Clear data** (the wording may differ by device). Uninstalling the app also removes its local app data, subject to any backup or restore process.
+- **Backups and device transfer:** The app's Android backup configuration includes its local database and preferences. Whether data is actually backed up or restored depends on Android, device, account, and backup settings. Data restored from a backup may reappear after reinstalling or moving to another device.
+
+Deleting local app data does not delete information already processed by Google or another service, or copies of an image that you chose to share with another app. Refer to those services for their data controls.
 
 ---
 
-### 6. Security
-All local database interactions operate within Android's sandboxed process model. When sharing completed artwork, the Application utilizes Android's secure `FileProvider` with temporary, content-scoped permissions.
+### 6. Security and Sharing
+
+The app's local database operates within Android's application sandbox. When sharing completed artwork, the app uses Android's FileProvider with temporary, content-scoped access permissions. No method of storage or transmission can be guaranteed to be completely secure.
 
 ---
 
-### 7. Contact Us
-If you have any questions or concerns regarding this Privacy Policy, please contact the developer via the official developer contact details listed in the application store listing (Google Play Store / Samsung Galaxy Store).
+### 7. Contact and Policy Updates
+
+For questions or corrections about this policy, you can open an issue in the project's public GitHub repository: [SamoTech/mandala-art-android](https://github.com/SamoTech/mandala-art-android/issues).
+
+This policy may be updated when app functionality, third-party SDKs, or applicable requirements change. The "Last Updated" date above indicates the most recent policy revision.
