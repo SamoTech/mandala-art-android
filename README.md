@@ -20,6 +20,8 @@ A collection of intricate mandala designs, expressive color choices, and room to
 <br />
 
 [![Latest release](https://img.shields.io/github/v/release/SamoTech/mandala-art-android?display_name=tag&style=for-the-badge&label=LATEST%20RELEASE&color=8B5CF6)](https://github.com/SamoTech/mandala-art-android/releases/latest)
+[![Total downloads](https://img.shields.io/github/downloads/SamoTech/mandala-art-android/total?style=for-the-badge&label=DOWNLOADS&color=0D9488)](https://github.com/SamoTech/mandala-art-android/releases)
+![Visitors](https://visitor-badge.laobi.icu/badge?page_id=SamoTech.mandala-art-android&left_text=visitors)
 [![Build status](https://img.shields.io/github/actions/workflow/status/SamoTech/mandala-art-android/android-ci.yml?branch=main&style=for-the-badge&label=AUTOMATED%20BUILD)](https://github.com/SamoTech/mandala-art-android/actions/workflows/android-ci.yml)
 ![Platform](https://img.shields.io/badge/MADE%20FOR-ANDROID-3DDC84?style=for-the-badge&logo=android&logoColor=white)
 
