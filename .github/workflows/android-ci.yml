@@ -122,19 +122,26 @@ jobs:
       - name: Generate missing Gradle Wrapper
         run: gradle wrapper --gradle-version 9.3.1 --distribution-type bin
 
-      - name: Read app version and create unique release tag
+      - name: Calculate monotonically increasing Android version and release tag
         id: version
         shell: bash
         run: |
           set -euo pipefail
-          VERSION_NAME="$(sed -n 's/^[[:space:]]*versionName[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' app/build.gradle.kts | head -n1)"
-          if [ -z "$VERSION_NAME" ]; then
+          BASE_VERSION="$(sed -n 's/^[[:space:]]*versionName[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' app/build.gradle.kts | head -n1)"
+          if [ -z "$BASE_VERSION" ]; then
             echo "::error::Could not read versionName from app/build.gradle.kts"
             exit 1
           fi
-          RELEASE_TAG="v${VERSION_NAME}.${GITHUB_RUN_NUMBER}"
+          VERSION_CODE="$GITHUB_RUN_NUMBER"
+          VERSION_NAME="${BASE_VERSION}.${GITHUB_RUN_NUMBER}"
+          RELEASE_TAG="v${VERSION_NAME}"
+          echo "VERSION_CODE=$VERSION_CODE" >> "$GITHUB_ENV"
+          echo "VERSION_NAME=$VERSION_NAME" >> "$GITHUB_ENV"
+          echo "version_code=$VERSION_CODE" >> "$GITHUB_OUTPUT"
           echo "version_name=$VERSION_NAME" >> "$GITHUB_OUTPUT"
           echo "release_tag=$RELEASE_TAG" >> "$GITHUB_OUTPUT"
+          echo "Android versionCode: $VERSION_CODE"
+          echo "Android versionName: $VERSION_NAME"
           echo "Release tag: $RELEASE_TAG"
 
       - name: Restore release keystore
