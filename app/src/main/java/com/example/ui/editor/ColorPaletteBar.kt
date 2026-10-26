@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.AutoFixHigh
 import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.FormatColorReset
 import androidx.compose.material.icons.filled.PanTool
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
@@ -65,6 +66,8 @@ fun ColorPaletteBar(
     onToggleEraser: () -> Unit,
     onToggleZoomPan: () -> Unit,
     onOpenColorPicker: () -> Unit,
+    isColorUnlocked: (Long) -> Boolean,
+    onRequestUnlockColor: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val palettes = MandalaPalettes.allPalettes
@@ -203,7 +206,8 @@ fun ColorPaletteBar(
                             .testTag("color_swatch_${colorLong.toString(16)}")
                             .clip(CircleShape)
                             .clickable {
-                                onColorSelected(colorLong)
+                                if (isColorUnlocked(colorLong)) onColorSelected(colorLong)
+                                else onRequestUnlockColor(colorLong)
                             },
                         contentAlignment = Alignment.Center
                     ) {
@@ -224,6 +228,9 @@ fun ColorPaletteBar(
                                 .background(composeColor)
                                 .border(1.dp, Color(0x33000000), CircleShape)
                         )
+                        if (!isColorUnlocked(colorLong)) {
+                            Icon(imageVector = Icons.Default.Lock, contentDescription = "Locked color", tint = Color.White, modifier = Modifier.size(16.dp))
+                        }
                     }
                 }
             }
