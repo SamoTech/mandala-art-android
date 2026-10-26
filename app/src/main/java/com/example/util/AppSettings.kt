@@ -57,7 +57,19 @@ class AppSettings(context: Context) {
         private const val KEY_OUTLINE = "key_outline"
         private const val KEY_UNLOCKED_DESIGNS = "key_unlocked_designs"
 
-        // 2 bonus intricate designs that can be unlocked via rewarded ad
-        val BONUS_DESIGNS = setOf("galaxy_spiral", "royal_rosette")
+        // Bonus designs that can be unlocked via rewarded ad
+        val BONUS_DESIGNS = setOf(
+            "galaxy_spiral", "royal_rosette",
+            "premium_mandala_1", "premium_mandala_2", "premium_mandala_3", "premium_mandala_4", "premium_mandala_5",
+            "premium_mandala_6", "premium_mandala_7", "premium_mandala_8", "premium_mandala_9", "premium_mandala_10",
+            "premium_mandala_11", "premium_mandala_12", "premium_mandala_13", "premium_mandala_14", "premium_mandala_15",
+            "premium_mandala_16", "premium_mandala_17", "premium_mandala_18", "premium_mandala_19", "premium_mandala_20",
+            "premium_mandala_21", "premium_mandala_22", "premium_mandala_23", "premium_mandala_24", "premium_mandala_25",
+            "premium_mandala_26", "premium_mandala_27", "premium_mandala_28", "premium_mandala_29", "premium_mandala_30",
+            "premium_mandala_31", "premium_mandala_32", "premium_mandala_33", "premium_mandala_34", "premium_mandala_35",
+            "premium_mandala_36", "premium_mandala_37", "premium_mandala_38", "premium_mandala_39", "premium_mandala_40",
+            "premium_mandala_41", "premium_mandala_42", "premium_mandala_43", "premium_mandala_44", "premium_mandala_45",
+            "premium_mandala_46", "premium_mandala_47", "premium_mandala_48", "premium_mandala_49", "premium_mandala_50"
+        )
     }
 }
