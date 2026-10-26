@@ -92,9 +92,14 @@ On Windows, use ` .\gradlew.bat ` instead of ` ./gradlew `. The debug APK is nor
 
 - [Android CI workflow](https://github.com/SamoTech/mandala-art-android/actions/workflows/android-ci.yml)
 - [Workflow runs](https://github.com/SamoTech/mandala-art-android/actions)
-- [GitHub Releases](https://github.com/SamoTech/mandala-art-android/releases)
+- [Download the latest production APK](https://github.com/SamoTech/mandala-art-android/releases/latest)
+- [All GitHub Releases](https://github.com/SamoTech/mandala-art-android/releases)
 
-The workflow is intended to build the debug app, run configured tests, and upload artifacts. A development prerelease may be published if automatic releases are enabled in the current workflow. Treat debug APKs and prereleases as test builds only.
+On every successful push to `main`, GitHub Actions builds the debug variant, runs unit tests, and then builds and signs the production APK. The workflow verifies the APK signature, publishes the APK and `SHA256SUMS.txt` as direct assets on a GitHub Release, and keeps a workflow artifact as a backup.
+
+Production releases receive a unique tag in the form `v1.0.RUN_NUMBER`. The Android `versionCode` is set to the monotonically increasing GitHub Actions run number, while `versionName` and the release tag are generated from the configured base version and that run number. This supports Android in-place upgrades, provided the same application ID and compatible signing key are retained.
+
+Debug APKs use the Android debug signing configuration and test ad IDs. They are for development/testing only. Production builds use the configured release signing key and production ad configuration. Before distributing publicly, review privacy/consent requirements, ad policy compliance, store listing, and release readiness.
 
 ## Rewarded Ads: Development Safety
 
