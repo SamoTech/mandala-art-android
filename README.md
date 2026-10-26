@@ -4,19 +4,21 @@
 
 # Mandala Art — Color, Relax, Create
 
-**Color • Relax • Create • Be Happy**
+**A calmer moment, one color at a time.**
 
+Color • Relax • Create • Be Happy
+
+[![Latest release](https://img.shields.io/github/v/release/SamoTech/mandala-art-android?display_name=tag&label=latest%20version)](https://github.com/SamoTech/mandala-art-android/releases/latest)
 [![Android CI](https://github.com/SamoTech/mandala-art-android/actions/workflows/android-ci.yml/badge.svg?branch=main)](https://github.com/SamoTech/mandala-art-android/actions/workflows/android-ci.yml)
 ![Android](https://img.shields.io/badge/Platform-Android-3DDC84?logo=android&logoColor=white)
 ![Kotlin](https://img.shields.io/badge/Language-Kotlin-7F52FF?logo=kotlin&logoColor=white)
 ![Jetpack Compose](https://img.shields.io/badge/UI-Jetpack%20Compose-4285F4?logo=jetpackcompose&logoColor=white)
-![Google Mobile Ads](https://img.shields.io/badge/Ads-Google%20Mobile%20Ads-FBBC04?logo=googleads&logoColor=black)
-![Gradle](https://img.shields.io/badge/Build-Gradle-02303A?logo=gradle&logoColor=white)
+
+**[Download Latest APK](https://github.com/SamoTech/mandala-art-android/releases/latest) · [Release Notes](https://github.com/SamoTech/mandala-art-android/releases/latest) · [View Source](https://github.com/SamoTech/mandala-art-android)**
 
 [Features](#features) • [Getting Started](#getting-started) • [Build & Test](#build-and-test) • [Privacy](#privacy)
 
 </div>
-
 ---
 
 ## About
