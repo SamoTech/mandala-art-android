@@ -60,6 +60,8 @@ import com.example.ui.theme.PinkAccent
 import com.example.ui.theme.PurplePrimary
 import com.example.util.AppSettings
 import com.example.ads.AdMobManager
+import com.example.analytics.AnalyticsTracker
+import androidx.compose.runtime.LaunchedEffect
 import com.example.util.ImageSharer
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,6 +72,10 @@ fun EditorScreen(
     onNavigateBack: () -> Unit
 ) {
     val context = LocalContext.current
+    LaunchedEffect(viewModel.design.id) {
+        AnalyticsTracker.logEvent("design_opened", "content_type", "mandala")
+        AnalyticsTracker.logEvent("coloring_started", "content_type", "mandala")
+    }
     val coloredRegions by viewModel.coloredRegions.collectAsState()
     val selectedColor by viewModel.selectedColor.collectAsState()
     val isEraserActive by viewModel.isEraserActive.collectAsState()
@@ -322,6 +328,9 @@ fun EditorScreen(
 
 
     lockedColorToUnlock?.let { color ->
+        LaunchedEffect(color) {
+            AnalyticsTracker.logEvent("rewarded_ad_offered", "content_type", "color")
+        }
         AlertDialog(
             onDismissRequest = { if (!colorAdInProgress) lockedColorToUnlock = null },
             title = { Text("Unlock Premium Color", fontWeight = FontWeight.Bold) },
@@ -333,10 +342,13 @@ fun EditorScreen(
                         Toast.makeText(context, "Unable to show ad right now.", Toast.LENGTH_SHORT).show()
                     } else {
                         colorAdInProgress = true
+                        AnalyticsTracker.logEvent("rewarded_ad_started", "content_type", "color")
                         AdMobManager.getInstance(context).showRewardedAd(
                             activity = activity,
                             onUserEarnedReward = { _ ->
+                                AnalyticsTracker.logEvent("rewarded_ad_completed", "content_type", "color")
                                 appSettings.unlockColor(color)
+                                AnalyticsTracker.logEvent("premium_unlock_granted", "content_type", "color")
                                 viewModel.setSelectedColor(color)
                                 lockedColorToUnlock = null
                             },
