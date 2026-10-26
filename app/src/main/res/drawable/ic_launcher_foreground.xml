@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Outer concentric ring -->
+    <path
+        android:strokeColor="#FFC107"
+        android:strokeWidth="1.2"
+        android:fillColor="#00000000"
+        android:pathData="M 54,26 A 28,28 0 1,0 54,82 A 28,28 0 1,0 54,26 Z" />
+    
+    <!-- 8 Outer Petals -->
+    <!-- North & South -->
+    <path
+        android:fillColor="#FF80AB"
+        android:strokeColor="#FFE082"
+        android:strokeWidth="0.8"
+        android:pathData="M 54,24 C 50,32 50,38 54,42 C 58,38 58,32 54,24 Z" />
+    <path
+        android:fillColor="#FF80AB"
+        android:strokeColor="#FFE082"
+        android:strokeWidth="0.8"
+        android:pathData="M 54,84 C 50,76 50,70 54,66 C 58,70 58,76 54,84 Z" />
+    <!-- East & West -->
+    <path
+        android:fillColor="#FF80AB"
+        android:strokeColor="#FFE082"
+        android:strokeWidth="0.8"
+        android:pathData="M 84,54 C 76,50 70,50 66,54 C 70,58 76,58 84,54 Z" />
+    <path
+        android:fillColor="#FF80AB"
+        android:strokeColor="#FFE082"
+        android:strokeWidth="0.8"
+        android:pathData="M 24,54 C 32,50 38,50 42,54 C 38,58 32,58 24,54 Z" />
+    <!-- Diagonals -->
+    <path
+        android:fillColor="#EA80FC"
+        android:strokeColor="#FFE082"
+        android:strokeWidth="0.8"
+        android:pathData="M 75.2,32.8 C 69.5,38.5 65.3,42.7 62.5,45.5 C 65.3,48.3 71,44.1 75.2,32.8 Z" />
+    <path
+        android:fillColor="#EA80FC"
+        android:strokeColor="#FFE082"
+        android:strokeWidth="0.8"
+        android:pathData="M 32.8,75.2 C 38.5,69.5 42.7,65.3 45.5,62.5 C 42.7,59.7 37,63.9 32.8,75.2 Z" />
+    <path
+        android:fillColor="#EA80FC"
+        android:strokeColor="#FFE082"
+        android:strokeWidth="0.8"
+        android:pathData="M 75.2,75.2 C 69.5,69.5 65.3,65.3 62.5,62.5 C 65.3,59.7 71,63.9 75.2,75.2 Z" />
+    <path
+        android:fillColor="#EA80FC"
+        android:strokeColor="#FFE082"
+        android:strokeWidth="0.8"
+        android:pathData="M 32.8,32.8 C 38.5,38.5 42.7,42.7 45.5,45.5 C 42.7,48.3 37,44.1 32.8,32.8 Z" />
+
+    <!-- Diamond star layer -->
+    <path
+        android:fillColor="#7C4DFF"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="0.8"
+        android:pathData="M 54,34 L 59,49 L 74,54 L 59,59 L 54,74 L 49,59 L 34,54 L 49,49 Z" />
+    <path
+        android:fillColor="#00E5FF"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="0.8"
+        android:pathData="M 54,39 L 65,43 L 69,54 L 65,65 L 54,69 L 43,65 L 39,54 L 43,43 Z" />
+
+    <!-- Inner lotus flower -->
+    <path
+        android:fillColor="#FFD54F"
+        android:strokeColor="#E65100"
+        android:strokeWidth="0.6"
+        android:pathData="M 54,46 C 51,50 51,54 54,58 C 57,54 57,50 54,46 Z" />
+    <path
+        android:fillColor="#FFD54F"
+        android:strokeColor="#E65100"
+        android:strokeWidth="0.6"
+        android:pathData="M 46,54 C 50,51 54,51 58,54 C 54,57 50,57 46,54 Z" />
+
+    <!-- Center pearl -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 54,51 A 3,3 0 1,0 54,57 A 3,3 0 1,0 54,51 Z" />
+</vector>

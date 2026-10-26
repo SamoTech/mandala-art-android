@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <cloud-backup>
+        <include domain="database" path="mandala_art_db" />
+        <include domain="sharedpref" path="mandala_app_prefs.xml" />
+        <exclude domain="root" path="artwork" />
+    </cloud-backup>
+    <device-transfer>
+        <include domain="database" path="mandala_art_db" />
+        <include domain="sharedpref" path="mandala_app_prefs.xml" />
+    </device-transfer>
+</data-extraction-rules>

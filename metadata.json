@@ -1,0 +1,6 @@
+{
+  "name": "Mandala Art",
+  "description": "Relaxing native mandala coloring game with interactive region-fill vector engine, 20+ intricate designs, palettes, and local gallery.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
