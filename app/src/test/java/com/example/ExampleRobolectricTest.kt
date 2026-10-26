@@ -112,6 +112,38 @@ class ExampleRobolectricTest {
     }
 
     @Test
+    fun verifyColorUnlockPersistsAcrossSettingsInstances() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val prefs = context.getSharedPreferences("mandala_app_prefs", Context.MODE_PRIVATE)
+        assertTrue("Test preferences must be cleared", prefs.edit().clear().commit())
+
+        val lockedColor = 0xFF880E4FL
+        val initialSettings = AppSettings(context)
+        assertFalse("Premium color should be locked by default", initialSettings.isColorUnlocked(lockedColor))
+
+        initialSettings.unlockColor(lockedColor)
+        assertTrue("Color should unlock after reward is granted", initialSettings.isColorUnlocked(lockedColor))
+
+        val recreatedSettings = AppSettings(context)
+        assertTrue("Unlocked color should persist across settings instances", recreatedSettings.isColorUnlocked(lockedColor))
+
+        assertTrue("Clean up test preferences", prefs.edit().clear().commit())
+    }
+
+    @Test
+    fun verifyStandardColorsRemainUnlockedByDefault() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val prefs = context.getSharedPreferences("mandala_app_prefs", Context.MODE_PRIVATE)
+        assertTrue("Test preferences must be cleared", prefs.edit().clear().commit())
+
+        val settings = AppSettings(context)
+        assertTrue("A standard palette color should remain free", settings.isColorUnlocked(0xFFFF4081L))
+        assertFalse("A premium palette color should be locked", settings.isColorUnlocked(0xFF880E4FL))
+
+        assertTrue("Clean up test preferences", prefs.edit().clear().commit())
+    }
+
+    @Test
     fun verifyEditorViewModelUndoRedoOperations() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         val inMemoryDb = Room.inMemoryDatabaseBuilder(context, MandalaDatabase::class.java)
