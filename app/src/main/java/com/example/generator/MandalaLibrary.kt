@@ -66,7 +66,60 @@ object MandalaLibrary {
             Recipe("infinite_garden", "Infinite Garden", MandalaCategory.FLORAL, Difficulty.HARD, 24, 11)
         )
 
-        return recipes.map { recipe ->
+        val premiumRecipes = listOf(
+            Recipe("premium_mandala_1", "Amethyst Petals", MandalaCategory.FLORAL, Difficulty.MEDIUM, 10, 0),
+            Recipe("premium_mandala_2", "Golden Mandala", MandalaCategory.GEOMETRIC, Difficulty.HARD, 11, 1),
+            Recipe("premium_mandala_3", "Sapphire Bloom", MandalaCategory.GEOMETRIC, Difficulty.EASY, 12, 2),
+            Recipe("premium_mandala_4", "Coral Reverie", MandalaCategory.FLORAL, Difficulty.MEDIUM, 13, 3),
+            Recipe("premium_mandala_5", "Emerald Lace", MandalaCategory.GEOMETRIC, Difficulty.HARD, 14, 4),
+            Recipe("premium_mandala_6", "Starlit Garden", MandalaCategory.GEOMETRIC, Difficulty.EASY, 15, 5),
+            Recipe("premium_mandala_7", "Royal Sunflower", MandalaCategory.FLORAL, Difficulty.MEDIUM, 16, 6),
+            Recipe("premium_mandala_8", "Oceanic Geometry", MandalaCategory.GEOMETRIC, Difficulty.HARD, 17, 7),
+            Recipe("premium_mandala_9", "Velvet Rose", MandalaCategory.GEOMETRIC, Difficulty.EASY, 18, 8),
+            Recipe("premium_mandala_10", "Aurora Wheel", MandalaCategory.FLORAL, Difficulty.MEDIUM, 19, 9),
+            Recipe("premium_mandala_11", "Lotus Sanctuary", MandalaCategory.GEOMETRIC, Difficulty.HARD, 20, 10),
+            Recipe("premium_mandala_12", "Sacred Wings", MandalaCategory.GEOMETRIC, Difficulty.EASY, 21, 11),
+            Recipe("premium_mandala_13", "Midnight Blossom", MandalaCategory.FLORAL, Difficulty.MEDIUM, 22, 0),
+            Recipe("premium_mandala_14", "Desert Mirage", MandalaCategory.GEOMETRIC, Difficulty.HARD, 23, 1),
+            Recipe("premium_mandala_15", "Crystal Lotus", MandalaCategory.GEOMETRIC, Difficulty.EASY, 24, 2),
+            Recipe("premium_mandala_16", "Floral Mosaic", MandalaCategory.FLORAL, Difficulty.MEDIUM, 10, 3),
+            Recipe("premium_mandala_17", "Celestial Waves", MandalaCategory.GEOMETRIC, Difficulty.HARD, 11, 4),
+            Recipe("premium_mandala_18", "Moon Garden", MandalaCategory.GEOMETRIC, Difficulty.EASY, 12, 5),
+            Recipe("premium_mandala_19", "Radiant Compass", MandalaCategory.FLORAL, Difficulty.MEDIUM, 13, 6),
+            Recipe("premium_mandala_20", "Pearl Mandala", MandalaCategory.GEOMETRIC, Difficulty.HARD, 14, 7),
+            Recipe("premium_mandala_21", "Wildflower Halo", MandalaCategory.GEOMETRIC, Difficulty.EASY, 15, 8),
+            Recipe("premium_mandala_22", "Opal Dream", MandalaCategory.FLORAL, Difficulty.MEDIUM, 16, 9),
+            Recipe("premium_mandala_23", "Sunset Filigree", MandalaCategory.GEOMETRIC, Difficulty.HARD, 17, 10),
+            Recipe("premium_mandala_24", "Zen Garden", MandalaCategory.GEOMETRIC, Difficulty.EASY, 18, 11),
+            Recipe("premium_mandala_25", "Prismatic Lotus", MandalaCategory.FLORAL, Difficulty.MEDIUM, 19, 0),
+            Recipe("premium_mandala_26", "Silver Fern", MandalaCategory.GEOMETRIC, Difficulty.HARD, 20, 1),
+            Recipe("premium_mandala_27", "Cosmic Petals", MandalaCategory.GEOMETRIC, Difficulty.EASY, 21, 2),
+            Recipe("premium_mandala_28", "Royal Arabesque", MandalaCategory.FLORAL, Difficulty.MEDIUM, 22, 3),
+            Recipe("premium_mandala_29", "Dawn Star", MandalaCategory.GEOMETRIC, Difficulty.HARD, 23, 4),
+            Recipe("premium_mandala_30", "Enchanted Dahlia", MandalaCategory.GEOMETRIC, Difficulty.EASY, 24, 5),
+            Recipe("premium_mandala_31", "Diamond Garden", MandalaCategory.FLORAL, Difficulty.MEDIUM, 10, 6),
+            Recipe("premium_mandala_32", "Northern Lights", MandalaCategory.GEOMETRIC, Difficulty.HARD, 11, 7),
+            Recipe("premium_mandala_33", "Flame Blossom", MandalaCategory.GEOMETRIC, Difficulty.EASY, 12, 8),
+            Recipe("premium_mandala_34", "Lotus Crown", MandalaCategory.FLORAL, Difficulty.MEDIUM, 13, 9),
+            Recipe("premium_mandala_35", "Eternal Petals", MandalaCategory.GEOMETRIC, Difficulty.HARD, 14, 10),
+            Recipe("premium_mandala_36", "Jasmine Circle", MandalaCategory.GEOMETRIC, Difficulty.EASY, 15, 11),
+            Recipe("premium_mandala_37", "Sapphire Star", MandalaCategory.FLORAL, Difficulty.MEDIUM, 16, 0),
+            Recipe("premium_mandala_38", "Harmony Wheel", MandalaCategory.GEOMETRIC, Difficulty.HARD, 17, 1),
+            Recipe("premium_mandala_39", "Rosewater Mandala", MandalaCategory.GEOMETRIC, Difficulty.EASY, 18, 2),
+            Recipe("premium_mandala_40", "Golden Fern", MandalaCategory.FLORAL, Difficulty.MEDIUM, 19, 3),
+            Recipe("premium_mandala_41", "Celestial Garden", MandalaCategory.GEOMETRIC, Difficulty.HARD, 20, 4),
+            Recipe("premium_mandala_42", "Blooming Spiral", MandalaCategory.GEOMETRIC, Difficulty.EASY, 21, 5),
+            Recipe("premium_mandala_43", "Mystic Peacock", MandalaCategory.FLORAL, Difficulty.MEDIUM, 22, 6),
+            Recipe("premium_mandala_44", "Starlight Crown", MandalaCategory.GEOMETRIC, Difficulty.HARD, 23, 7),
+            Recipe("premium_mandala_45", "Ocean Jewel", MandalaCategory.GEOMETRIC, Difficulty.EASY, 24, 8),
+            Recipe("premium_mandala_46", "Radiant Arabesque", MandalaCategory.FLORAL, Difficulty.MEDIUM, 10, 9),
+            Recipe("premium_mandala_47", "Lavender Halo", MandalaCategory.GEOMETRIC, Difficulty.HARD, 11, 10),
+            Recipe("premium_mandala_48", "Infinite Blossom", MandalaCategory.GEOMETRIC, Difficulty.EASY, 12, 11),
+            Recipe("premium_mandala_49", "Solar Garden", MandalaCategory.FLORAL, Difficulty.MEDIUM, 13, 0),
+            Recipe("premium_mandala_50", "Dreamcatcher Mandala", MandalaCategory.GEOMETRIC, Difficulty.HARD, 14, 1)
+        )
+
+        return (recipes + premiumRecipes).map { recipe ->
             val regions = mutableListOf<MandalaRegion>()
             regions.add(MandalaShapes.circle("${recipe.id}_core", radius = if (recipe.difficulty == Difficulty.HARD) 28f else 38f))
             val n = recipe.symmetry
