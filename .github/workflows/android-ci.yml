@@ -1,10 +1,8 @@
-name: Android CI and Automatic Development Release
+name: Android CI and Automatic Releases
 
 on:
   push:
     branches: [main]
-    tags:
-      - 'v*'
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -89,13 +87,15 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
-
-  build-signed-production-release:
-    name: Build and verify signed production APK
+  build-sign-and-publish-production:
+    name: Build, sign, and publish production release
     needs: build-and-test
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    permissions:
+      contents: write
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -121,6 +121,21 @@ jobs:
 
       - name: Generate missing Gradle Wrapper
         run: gradle wrapper --gradle-version 9.3.1 --distribution-type bin
+
+      - name: Read app version and create unique release tag
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION_NAME="$(sed -n 's/^[[:space:]]*versionName[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' app/build.gradle.kts | head -n1)"
+          if [ -z "$VERSION_NAME" ]; then
+            echo "::error::Could not read versionName from app/build.gradle.kts"
+            exit 1
+          fi
+          RELEASE_TAG="v${VERSION_NAME}.${GITHUB_RUN_NUMBER}"
+          echo "version_name=$VERSION_NAME" >> "$GITHUB_OUTPUT"
+          echo "release_tag=$RELEASE_TAG" >> "$GITHUB_OUTPUT"
+          echo "Release tag: $RELEASE_TAG"
 
       - name: Restore release keystore
         shell: bash
@@ -150,8 +165,10 @@ jobs:
           test -n "$KEY_PASSWORD"
           ./gradlew --no-daemon assembleRelease
 
-      - name: Verify release APK signature
+      - name: Verify APK signature and prepare release assets
         shell: bash
+        env:
+          RELEASE_TAG: ${{ steps.version.outputs.release_tag }}
         run: |
           set -euo pipefail
           APK_PATH="$(find app/build/outputs/apk/release -maxdepth 1 -name '*.apk' -print -quit)"
@@ -161,53 +178,38 @@ jobs:
           fi
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$APK_PATH"
           mkdir -p release-assets
-          cp "$APK_PATH" release-assets/Mandala-Art-${GITHUB_REF_NAME}.apk
-          sha256sum release-assets/*.apk > release-assets/SHA256SUMS.txt
+          cp "$APK_PATH" "release-assets/Mandala-Art-${RELEASE_TAG}.apk"
+          (cd release-assets && sha256sum "Mandala-Art-${RELEASE_TAG}.apk" > SHA256SUMS.txt)
 
       - name: Clean up release keystore
         if: always()
-        run: |
-          rm -f "${{ runner.temp }}/my-upload-key.jks"
+        run: rm -f "${{ runner.temp }}/my-upload-key.jks"
 
-      - name: Upload signed production APK artifact
+      - name: Upload signed APK artifact as backup
         uses: actions/upload-artifact@v4
         with:
-          name: mandala-art-signed-release-${{ github.ref_name }}
+          name: mandala-art-signed-release-${{ steps.version.outputs.release_tag }}
           path: release-assets/*
           if-no-files-found: error
           retention-days: 90
 
-  publish-development-release:
-    name: Publish GitHub pre-release
-    needs: build-and-test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    permissions:
-      contents: write
-
-    steps:
-      - name: Download debug APK artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: mandala-art-debug-apk
-          path: release-assets
-
-      - name: Publish automatic development pre-release
+      - name: Publish GitHub production release with direct APK download
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: dev-build-${{ github.run_number }}
-          name: Mandala Art Development Build ${{ github.run_number }}
-          prerelease: true
-          make_latest: false
+          tag_name: ${{ steps.version.outputs.release_tag }}
+          target_commitish: ${{ github.sha }}
+          name: Mandala Art ${{ steps.version.outputs.release_tag }}
+          prerelease: false
+          make_latest: true
           generate_release_notes: true
-          overwrite_files: true
           fail_on_unmatched_files: true
-          files: release-assets/*.apk
+          files: |
+            release-assets/Mandala-Art-${{ steps.version.outputs.release_tag }}.apk
+            release-assets/SHA256SUMS.txt
           body: |
-            Automated development build generated from commit ${{ github.sha }}.
+            Automated signed production release for commit ${{ github.sha }}.
 
-            - Build and unit-test jobs passed before this release was published.
-            - This is a **debug APK for development/testing**, not a production release.
-            - It uses the Android debug signing key generated by CI; it is not signed with the app's production upload key.
-            - Test AdMob configuration should remain enabled. Do not use this build as a production/Play Store release.
+            - Debug build and unit tests passed before release.
+            - Production APK signature was verified with apksigner.
+            - Install the APK directly on a compatible Android device.
+            - SHA256SUMS.txt provides the APK checksum for integrity verification.
