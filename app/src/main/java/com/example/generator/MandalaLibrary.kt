@@ -34,7 +34,94 @@ object MandalaLibrary {
             createMandalaOfSerenity(),
             createGalaxySpiral(),
             createRoyalRosette()
+        ) + createAdditionalDesigns()
+    }
+
+    /**
+     * Additional locally generated designs. Each uses a distinct radial recipe,
+     * stable region IDs, and the same vector-region engine as the original library.
+     */
+    private fun createAdditionalDesigns(): List<MandalaDesign> {
+        data class Recipe(
+            val id: String,
+            val title: String,
+            val category: MandalaCategory,
+            val difficulty: Difficulty,
+            val symmetry: Int,
+            val style: Int
         )
+
+        val recipes = listOf(
+            Recipe("moonlit_lotus", "Moonlit Lotus", MandalaCategory.FLORAL, Difficulty.EASY, 10, 0),
+            Recipe("rose_compass", "Rose Compass", MandalaCategory.FLORAL, Difficulty.MEDIUM, 12, 1),
+            Recipe("ocean_tide", "Ocean Tide", MandalaCategory.GEOMETRIC, Difficulty.EASY, 14, 2),
+            Recipe("desert_sun", "Desert Sun", MandalaCategory.GEOMETRIC, Difficulty.MEDIUM, 16, 3),
+            Recipe("butterfly_garden", "Butterfly Garden", MandalaCategory.FLORAL, Difficulty.MEDIUM, 12, 4),
+            Recipe("crystal_bloom", "Crystal Bloom", MandalaCategory.INTRICATE, Difficulty.HARD, 18, 5),
+            Recipe("night_sky", "Night Sky", MandalaCategory.GEOMETRIC, Difficulty.MEDIUM, 16, 6),
+            Recipe("arabesque_dream", "Arabesque Dream", MandalaCategory.INTRICATE, Difficulty.HARD, 20, 7),
+            Recipe("fern_and_flower", "Fern and Flower", MandalaCategory.FLORAL, Difficulty.MEDIUM, 14, 8),
+            Recipe("celestial_crown", "Celestial Crown", MandalaCategory.INTRICATE, Difficulty.HARD, 18, 9),
+            Recipe("prism_waves", "Prism Waves", MandalaCategory.GEOMETRIC, Difficulty.HARD, 22, 10),
+            Recipe("infinite_garden", "Infinite Garden", MandalaCategory.FLORAL, Difficulty.HARD, 24, 11)
+        )
+
+        return recipes.map { recipe ->
+            val regions = mutableListOf<MandalaRegion>()
+            regions.add(MandalaShapes.circle("${recipe.id}_core", radius = if (recipe.difficulty == Difficulty.HARD) 28f else 38f))
+            val n = recipe.symmetry
+            val step = 360f / n
+            val halfWidth = (PI / (n * if (recipe.style % 2 == 0) 1.15 else 1.35)).toFloat()
+
+            // Four balanced rings keep the artwork legible and fully fillable.
+            for (i in 0 until n) {
+                val a = (i * 2 * PI / n).toFloat()
+                val deg = i * step
+                when (recipe.style % 4) {
+                    0 -> regions.add(MandalaShapes.petal("${recipe.id}_inner_$i", 42f, 132f, a, halfWidth))
+                    1 -> regions.add(MandalaShapes.annularSector("${recipe.id}_inner_$i", 45f, 125f, deg, step))
+                    2 -> regions.add(MandalaShapes.diamond("${recipe.id}_inner_$i", 42f, 135f, 88f, a, halfWidth))
+                    else -> regions.add(MandalaShapes.triangleRay("${recipe.id}_inner_$i", 45f, 135f, a - halfWidth, a, a + halfWidth))
+                }
+            }
+            for (i in 0 until n) {
+                val a = ((i + 0.5) * 2 * PI / n).toFloat()
+                val deg = (i + 0.5f) * step
+                when (recipe.style % 4) {
+                    0 -> regions.add(MandalaShapes.diamond("${recipe.id}_mid_$i", 125f, 245f, 185f, a, halfWidth))
+                    1 -> regions.add(MandalaShapes.petal("${recipe.id}_mid_$i", 120f, 250f, a, halfWidth))
+                    2 -> regions.add(MandalaShapes.annularSector("${recipe.id}_mid_$i", 140f, 235f, deg - step * 0.5f, step))
+                    else -> regions.add(MandalaShapes.petal("${recipe.id}_mid_$i", 130f, 250f, a, halfWidth * 0.9f))
+                }
+            }
+            for (i in 0 until n) {
+                val a = (i * 2 * PI / n).toFloat()
+                val deg = i * step
+                when ((recipe.style + 1) % 4) {
+                    0 -> regions.add(MandalaShapes.petal("${recipe.id}_outer_$i", 235f, 355f, a, halfWidth))
+                    1 -> regions.add(MandalaShapes.diamond("${recipe.id}_outer_$i", 230f, 355f, 292f, a, halfWidth))
+                    2 -> regions.add(MandalaShapes.annularSector("${recipe.id}_outer_$i", 245f, 350f, deg, step))
+                    else -> regions.add(MandalaShapes.triangleRay("${recipe.id}_outer_$i", 245f, 365f, a - halfWidth, a, a + halfWidth))
+                }
+            }
+            for (i in 0 until n) {
+                val a = ((i + 0.5) * 2 * PI / n).toFloat()
+                val deg = (i + 0.5f) * step
+                when (recipe.style % 3) {
+                    0 -> regions.add(MandalaShapes.bead("${recipe.id}_bead_$i", 405f, if (n >= 20) 8f else 11f, a))
+                    1 -> regions.add(MandalaShapes.annularSector("${recipe.id}_rim_$i", 365f, 430f, deg - step * 0.5f, step))
+                    else -> regions.add(MandalaShapes.petal("${recipe.id}_rim_$i", 355f, 435f, a, halfWidth * 0.8f))
+                }
+            }
+
+            MandalaDesign(
+                id = recipe.id,
+                title = recipe.title,
+                category = recipe.category,
+                difficulty = recipe.difficulty,
+                regions = regions
+            )
+        }
     }
 
     fun getDesignById(id: String): MandalaDesign {
