@@ -1,6 +1,6 @@
 {
   "name": "Mandala Art",
-  "description": "Relaxing native mandala coloring game with interactive region-fill vector engine, 20+ intricate designs, palettes, and local gallery.",
+  "description": "Native Android mandala coloring app with interactive region-fill coloring, customizable palettes, saved artwork, and optional rewarded ads.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": []
 }
