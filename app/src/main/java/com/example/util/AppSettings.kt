@@ -19,6 +19,9 @@ class AppSettings(context: Context) {
     private val _outlineColor = MutableStateFlow(prefs.getLong(KEY_OUTLINE, 0xFF212121L))
     val outlineColor: StateFlow<Long> = _outlineColor.asStateFlow()
 
+    private val _unlockedColors = MutableStateFlow(prefs.getStringSet(KEY_UNLOCKED_COLORS, emptySet()) ?: emptySet())
+    val unlockedColors: StateFlow<Set<String>> = _unlockedColors.asStateFlow()
+
     private val _unlockedDesigns = MutableStateFlow(
         prefs.getStringSet(KEY_UNLOCKED_DESIGNS, emptySet()) ?: emptySet()
     )
@@ -39,6 +42,14 @@ class AppSettings(context: Context) {
         _outlineColor.value = color
     }
 
+    fun isColorUnlocked(color: Long): Boolean = color.toString(16) !in LOCKED_COLORS || _unlockedColors.value.contains(color.toString(16))
+
+    fun unlockColor(color: Long) {
+        val updated = _unlockedColors.value.toMutableSet().apply { add(color.toString(16)) }
+        prefs.edit().putStringSet(KEY_UNLOCKED_COLORS, updated).apply()
+        _unlockedColors.value = updated
+    }
+
     fun isDesignUnlocked(designId: String): Boolean {
         // Only special bonus designs require unlock; standard 22 designs are free by default
         if (designId !in BONUS_DESIGNS) return true
@@ -56,6 +67,8 @@ class AppSettings(context: Context) {
         private const val KEY_HAPTIC = "key_haptic"
         private const val KEY_OUTLINE = "key_outline"
         private const val KEY_UNLOCKED_DESIGNS = "key_unlocked_designs"
+        private const val KEY_UNLOCKED_COLORS = "key_unlocked_colors"
+        val LOCKED_COLORS = setOf("ff880e4f", "ff4a148c", "ff1a237e", "ff004d40", "ff006064", "ff01579b", "ff827717", "ffe65100", "ffbf360c", "ff3e2723", "ffc2185b", "ffffb300")
 
         // Bonus designs that can be unlocked via rewarded ad
         val BONUS_DESIGNS = setOf(
