@@ -1,65 +1,138 @@
+<!--
+  Mandala Art — Official product page
+  Keep product claims aligned with the current app implementation.
+-->
+
 <div align="center">
 
 <img src="docs/images/mandala-art-readme-banner.png" alt="Mandala Art — Color, Relax, Create" width="100%" />
 
-# Mandala Art — Color, Relax, Create
+<br />
 
-**A calmer moment, one color at a time.**
+# Mandala Art
 
-Color • Relax • Create • Be Happy
+### Color. Relax. Create.
 
-[![Latest release](https://img.shields.io/github/v/release/SamoTech/mandala-art-android?display_name=tag&label=latest%20version)](https://github.com/SamoTech/mandala-art-android/releases/latest)
-[![Android CI](https://github.com/SamoTech/mandala-art-android/actions/workflows/android-ci.yml/badge.svg?branch=main)](https://github.com/SamoTech/mandala-art-android/actions/workflows/android-ci.yml)
-![Android](https://img.shields.io/badge/Platform-Android-3DDC84?logo=android&logoColor=white)
-![Kotlin](https://img.shields.io/badge/Language-Kotlin-7F52FF?logo=kotlin&logoColor=white)
-![Jetpack Compose](https://img.shields.io/badge/UI-Jetpack%20Compose-4285F4?logo=jetpackcompose&logoColor=white)
+A little space for creativity, calm, and color.
 
-**[Download Latest APK](https://github.com/SamoTech/mandala-art-android/releases/latest) · [Release Notes](https://github.com/SamoTech/mandala-art-android/releases/latest) · [View Source](https://github.com/SamoTech/mandala-art-android)**
+<br />
 
-[Features](#features) • [Getting Started](#getting-started) • [Build & Test](#build-and-test) • [Privacy](#privacy)
+[![Latest version](https://img.shields.io/github/v/release/SamoTech/mandala-art-android?display_name=tag&style=for-the-badge&label=LATEST%20VERSION)](https://github.com/SamoTech/mandala-art-android/releases/latest)
+[![Android CI](https://img.shields.io/github/actions/workflow/status/SamoTech/mandala-art-android/android-ci.yml?branch=main&style=for-the-badge&label=BUILD)](https://github.com/SamoTech/mandala-art-android/actions/workflows/android-ci.yml)
+![Android](https://img.shields.io/badge/ANDROID-7.0%2B-3DDC84?style=for-the-badge&logo=android&logoColor=white)
+
+<br />
+
+## Make room for a little color
+
+Explore mandala designs, experiment with color palettes, and build a collection of artwork that feels like yours.
+
+<br />
+
+[ **GET THE LATEST APK** ](https://github.com/SamoTech/mandala-art-android/releases/latest)
+
+[Release notes](https://github.com/SamoTech/mandala-art-android/releases) · [Report an issue](https://github.com/SamoTech/mandala-art-android/issues) · [Explore the project](https://github.com/SamoTech/mandala-art-android)
 
 </div>
+
 ---
 
-## About
+## Your creative pause
 
-Mandala Art is an Android coloring app designed for calm, creative downtime. Browse mandala designs, color them with your preferred palette, and revisit your artwork. The app is built with **Kotlin** and **Jetpack Compose**.
+Mandala Art is an Android coloring experience made for creative downtime. Choose a design, color it your way, and return to your artwork whenever you want another moment to create.
 
-> **Development status:** Debug and CI builds are for testing, not production distribution. Google test ad IDs are intentionally enabled during development.
+<table>
+  <tr>
+    <td width="33%" align="center">
+      <h3>✦ Explore</h3>
+      Browse mandala designs and collections.
+    </td>
+    <td width="33%" align="center">
+      <h3>✎ Color</h3>
+      Use coloring tools and palettes to make a design your own.
+    </td>
+    <td width="33%" align="center">
+      <h3>♡ Keep creating</h3>
+      Revisit your personal artwork collection and continue refining your creations.
+    </td>
+  </tr>
+</table>
 
-## Features
+## Designed around creativity
 
-- Mandala design gallery and collections.
-- Coloring tools and color palettes.
-- Personal artwork collection.
-- Undo and redo support in the editing flow.
-- Standard free designs remain available without watching ads.
-- Optional bonus designs use rewarded ads; a design should unlock only after the Google Mobile Ads SDK confirms the reward.
-- Ad failures or simply closing an ad must not grant a reward.
-- Automated Android builds and tests through GitHub Actions.
+- **Mandala gallery** — discover designs and collections.
+- **Color palettes** — make each design your own.
+- **Personal artwork** — keep track of your creations in the app.
+- **Undo and redo** — step back and refine your work while editing.
+- **Free designs** — standard designs are available without watching an ad.
+- **Optional bonus designs** — rewarded ads may be used to unlock additional designs.
 
-Feature availability may change as development continues; check the current source and workflow for the exact implementation.
+> Features can evolve between releases. Check the latest release notes for changes and fixes.
 
-## Technology
+---
 
-| Area | Technology |
+## Get Mandala Art
+
+<div align="center">
+
+### Ready to color?
+
+Download the latest production APK from GitHub Releases.
+
+[ **DOWNLOAD LATEST VERSION** ](https://github.com/SamoTech/mandala-art-android/releases/latest)
+
+<sub>On the release page, open **Assets** and select the file named <code>Mandala-Art-*.apk</code>. Download only releases published by this repository.</sub>
+
+</div>
+
+### Install on Android
+
+1. Open the [latest release](https://github.com/SamoTech/mandala-art-android/releases/latest).
+2. Expand **Assets** and download the APK file.
+3. Open the downloaded APK on your Android device.
+4. If Android asks, allow installation from that source, then follow the on-screen prompts.
+
+**Compatibility:** Android 7.0 (API 24) or later. Android may show a security prompt when installing apps from outside Google Play.
+
+### Verify your download
+
+Production releases include a `SHA256SUMS.txt` file. Use it to verify the APK checksum if you have a checksum utility available. A checksum confirms file integrity; it does not independently prove who published the file, so download from this repository's release page.
+
+---
+
+## Product details
+
+| Detail | Information |
 |---|---|
-| Language | Kotlin |
-| UI | Jetpack Compose |
-| Build | Gradle |
+| Product | Mandala Art — Color, Relax, Create |
 | Platform | Android |
-| Ads | Google Mobile Ads |
-| CI | GitHub Actions |
+| Minimum Android version | Android 7.0 (API 24) |
+| App technology | Kotlin, Jetpack Compose |
+| Distribution | APK through GitHub Releases |
+| Latest version | [View latest release](https://github.com/SamoTech/mandala-art-android/releases/latest) |
 
-## Getting Started
+## Privacy and ads
+
+The app includes Google Mobile Ads integration, including optional rewarded ads for bonus designs. Advertising behavior, data handling, and consent requirements may vary by configuration and release. Review the app's current implementation and the applicable policies before making privacy assumptions. Do not assume that no data is transmitted.
+
+## About this project
+
+Mandala Art is maintained by [SamoTech](https://github.com/SamoTech). The repository includes the Android app source, automated build and test workflow, and production release process.
+
+- [Latest release and changelog](https://github.com/SamoTech/mandala-art-android/releases/latest)
+- [All releases](https://github.com/SamoTech/mandala-art-android/releases)
+- [Build status and workflow](https://github.com/SamoTech/mandala-art-android/actions/workflows/android-ci.yml)
+- [Issues and feedback](https://github.com/SamoTech/mandala-art-android/issues)
+
+<details>
+<summary><strong>For developers: build and test locally</strong></summary>
 
 ### Requirements
 
 - Android Studio and a compatible Android SDK.
-- A JDK compatible with the repository's Gradle wrapper.
-- Android 7.0 (API 24) or later, matching the configured minimum SDK.
+- A JDK compatible with the project's Gradle configuration.
 
-### Clone
+### Clone the repository
 
 ```bash
 git clone https://github.com/SamoTech/mandala-art-android.git
@@ -68,85 +141,38 @@ cd mandala-art-android
 
 Open the project in Android Studio and allow Gradle sync to complete.
 
-## Build and Test
+### Build a debug APK
 
-**Windows — build debug APK**
+**Windows PowerShell**
 
 ```powershell
 .\gradlew.bat assembleDebug
 ```
 
-**macOS/Linux — build debug APK**
+**macOS / Linux**
 
 ```bash
 ./gradlew assembleDebug
 ```
 
-**Run unit tests**
+### Run unit tests
 
 ```bash
 ./gradlew :app:testDebugUnitTest
 ```
 
-On Windows, use ` .\gradlew.bat ` instead of ` ./gradlew `. The debug APK is normally written to `app/build/outputs/apk/debug/app-debug.apk`.
+On Windows, use ` .\gradlew.bat ` in place of ` ./gradlew `. The debug APK is normally generated at `app/build/outputs/apk/debug/app-debug.apk`.
 
-## Continuous Integration and Releases
+Debug builds are for development and testing. They use the debug signing configuration and test ad IDs; they are not the recommended download for end users. Production builds are signed and published by the main-branch GitHub Actions workflow after the required checks succeed.
 
-- [Android CI workflow](https://github.com/SamoTech/mandala-art-android/actions/workflows/android-ci.yml)
-- [Workflow runs](https://github.com/SamoTech/mandala-art-android/actions)
-- [Download the latest production APK](https://github.com/SamoTech/mandala-art-android/releases/latest)
-- [All GitHub Releases](https://github.com/SamoTech/mandala-art-android/releases)
-
-On every successful push to `main`, GitHub Actions builds the debug variant, runs unit tests, and then builds and signs the production APK. The workflow verifies the APK signature, publishes the APK and `SHA256SUMS.txt` as direct assets on a GitHub Release, and keeps a workflow artifact as a backup.
-
-Production releases receive a unique tag in the form `v1.0.RUN_NUMBER`. The Android `versionCode` is set to the monotonically increasing GitHub Actions run number, while `versionName` and the release tag are generated from the configured base version and that run number. This supports Android in-place upgrades, provided the same application ID and compatible signing key are retained.
-
-Debug APKs use the Android debug signing configuration and test ad IDs. They are for development/testing only. Production builds use the configured release signing key and production ad configuration. Before distributing publicly, review privacy/consent requirements, ad policy compliance, store listing, and release readiness.
-
-## Rewarded Ads: Development Safety
-
-Keep `AdMobConstants.USE_TEST_ADS = true` while developing. Do not replace test IDs with production ad unit IDs until the release configuration has been deliberately reviewed.
-
-- Grant bonus access only from the SDK's reward-earned callback.
-- Do not grant rewards when an ad fails to load, fails to show, or closes without a confirmed reward.
-- Ensure a single ad cannot grant duplicate rewards.
-- Review Google Mobile Ads policies, consent requirements, and Google Play Data safety requirements before release.
-
-## Project Structure
-
-```text
-mandala-art-android/
-├── .github/workflows/android-ci.yml
-├── app/src/main/java/com/example/
-│   ├── MainActivity.kt
-│   └── ads/AdMobManager.kt
-├── app/src/test/
-├── gradle/
-├── build.gradle.kts
-├── settings.gradle.kts
-└── README.md
-```
-
-This is a high-level guide; verify exact paths against the current repository tree.
-
-## Banner and Screenshots
-
-The banner referenced above should be committed at `docs/images/mandala-art-readme-banner.png`. Promotional mockups are illustrative, not verified screenshots of the current app. Add genuine app screenshots when available.
-
-## Privacy
-
-Verify the actual implementation's storage, analytics, advertising, and network behavior before making privacy claims. Do not state that all data stays local or that no data is transmitted unless the code and SDK configuration have been audited. Publish a privacy policy and complete applicable Google Play Data safety declarations before release.
-
-## Contributing
-
-For bug reports, include the device model, Android version, steps to reproduce, expected and actual results, and relevant logs with personal information removed. Include the app version or commit SHA when possible. Run relevant Gradle tests before submitting a pull request.
-
-## License
-
-No license is asserted by this README. Add the chosen license file before describing the project as MIT-licensed or otherwise open source.
+</details>
 
 ---
 
 <div align="center">
-<sub>Built with Kotlin and Jetpack Compose · Maintained by <a href="https://github.com/SamoTech">SamoTech</a></sub>
+
+**Mandala Art** · A little space to color, relax, and create.
+
+Maintained with care by [SamoTech](https://github.com/SamoTech).
+
 </div>
