@@ -22,8 +22,10 @@ class MandalaRepository(private val dao: MandalaDao) {
         mandalaId: String,
         coloredRegions: Map<String, Long>,
         totalRegions: Int,
-        isFavorite: Boolean = false
+        isFavorite: Boolean? = null
     ) {
+        val existing = dao.getProgressOnce(mandalaId)
+        val favoriteState = isFavorite ?: existing?.isFavorite ?: false
         val nonDefaultCount = coloredRegions.values.count { it != 0xFFFFFFFFL }
         val percent = if (totalRegions > 0) (nonDefaultCount.toFloat() / totalRegions).coerceIn(0f, 1f) else 0f
         val isCompleted = percent >= 0.999f
@@ -33,7 +35,7 @@ class MandalaRepository(private val dao: MandalaDao) {
             mandalaId = mandalaId,
             coloredRegionsJson = serialized,
             percentCompleted = percent,
-            isFavorite = isFavorite,
+            isFavorite = favoriteState,
             isCompleted = isCompleted,
             lastEditedTimestamp = System.currentTimeMillis()
         )
