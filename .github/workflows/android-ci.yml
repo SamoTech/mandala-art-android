@@ -87,10 +87,37 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
+  detect-production-changes:
+    name: Check whether app changes require a production release
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    outputs:
+      should_release: ${{ steps.filter.outputs.should_release }}
+    steps:
+      - name: Checkout repository history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect app or build changes
+        id: filter
+        shell: bash
+        run: |
+          set -euo pipefail
+          CHANGED_FILES="$(git diff --name-only "${GITHUB_SHA}^1" "${GITHUB_SHA}")"
+          printf '%s\\n' "$CHANGED_FILES"
+          if printf '%s\\n' "$CHANGED_FILES" | grep -Eq '^(app/|gradle/|build\\.gradle(\\.kts)?$|settings\\.gradle(\\.kts)?$|gradle\\.properties$|gradlew$|gradlew\\.bat$)'; then
+            echo "should_release=true" >> "$GITHUB_OUTPUT"
+            echo "Application/build changes detected; production release is eligible."
+          else
+            echo "should_release=false" >> "$GITHUB_OUTPUT"
+            echo "No application/build changes detected; skipping production release."
+          fi
+
   build-sign-and-publish-production:
     name: Build, sign, and publish production release
-    needs: build-and-test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [build-and-test, detect-production-changes]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.detect-production-changes.outputs.should_release == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     permissions:
