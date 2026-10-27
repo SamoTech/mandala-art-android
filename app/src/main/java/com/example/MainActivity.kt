@@ -25,6 +25,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -39,6 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ads.AdMobManager
+import com.example.analytics.AnalyticsTracker
 import com.example.data.MandalaDatabase
 import com.example.data.MandalaRepository
 import com.example.generator.MandalaLibrary
@@ -71,6 +73,7 @@ class MainActivity : ComponentActivity() {
         val database = MandalaDatabase.getInstance(applicationContext)
         val repository = MandalaRepository(database.mandalaDao())
         val appSettings = AppSettings(applicationContext)
+        AnalyticsTracker.initialize(applicationContext)
         val adMobManager = AdMobManager.getInstance(applicationContext)
 
         // Initialize Google UMP Consent and AdMob SDK
@@ -227,6 +230,9 @@ fun MandalaApp(
 
     // Rewarded Ad Voluntary Unlock Dialog
     bonusToUnlock?.let { targetId ->
+        LaunchedEffect(targetId) {
+            AnalyticsTracker.logEvent("rewarded_ad_offered", "content_type", "design")
+        }
         val targetDesign = MandalaLibrary.getDesignById(targetId)
         AlertDialog(
             onDismissRequest = {
@@ -250,6 +256,7 @@ fun MandalaApp(
                     onClick = {
                         if (isAdRequestInProgress) return@Button
                         isAdRequestInProgress = true
+                        AnalyticsTracker.logEvent("rewarded_ad_started", "content_type", "design")
                         val idToUnlock = targetId
                         bonusToUnlock = null
 
@@ -261,7 +268,9 @@ fun MandalaApp(
                             activity = activity,
                             onUserEarnedReward = { _ ->
                                 if (rewardGranted.compareAndSet(false, true)) {
+                                    AnalyticsTracker.logEvent("rewarded_ad_completed", "content_type", "design")
                                     appSettings.unlockDesign(idToUnlock)
+                                    AnalyticsTracker.logEvent("premium_unlock_granted", "content_type", "design")
                                     Toast.makeText(context, "Unlocked \"$designTitle\"! Enjoy coloring.", Toast.LENGTH_SHORT).show()
                                     if (navigated.compareAndSet(false, true)) {
                                         navigateTo(Screen.Editor(idToUnlock))
