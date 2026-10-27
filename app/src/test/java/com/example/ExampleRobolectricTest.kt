@@ -23,6 +23,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlinx.coroutines.runBlocking
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
@@ -269,4 +270,30 @@ class ExampleRobolectricTest {
         val manager = AdMobManager.getInstance(context)
         assertNotNull(manager)
     }
+
+    @Test
+    fun saveProgressPreservesFavoriteStateDuringAutosave() = runBlocking {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val inMemoryDb = Room.inMemoryDatabaseBuilder(context, MandalaDatabase::class.java)
+            .allowMainThreadQueries()
+            .build()
+        try {
+            val repository = MandalaRepository(inMemoryDb.mandalaDao())
+            repository.toggleFavorite("lotus_bloom", currentFav = false)
+
+            repository.saveProgress(
+                mandalaId = "lotus_bloom",
+                coloredRegions = mapOf("petal_0" to MandalaPalettes.defaultColor),
+                totalRegions = MandalaLibrary.getDesignById("lotus_bloom").regionCount
+            )
+
+            val saved = repository.getProgressOnce("lotus_bloom")
+            assertNotNull("Artwork should be saved", saved)
+            assertTrue("Autosaving coloring progress must not remove the favorite flag", saved!!.isFavorite)
+            assertEquals(MandalaPalettes.defaultColor, saved.coloredRegions["petal_0"])
+        } finally {
+            inMemoryDb.close()
+        }
+    }
+
 }
