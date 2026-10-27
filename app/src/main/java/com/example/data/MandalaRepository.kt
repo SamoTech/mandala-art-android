@@ -24,22 +24,35 @@ class MandalaRepository(private val dao: MandalaDao) {
         totalRegions: Int,
         isFavorite: Boolean? = null
     ) {
-        val existing = dao.getProgressOnce(mandalaId)
-        val favoriteState = isFavorite ?: existing?.isFavorite ?: false
         val nonDefaultCount = coloredRegions.values.count { it != 0xFFFFFFFFL }
         val percent = if (totalRegions > 0) (nonDefaultCount.toFloat() / totalRegions).coerceIn(0f, 1f) else 0f
         val isCompleted = percent >= 0.999f
 
         val serialized = serializeColors(coloredRegions)
-        val entity = MandalaProgressEntity(
-            mandalaId = mandalaId,
-            coloredRegionsJson = serialized,
-            percentCompleted = percent,
-            isFavorite = favoriteState,
-            isCompleted = isCompleted,
-            lastEditedTimestamp = System.currentTimeMillis()
+        val timestamp = System.currentTimeMillis()
+        if (isFavorite == null) {
+            // Update progress fields atomically without overwriting a concurrent favorite toggle.
+            val updatedRows = dao.updateProgressPreservingFavorite(
+                mandalaId = mandalaId,
+                coloredRegionsJson = serialized,
+                percentCompleted = percent,
+                isCompleted = isCompleted,
+                lastEditedTimestamp = timestamp
+            )
+            if (updatedRows > 0) return
+        }
+
+        // New artwork starts as not favorite unless the caller explicitly sets the state.
+        dao.saveProgress(
+            MandalaProgressEntity(
+                mandalaId = mandalaId,
+                coloredRegionsJson = serialized,
+                percentCompleted = percent,
+                isFavorite = isFavorite ?: false,
+                isCompleted = isCompleted,
+                lastEditedTimestamp = timestamp
+            )
         )
-        dao.saveProgress(entity)
     }
 
     suspend fun toggleFavorite(mandalaId: String, currentFav: Boolean) {
