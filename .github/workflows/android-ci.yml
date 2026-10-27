@@ -227,6 +227,38 @@ jobs:
           if-no-files-found: error
           retention-days: 90
 
+      - name: Generate release notes and compose release description
+        id: release-notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.version.outputs.release_tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          NOTES="$(gh api --method POST "repos/${GITHUB_REPOSITORY}/releases/generate-notes" \
+            -f tag_name="${RELEASE_TAG}" \
+            -f target_commitish="${GITHUB_SHA}" \
+            --jq '.body')"
+          {
+            printf '%s\\n' '## Mandala Art for Android' ''
+            printf '%s\\n' 'A signed production build of Mandala Art, a mandala coloring studio for Android.' ''
+            printf '%s\\n' '## Download and install' ''
+            printf '%s\\n' "1. Download `Mandala-Art-${RELEASE_TAG}.apk` from the Assets section."
+            printf '%s\\n' '2. Open the APK on your Android device and follow the installation prompts.'
+            printf '%s\\n' '3. To update an existing installation, install over the current app. Do not uninstall the app or clear its data as part of a normal update.' ''
+            printf '%s\\n' '## Build and integrity' ''
+            printf '%s\\n' '- The debug build and unit tests passed in GitHub Actions before publication.'
+            printf '%s\\n' '- The production APK signature was verified with `apksigner`.'
+            printf '%s\\n' '- `SHA256SUMS.txt` contains the APK SHA-256 checksum for integrity verification.' ''
+            printf '%s\\n' '## Changes in this release' ''
+            printf '%s\\n' "${NOTES}"
+          } > release-body.md
+          {
+            echo 'body<<RELEASE_BODY_EOF'
+            cat release-body.md
+            echo 'RELEASE_BODY_EOF'
+          } >> "$GITHUB_OUTPUT"
+
       - name: Publish GitHub production release with direct APK download
         uses: softprops/action-gh-release@v2
         with:
@@ -235,32 +267,9 @@ jobs:
           name: Mandala Art ${{ steps.version.outputs.release_tag }}
           prerelease: false
           make_latest: true
-          generate_release_notes: true
+          generate_release_notes: false
           fail_on_unmatched_files: true
           files: |
             release-assets/Mandala-Art-${{ steps.version.outputs.release_tag }}.apk
             release-assets/SHA256SUMS.txt
-          body: |
-            ## Mandala Art for Android
-
-            A signed production build of Mandala Art, a mandala coloring studio for Android.
-
-            ## What's included
-
-            GitHub's generated release notes below summarize the changes included in this version.
-
-            ## Download and install
-
-            1. Download `Mandala-Art-${{ steps.version.outputs.release_tag }}.apk` from the Assets section.
-            2. Open the APK on your Android device and follow the installation prompts.
-            3. To update an existing installation, install over the current app. Do not uninstall the app or clear its data as part of a normal update.
-
-            ## Build and integrity
-
-            - The debug build and unit tests passed in GitHub Actions before publication.
-            - The production APK signature was verified with `apksigner`.
-            - `SHA256SUMS.txt` contains the APK SHA-256 checksum for integrity verification.
-
-            ## Changes in this release
-
-            See the automatically generated changelog below for the commits and pull requests included in this release.
+          body: ${{ steps.release-notes.outputs.body }}
