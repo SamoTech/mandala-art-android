@@ -105,8 +105,8 @@ jobs:
         run: |
           set -euo pipefail
           CHANGED_FILES="$(git diff --name-only "${GITHUB_SHA}^1" "${GITHUB_SHA}")"
-          printf '%s\\n' "$CHANGED_FILES"
-          if printf '%s\\n' "$CHANGED_FILES" | grep -Eq '^(app/|gradle/|build\\.gradle(\\.kts)?$|settings\\.gradle(\\.kts)?$|gradle\\.properties$|gradlew$|gradlew\\.bat$)'; then
+          printf '%s\n' "$CHANGED_FILES"
+          if printf '%s\n' "$CHANGED_FILES" | grep -Eq '^(app/|gradle/|build\.gradle(\.kts)?$|settings\.gradle(\.kts)?$|gradle\.properties$|gradlew$|gradlew\.bat$)'; then
             echo "should_release=true" >> "$GITHUB_OUTPUT"
             echo "Application/build changes detected; production release is eligible."
           else
