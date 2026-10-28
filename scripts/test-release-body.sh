@@ -25,7 +25,7 @@ test ! -e "$TMP_DIR/SHOULD_NOT_RUN"
 
 DELIMITER="$(sed -n '1s/^body<<//p' "$TMP_DIR/github-output")"
 test -n "$DELIMITER"
-test "$(grep -Fc "$DELIMITER" "$TMP_DIR/github-output")" -eq 1
+test "$(grep -Fc "$DELIMITER" "$TMP_DIR/github-output")" -eq 2
 sed '1d;$d' "$TMP_DIR/github-output" > "$TMP_DIR/extracted-body.md"
 cmp "$TMP_DIR/release-body.md" "$TMP_DIR/extracted-body.md"
 
