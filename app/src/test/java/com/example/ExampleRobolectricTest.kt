@@ -7,6 +7,7 @@ import androidx.test.core.app.ApplicationProvider
 import com.example.ads.AdMobConstants
 import com.example.ads.AdMobManager
 import com.example.data.MandalaDatabase
+import com.example.data.MandalaProgressEntity
 import com.example.data.MandalaRepository
 import com.example.generator.MandalaLibrary
 import com.example.model.MandalaPalettes
@@ -293,6 +294,58 @@ class ExampleRobolectricTest {
             assertEquals(MandalaPalettes.defaultColor, saved.coloredRegions["petal_0"])
         } finally {
             inMemoryDb.close()
+        }
+    }
+
+
+    @Test
+    fun savedProgressSurvivesDatabaseCloseAndReopen() = runBlocking {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val databaseName = "room_persistence_regression_test.db"
+        context.deleteDatabase(databaseName)
+
+        try {
+            val initialDatabase = Room.databaseBuilder(
+                context,
+                MandalaDatabase::class.java,
+                databaseName
+            ).allowMainThreadQueries().build()
+
+            try {
+                initialDatabase.mandalaDao().saveProgress(
+                    MandalaProgressEntity(
+                        mandalaId = "persistence_test_mandala",
+                        coloredRegionsJson = "petal_0:4278190335",
+                        percentCompleted = 0.25f,
+                        isFavorite = true,
+                        isCompleted = false,
+                        lastEditedTimestamp = 123456789L
+                    )
+                )
+            } finally {
+                initialDatabase.close()
+            }
+
+            val reopenedDatabase = Room.databaseBuilder(
+                context,
+                MandalaDatabase::class.java,
+                databaseName
+            ).allowMainThreadQueries().build()
+
+            try {
+                val restored = reopenedDatabase.mandalaDao()
+                    .getProgressOnce("persistence_test_mandala")
+
+                assertNotNull("Saved progress must remain after reopening the database", restored)
+                assertEquals("petal_0:4278190335", restored!!.coloredRegionsJson)
+                assertEquals(0.25f, restored.percentCompleted, 0.0001f)
+                assertTrue("Favorite state must survive database reopening", restored.isFavorite)
+                assertEquals(123456789L, restored.lastEditedTimestamp)
+            } finally {
+                reopenedDatabase.close()
+            }
+        } finally {
+            context.deleteDatabase(databaseName)
         }
     }
 
