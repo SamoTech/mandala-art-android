@@ -39,6 +39,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
@@ -48,6 +49,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -60,10 +62,13 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.R
+import com.example.data.CloudSaveManager
+import kotlinx.coroutines.launch
 import com.example.ui.theme.PinkAccent
 import com.example.ui.theme.PurplePrimary
 import com.example.util.AppSettings
@@ -73,6 +78,7 @@ import com.example.util.AppSettings
 fun SettingsScreen(
     appSettings: AppSettings,
     onManageConsent: (() -> Unit)? = null,
+    cloudSaveManager: CloudSaveManager? = null,
     onNavigateBack: () -> Unit
 ) {
     val soundEnabled by appSettings.soundEnabled.collectAsState()
@@ -81,6 +87,12 @@ fun SettingsScreen(
 
     var showPrivacyPolicyDialog by remember { mutableStateOf(false) }
     var showLicensesDialog by remember { mutableStateOf(false) }
+    var cloudEmail by remember { mutableStateOf("") }
+    var cloudPassword by remember { mutableStateOf("") }
+    var createCloudAccount by remember { mutableStateOf(false) }
+    var cloudBusy by remember { mutableStateOf(false) }
+    var cloudMessage by remember { mutableStateOf<String?>(null) }
+    val cloudScope = rememberCoroutineScope()
 
     val outlineColorOptions = listOf(
         Pair("Classic Black", 0xFF212121L),
@@ -392,6 +404,118 @@ fun SettingsScreen(
                     }
                 }
 
+                // Optional cloud save section. Local Room saves remain available without an account.
+                if (cloudSaveManager != null) {
+                    Text(
+                        text = "Cloud Save",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Card(
+                        shape = RoundedCornerShape(18.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            val signedInUser = cloudSaveManager.currentUser
+                            if (signedInUser != null) {
+                                Text("Signed in as ${signedInUser.email ?: "Firebase user"}")
+                                Text(
+                                    "Your local progress stays available offline. Sync uploads or restores the newest saved record per mandala.",
+                                    fontSize = 12.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Button(
+                                    onClick = {
+                                        cloudScope.launch {
+                                            cloudBusy = true
+                                            cloudMessage = null
+                                            cloudMessage = try {
+                                                cloudSaveManager.syncProgress()
+                                                "Cloud sync completed."
+                                            } catch (error: Exception) {
+                                                error.localizedMessage ?: "Cloud sync failed. Check your connection and Firestore rules."
+                                            }
+                                            cloudBusy = false
+                                        }
+                                    },
+                                    enabled = !cloudBusy,
+                                    modifier = Modifier.fillMaxWidth().testTag("btn_cloud_sync")
+                                ) { Text(if (cloudBusy) "Syncing..." else "Sync Progress") }
+                                OutlinedButton(
+                                    onClick = {
+                                        cloudSaveManager.signOut()
+                                        cloudMessage = "Signed out. Local progress remains on this device."
+                                    },
+                                    enabled = !cloudBusy,
+                                    modifier = Modifier.fillMaxWidth().testTag("btn_cloud_sign_out")
+                                ) { Text("Sign Out") }
+                            } else {
+                                Text(
+                                    "Create an account or sign in to back up your coloring progress across devices.",
+                                    fontSize = 13.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                OutlinedTextField(
+                                    value = cloudEmail,
+                                    onValueChange = { cloudEmail = it },
+                                    label = { Text("Email") },
+                                    singleLine = true,
+                                    modifier = Modifier.fillMaxWidth().testTag("field_cloud_email")
+                                )
+                                OutlinedTextField(
+                                    value = cloudPassword,
+                                    onValueChange = { cloudPassword = it },
+                                    label = { Text("Password (at least 6 characters)") },
+                                    singleLine = true,
+                                    visualTransformation = PasswordVisualTransformation(),
+                                    modifier = Modifier.fillMaxWidth().testTag("field_cloud_password")
+                                )
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Switch(
+                                        checked = createCloudAccount,
+                                        onCheckedChange = { createCloudAccount = it },
+                                        enabled = !cloudBusy
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(if (createCloudAccount) "Create new account" else "I already have an account")
+                                }
+                                Button(
+                                    onClick = {
+                                        cloudScope.launch {
+                                            cloudBusy = true
+                                            cloudMessage = null
+                                            cloudMessage = try {
+                                                if (createCloudAccount) {
+                                                    cloudSaveManager.createAccount(cloudEmail, cloudPassword)
+                                                } else {
+                                                    cloudSaveManager.signIn(cloudEmail, cloudPassword)
+                                                }
+                                                cloudPassword = ""
+                                                "Signed in. Cloud sync completed."
+                                            } catch (error: Exception) {
+                                                error.localizedMessage ?: "Could not sign in. Check your details and connection."
+                                            }
+                                            cloudBusy = false
+                                        }
+                                    },
+                                    enabled = !cloudBusy && cloudEmail.contains("@") && cloudPassword.length >= 6,
+                                    modifier = Modifier.fillMaxWidth().testTag("btn_cloud_auth")
+                                ) {
+                                    Text(if (cloudBusy) "Please wait..." else if (createCloudAccount) "Create Account & Sync" else "Sign In & Sync")
+                                }
+                            }
+                            cloudMessage?.let {
+                                Text(it, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                        }
+                    }
+                }
+
                 // About Mandala Art Section
                 Text(
                     text = stringResource(R.string.settings_about),
@@ -450,7 +574,7 @@ fun SettingsScreen(
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
-                            text = "• 24 original algorithmic vector designs\n• 100% offline & private with local storage\n• 5 relaxing curated color themes\n• Unlimited Undo & Redo with zoom & pan",
+                            text = "• 24 original algorithmic vector designs\n• Offline-first local saves with optional cloud backup\n• 5 relaxing curated color themes\n• Unlimited Undo & Redo with zoom & pan",
                             fontSize = 12.sp,
                             lineHeight = 18.sp,
                             color = MaterialTheme.colorScheme.onSurface
@@ -475,8 +599,8 @@ fun SettingsScreen(
                         .verticalScroll(rememberScrollState())
                 ) {
                     Text(
-                        text = "1. Zero Personal Data Collected by App:\n" +
-                                "Mandala Art does not collect names, emails, phone numbers, contacts, accounts, photos, or precise location. All your coloring progress, favorites, and settings are stored locally on your device in an isolated SQLite database.\n\n" +
+                        text = "1. Optional Cloud Save:\n" +
+                                "Account creation is optional. If you create an account, Firebase Authentication processes your email address. When you manually sync, your coloring progress, colors, favorites, completion status, and timestamps are stored in Cloud Firestore under your account. Without signing in, progress remains local.\n\n" +
                                 "2. Advertising & Third-Party SDKs:\n" +
                                 "The app uses Google AdMob (Google Mobile Ads SDK) to show non-intrusive ads and voluntary rewarded video unlocks. Google AdMob may process device identifiers (such as Android Advertising ID), coarse IP address, and interaction diagnostics for ad serving and fraud detection.\n\n" +
                                 "3. User Consent (GDPR / CCPA):\n" +
@@ -484,7 +608,7 @@ fun SettingsScreen(
                                 "4. Children's Privacy:\n" +
                                 "We treat ads as General Audience (Content Rating G) and do not knowingly collect personal information from children under 13.\n\n" +
                                 "5. Data Deletion:\n" +
-                                "You can delete all your coloring progress anytime using the 'Reset' or 'Delete' buttons within the app, or by clearing storage in Android App Settings.",
+                                "Local progress can be deleted using the app controls or Android App Settings. Signing out does not delete cloud saves. Contact the project maintainers to request deletion of cloud account data.",
                         fontSize = 12.sp,
                         lineHeight = 18.sp
                     )

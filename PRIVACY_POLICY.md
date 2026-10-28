@@ -1,6 +1,6 @@
 # Privacy Policy for Mandala Art — Color, Relax, Create
 
-**Last Updated:** October 26, 2026
+**Last Updated:** October 28, 2026
 
 Mandala Art ("the Application") is an offline-first coloring app. This policy explains what the app stores on your device, what information may be processed by its advertising services, and the choices available to you.
 
@@ -8,10 +8,10 @@ Mandala Art ("the Application") is an offline-first coloring app. This policy ex
 
 ### 1. Information Stored by the Application
 
-- The Application does not require account creation, login, or registration.
-- The Application does not ask you to provide your name, email address, physical address, phone number, contacts, or payment details.
-- Coloring progress, custom color choices, favorites, app settings, and related artwork records are stored locally on your device using Android Room / SQLite and SharedPreferences.
-- The app's own functionality is designed to keep coloring progress and artwork on your device; it does not require a Mandala Art account or app-operated cloud service to use these features.
+- Account creation is optional. Users who choose Cloud Save can create an account with an email address and password through Firebase Authentication.
+- Without signing in, coloring progress and favorites remain stored locally on the device using Android Room / SQLite.
+- If a user signs in and manually syncs, saved mandala progress, color-region data, completion percentage, favorite/completion flags, and edit timestamps are sent to Cloud Firestore under that Firebase user ID so the progress can be restored on another device.
+- Firebase processes account credentials and cloud-save data under Google's applicable terms and privacy documentation. Cloud Save does not require contacts, physical address, or payment details.
 - Exported mandala PNG images are prepared in the app's private cache and shared only when you choose to use Android's system share interface. Once shared, the receiving app or service handles the image under its own policies.
 
 ---
@@ -49,6 +49,7 @@ The Application does not require children or other users to submit personal deta
 ### 5. Data Retention, Backup, and Deletion
 
 - **Local storage:** App data remains in the app's local storage until it is deleted or the app is uninstalled, subject to Android's backup and restore behavior.
+- **Cloud Save:** Signing out does not delete cloud data. This initial version does not provide an in-app cloud-data deletion control. To request deletion of the Firebase account and associated cloud-save records, contact the project maintainers using the repository issue link below; do not post private account details publicly.
 - **Delete one artwork's progress:** Use **Reset** in that mandala's editor to clear its saved progress, or delete the relevant saved artwork from **My Art**.
 - **Delete all app-local data:** Open **Android Settings > Apps > Mandala Art > Storage** and select **Clear data** (the wording may differ by device). Uninstalling the app also removes its local app data, subject to any backup or restore process.
 - **Backups and device transfer:** The app's Android backup configuration includes its local database and preferences. Whether data is actually backed up or restored depends on Android, device, account, and backup settings. Data restored from a backup may reappear after reinstalling or moving to another device.

@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ads.AdMobManager
 import com.example.analytics.AnalyticsTracker
+import com.example.data.CloudSaveManager
 import com.example.data.MandalaDatabase
 import com.example.data.MandalaRepository
 import com.example.generator.MandalaLibrary
@@ -72,6 +73,7 @@ class MainActivity : ComponentActivity() {
 
         val database = MandalaDatabase.getInstance(applicationContext)
         val repository = MandalaRepository(database.mandalaDao())
+        val cloudSaveManager = CloudSaveManager(database.mandalaDao())
         val appSettings = AppSettings(applicationContext)
         AnalyticsTracker.initialize(applicationContext)
         val adMobManager = AdMobManager.getInstance(applicationContext)
@@ -90,7 +92,8 @@ class MainActivity : ComponentActivity() {
                         activity = this,
                         repository = repository,
                         appSettings = appSettings,
-                        adMobManager = adMobManager
+                        adMobManager = adMobManager,
+                        cloudSaveManager = cloudSaveManager
                     )
                 }
             }
@@ -103,7 +106,8 @@ fun MandalaApp(
     activity: Activity,
     repository: MandalaRepository,
     appSettings: AppSettings,
-    adMobManager: AdMobManager
+    adMobManager: AdMobManager,
+    cloudSaveManager: CloudSaveManager
 ) {
     val context = LocalContext.current
     val screenStack = remember { mutableStateListOf<Screen>(Screen.Home) }
@@ -219,6 +223,7 @@ fun MandalaApp(
             is Screen.Settings -> {
                 SettingsScreen(
                     appSettings = appSettings,
+                    cloudSaveManager = cloudSaveManager,
                     onManageConsent = {
                         adMobManager.showPrivacyOptionsForm(activity)
                     },

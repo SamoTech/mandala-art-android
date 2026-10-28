@@ -58,7 +58,7 @@ class MandalaRepository(private val dao: MandalaDao) {
     suspend fun toggleFavorite(mandalaId: String, currentFav: Boolean) {
         val existing = dao.getProgressOnce(mandalaId)
         if (existing != null) {
-            dao.updateFavorite(mandalaId, !currentFav)
+            dao.updateFavorite(mandalaId, !currentFav, System.currentTimeMillis())
         } else {
             // Create initial entry with favorite flagged
             dao.saveProgress(
