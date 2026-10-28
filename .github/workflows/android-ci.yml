@@ -268,10 +268,13 @@ jobs:
             printf '%s\n' '## Changes in this release' ''
             printf '%s\n' "${NOTES}"
           } > release-body.md
+          # Use a per-run delimiter so generated release notes cannot terminate
+          # the multiline GITHUB_OUTPUT value early.
+          OUTPUT_DELIMITER="RELEASE_BODY_$(openssl rand -hex 16)"
           {
-            echo 'body<<RELEASE_BODY_EOF'
+            echo "body<<${OUTPUT_DELIMITER}"
             cat release-body.md
-            echo 'RELEASE_BODY_EOF'
+            echo "${OUTPUT_DELIMITER}"
           } >> "$GITHUB_OUTPUT"
 
       - name: Publish GitHub production release with direct APK download
