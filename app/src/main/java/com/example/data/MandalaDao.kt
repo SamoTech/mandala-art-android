@@ -17,6 +17,12 @@ interface MandalaDao {
     @Query("SELECT * FROM mandala_progress WHERE mandalaId = :mandalaId LIMIT 1")
     suspend fun getProgressOnce(mandalaId: String): MandalaProgressEntity?
 
+    @Query("SELECT * FROM mandala_progress ORDER BY lastEditedTimestamp DESC")
+    suspend fun getAllProgressOnce(): List<MandalaProgressEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertProgress(entity: MandalaProgressEntity)
+
     @Query("""
         UPDATE mandala_progress
         SET coloredRegionsJson = :coloredRegionsJson,
