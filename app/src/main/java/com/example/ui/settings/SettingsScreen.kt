@@ -571,7 +571,7 @@ fun SettingsScreen(
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
-                            text = "• 24 original algorithmic vector designs\n• 100% offline & private with local storage\n• 5 relaxing curated color themes\n• Unlimited Undo & Redo with zoom & pan",
+                            text = "• 24 original algorithmic vector designs\n• Offline-first local saves with optional cloud backup\n• 5 relaxing curated color themes\n• Unlimited Undo & Redo with zoom & pan",
                             fontSize = 12.sp,
                             lineHeight = 18.sp,
                             color = MaterialTheme.colorScheme.onSurface
@@ -596,8 +596,8 @@ fun SettingsScreen(
                         .verticalScroll(rememberScrollState())
                 ) {
                     Text(
-                        text = "1. Zero Personal Data Collected by App:\n" +
-                                "Mandala Art does not collect names, emails, phone numbers, contacts, accounts, photos, or precise location. All your coloring progress, favorites, and settings are stored locally on your device in an isolated SQLite database.\n\n" +
+                        text = "1. Optional Cloud Save:\n" +
+                                "Account creation is optional. If you create an account, Firebase Authentication processes your email address. When you manually sync, your coloring progress, colors, favorites, completion status, and timestamps are stored in Cloud Firestore under your account. Without signing in, progress remains local.\n\n" +
                                 "2. Advertising & Third-Party SDKs:\n" +
                                 "The app uses Google AdMob (Google Mobile Ads SDK) to show non-intrusive ads and voluntary rewarded video unlocks. Google AdMob may process device identifiers (such as Android Advertising ID), coarse IP address, and interaction diagnostics for ad serving and fraud detection.\n\n" +
                                 "3. User Consent (GDPR / CCPA):\n" +
@@ -605,7 +605,7 @@ fun SettingsScreen(
                                 "4. Children's Privacy:\n" +
                                 "We treat ads as General Audience (Content Rating G) and do not knowingly collect personal information from children under 13.\n\n" +
                                 "5. Data Deletion:\n" +
-                                "You can delete all your coloring progress anytime using the 'Reset' or 'Delete' buttons within the app, or by clearing storage in Android App Settings.",
+                                "Local progress can be deleted using the app controls or Android App Settings. Signing out does not delete cloud saves. Contact the project maintainers to request deletion of cloud account data."
                         fontSize = 12.sp,
                         lineHeight = 18.sp
                     )
