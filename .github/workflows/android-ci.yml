@@ -67,6 +67,9 @@ jobs:
       - name: Run unit tests
         run: ./gradlew --no-daemon testDebugUnitTest
 
+      - name: Smoke-test release description without publishing
+        run: bash scripts/test-release-body.sh
+
       - name: Upload debug APK
         if: success()
         uses: actions/upload-artifact@v4
@@ -102,16 +105,31 @@ jobs:
       - name: Detect app or build changes
         id: filter
         shell: bash
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+          AFTER_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
-          CHANGED_FILES="$(git diff --name-only "${GITHUB_SHA}^1" "${GITHUB_SHA}")"
+
+          # An all-zero before SHA represents an initial push/new branch.
+          # Compare the pushed tree against an empty tree in that case.
+          if [[ -z "${BEFORE_SHA}" || "${BEFORE_SHA}" =~ ^0+$ ]]; then
+            DIFF_BASE="$(git hash-object -t tree /dev/null)"
+          elif git cat-file -e "${BEFORE_SHA}^{commit}" 2>/dev/null; then
+            DIFF_BASE="$BEFORE_SHA"
+          else
+            echo "::error::Push before SHA is not available locally; refusing to silently skip a potential production release."
+            exit 1
+          fi
+
+          CHANGED_FILES="$(git diff --name-only "$DIFF_BASE" "$AFTER_SHA")"
           printf '%s\n' "$CHANGED_FILES"
           if printf '%s\n' "$CHANGED_FILES" | grep -Eq '^(app/|gradle/|build\.gradle(\.kts)?$|settings\.gradle(\.kts)?$|gradle\.properties$|gradlew$|gradlew\.bat$)'; then
             echo "should_release=true" >> "$GITHUB_OUTPUT"
-            echo "Application/build changes detected; production release is eligible."
+            echo "Application/build changes detected in the pushed range; production release is eligible."
           else
             echo "should_release=false" >> "$GITHUB_OUTPUT"
-            echo "No application/build changes detected; skipping production release."
+            echo "No application/build changes detected in the pushed range; skipping production release."
           fi
 
   build-sign-and-publish-production:
@@ -227,6 +245,20 @@ jobs:
           if-no-files-found: error
           retention-days: 90
 
+      - name: Generate release notes and compose release description
+        id: release-notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.version.outputs.release_tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          NOTES="$(gh api --method POST "repos/${GITHUB_REPOSITORY}/releases/generate-notes" \
+            -f tag_name="${RELEASE_TAG}" \
+            -f target_commitish="${GITHUB_SHA}" \
+            --jq '.body')"
+          export NOTES
+          bash scripts/compose-release-body.sh
       - name: Publish GitHub production release with direct APK download
         uses: softprops/action-gh-release@v2
         with:
@@ -235,32 +267,9 @@ jobs:
           name: Mandala Art ${{ steps.version.outputs.release_tag }}
           prerelease: false
           make_latest: true
-          generate_release_notes: true
+          generate_release_notes: false
           fail_on_unmatched_files: true
           files: |
             release-assets/Mandala-Art-${{ steps.version.outputs.release_tag }}.apk
             release-assets/SHA256SUMS.txt
-          body: |
-            ## Mandala Art for Android
-
-            A signed production build of Mandala Art, a mandala coloring studio for Android.
-
-            ## What's included
-
-            GitHub's generated release notes below summarize the changes included in this version.
-
-            ## Download and install
-
-            1. Download `Mandala-Art-${{ steps.version.outputs.release_tag }}.apk` from the Assets section.
-            2. Open the APK on your Android device and follow the installation prompts.
-            3. To update an existing installation, install over the current app. Do not uninstall the app or clear its data as part of a normal update.
-
-            ## Build and integrity
-
-            - The debug build and unit tests passed in GitHub Actions before publication.
-            - The production APK signature was verified with `apksigner`.
-            - `SHA256SUMS.txt` contains the APK SHA-256 checksum for integrity verification.
-
-            ## Changes in this release
-
-            See the automatically generated changelog below for the commits and pull requests included in this release.
+          body: ${{ steps.release-notes.outputs.body }}
