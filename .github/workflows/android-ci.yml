@@ -102,16 +102,31 @@ jobs:
       - name: Detect app or build changes
         id: filter
         shell: bash
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+          AFTER_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
-          CHANGED_FILES="$(git diff --name-only "${GITHUB_SHA}^1" "${GITHUB_SHA}")"
+
+          # An all-zero before SHA represents an initial push/new branch.
+          # Compare the pushed tree against an empty tree in that case.
+          if [[ -z "${BEFORE_SHA}" || "${BEFORE_SHA}" =~ ^0+$ ]]; then
+            DIFF_BASE="$(git hash-object -t tree /dev/null)"
+          elif git cat-file -e "${BEFORE_SHA}^{commit}" 2>/dev/null; then
+            DIFF_BASE="$BEFORE_SHA"
+          else
+            echo "::error::Push before SHA is not available locally; refusing to silently skip a potential production release."
+            exit 1
+          fi
+
+          CHANGED_FILES="$(git diff --name-only "$DIFF_BASE" "$AFTER_SHA")"
           printf '%s\n' "$CHANGED_FILES"
           if printf '%s\n' "$CHANGED_FILES" | grep -Eq '^(app/|gradle/|build\.gradle(\.kts)?$|settings\.gradle(\.kts)?$|gradle\.properties$|gradlew$|gradlew\.bat$)'; then
             echo "should_release=true" >> "$GITHUB_OUTPUT"
-            echo "Application/build changes detected; production release is eligible."
+            echo "Application/build changes detected in the pushed range; production release is eligible."
           else
             echo "should_release=false" >> "$GITHUB_OUTPUT"
-            echo "No application/build changes detected; skipping production release."
+            echo "No application/build changes detected in the pushed range; skipping production release."
           fi
 
   build-sign-and-publish-production:
