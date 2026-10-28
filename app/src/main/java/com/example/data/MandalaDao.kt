@@ -42,8 +42,8 @@ interface MandalaDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun saveProgress(entity: MandalaProgressEntity)
 
-    @Query("UPDATE mandala_progress SET isFavorite = :isFav WHERE mandalaId = :mandalaId")
-    suspend fun updateFavorite(mandalaId: String, isFav: Boolean)
+    @Query("UPDATE mandala_progress SET isFavorite = :isFav, lastEditedTimestamp = :timestamp WHERE mandalaId = :mandalaId")
+    suspend fun updateFavorite(mandalaId: String, isFav: Boolean, timestamp: Long)
 
     @Query("DELETE FROM mandala_progress WHERE mandalaId = :mandalaId")
     suspend fun deleteProgress(mandalaId: String)
