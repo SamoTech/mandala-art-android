@@ -19,7 +19,7 @@ abstract class MandalaDatabase : RoomDatabase() {
                     context.applicationContext,
                     MandalaDatabase::class.java,
                     "mandala_art_db"
-                ).fallbackToDestructiveMigration().build()
+                ).build()
                 INSTANCE = instance
                 instance
             }
