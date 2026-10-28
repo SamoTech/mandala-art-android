@@ -62,6 +62,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -471,6 +472,7 @@ fun SettingsScreen(
                                     onValueChange = { cloudPassword = it },
                                     label = { Text("Password (at least 6 characters)") },
                                     singleLine = true,
+                                    visualTransformation = PasswordVisualTransformation(),
                                     modifier = Modifier.fillMaxWidth().testTag("field_cloud_password")
                                 )
                                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -493,6 +495,7 @@ fun SettingsScreen(
                                                 } else {
                                                     cloudSaveManager.signIn(cloudEmail, cloudPassword)
                                                 }
+                                                cloudPassword = ""
                                                 "Signed in. Cloud sync completed."
                                             } catch (error: Exception) {
                                                 error.localizedMessage ?: "Could not sign in. Check your details and connection."
