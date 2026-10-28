@@ -605,7 +605,7 @@ fun SettingsScreen(
                                 "4. Children's Privacy:\n" +
                                 "We treat ads as General Audience (Content Rating G) and do not knowingly collect personal information from children under 13.\n\n" +
                                 "5. Data Deletion:\n" +
-                                "Local progress can be deleted using the app controls or Android App Settings. Signing out does not delete cloud saves. Contact the project maintainers to request deletion of cloud account data."
+                                "Local progress can be deleted using the app controls or Android App Settings. Signing out does not delete cloud saves. Contact the project maintainers to request deletion of cloud account data.",
                         fontSize = 12.sp,
                         lineHeight = 18.sp
                     )
