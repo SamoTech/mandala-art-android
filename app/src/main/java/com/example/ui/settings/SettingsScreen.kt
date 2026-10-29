@@ -640,7 +640,7 @@ fun SettingsScreen(
                 ) {
                     Text(
                         text = "1. Mandala Art Original Artwork:\n" +
-                                "All 24 mandala artwork patterns and line-art designs in this application are original algorithmic vector works mathematically generated for Mandala Art. Copyright (c) 2026 Mandala Art Project.\n\n" +
+                                "All 86 mandala artwork patterns and line-art designs in this application are original algorithmic vector works mathematically generated for Mandala Art. Copyright (c) 2026 Mandala Art Project.\n\n" +
                                 "2. Android Jetpack & Libraries:\n" +
                                 "Licensed under the Apache License, Version 2.0 (the 'License').\n" +
                                 "Includes:\n" +
