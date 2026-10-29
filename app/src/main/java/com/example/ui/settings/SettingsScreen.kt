@@ -574,7 +574,7 @@ fun SettingsScreen(
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
-                            text = "• 24 original algorithmic vector designs\n• Offline-first local saves with optional cloud backup\n• 5 relaxing curated color themes\n• Unlimited Undo & Redo with zoom & pan",
+                            text = "• 86 original algorithmic vector designs\n• Offline-first local saves with optional cloud backup\n• 5 relaxing curated color themes\n• Unlimited Undo & Redo with zoom & pan",
                             fontSize = 12.sp,
                             lineHeight = 18.sp,
                             color = MaterialTheme.colorScheme.onSurface
@@ -603,6 +603,7 @@ fun SettingsScreen(
                                 "Account creation is optional. If you create an account, Firebase Authentication processes your email address. When you manually sync, your coloring progress, colors, favorites, completion status, and timestamps are stored in Cloud Firestore under your account. Without signing in, progress remains local.\n\n" +
                                 "2. Advertising & Third-Party SDKs:\n" +
                                 "The app uses Google AdMob (Google Mobile Ads SDK) to show non-intrusive ads and voluntary rewarded video unlocks. Google AdMob may process device identifiers (such as Android Advertising ID), coarse IP address, and interaction diagnostics for ad serving and fraud detection.\n\n" +
+                                "The app also uses Firebase Analytics with a small, fixed set of app events: when a design is opened, when coloring is started, when a rewarded ad is offered, started, or completed, and when premium content is unlocked. These events include only a coarse content category, never artwork images, colors, or coloring progress. Firebase also collects an app instance identifier and standard app lifecycle and technical information.\n\n" +
                                 "3. User Consent (GDPR / CCPA):\n" +
                                 "In regions requiring consent (such as the European Economic Area and UK), Google User Messaging Platform (UMP) requests your consent for personalized ads before ads are requested. You can update your consent at any time in Settings.\n\n" +
                                 "4. Children's Privacy:\n" +
