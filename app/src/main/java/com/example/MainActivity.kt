@@ -253,7 +253,7 @@ fun MandalaApp(
             },
             text = {
                 Text(
-                    text = "Would you like to watch a short sponsored video to unlock \"${targetDesign.title}\" permanently? You can also continue enjoying all 22 free designs anytime."
+                    text = "Would you like to watch a short sponsored video to unlock \"${targetDesign.title}\" permanently? You can also continue enjoying all 34 free designs anytime."
                 )
             },
             confirmButton = {
@@ -288,7 +288,7 @@ fun MandalaApp(
                                     // Ad was closed or dismissed without earning reward: NEVER unlock bonus design
                                     Toast.makeText(
                                         context,
-                                        "Video was not completed. Watch the full video to unlock \"$designTitle\", or enjoy all 22 free designs anytime.",
+                                        "Video was not completed. Watch the full video to unlock \"$designTitle\", or enjoy all 34 free designs anytime.",
                                         Toast.LENGTH_LONG
                                     ).show()
                                 }
@@ -345,7 +345,7 @@ fun MandalaApp(
             },
             text = {
                 Text(
-                    text = "The sponsored video for \"${targetDesign.title}\" is not ready yet. Please check your internet connection and try again in a few moments.\n\nAll 22 standard mandala designs remain free and open to color without ads!"
+                    text = "The sponsored video for \"${targetDesign.title}\" is not ready yet. Please check your internet connection and try again in a few moments.\n\nAll 34 standard mandala designs remain free and open to color without ads!"
                 )
             },
             confirmButton = {
