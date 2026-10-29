@@ -1,6 +1,6 @@
 # Privacy Policy for Mandala Art — Color, Relax, Create
 
-**Last Updated:** October 28, 2026
+**Last Updated:** October 29, 2026
 
 Mandala Art ("the Application") is an offline-first coloring app. This policy explains what the app stores on your device, what information may be processed by its advertising services, and the choices available to you.
 
@@ -27,6 +27,8 @@ When the advertising SDK operates, Google Mobile Ads may automatically collect o
 - Diagnostic and performance information, including information used to help detect fraud and abuse.
 
 These practices are controlled in part by Google and may vary with SDK version, device settings, consent status, and the features used. The app does not receive all information processed by the advertising SDK. Review Google's [Google Mobile Ads data disclosure](https://developers.google.com/admob/android/privacy/play-data-disclosure) and [Advertising Privacy Policy](https://policies.google.com/technologies/ads) for more information.
+
+The Application also uses **Firebase Analytics** to understand how features are used. The app logs a small, fixed set of app events: when a design is opened, when coloring is started, when a rewarded ad is offered, started, or completed, and when premium content is unlocked. Each event includes only a coarse content category (for example "mandala", "design", or "color"); artwork images, colors, and coloring progress are not sent to Firebase Analytics. Firebase Analytics also collects standard technical data automatically, such as an app instance identifier, approximate device and app information, and app lifecycle events. This information is processed by Google under [Google's Privacy Policy](https://policies.google.com/privacy).
 
 ---
 
