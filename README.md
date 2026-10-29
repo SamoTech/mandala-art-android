@@ -92,7 +92,7 @@ No artistic experience needed. Start with a mandala, explore your palette, and t
 
 ### ◉ A gallery of patterns
 
-Explore **24 original algorithmic mandala designs**, from floral geometry to intricate symmetrical forms.
+Explore **86 algorithmic mandala designs** — 24 hand-crafted originals plus 62 generated variations — from floral geometry to intricate symmetrical forms. 34 designs are available free; others can be unlocked through optional rewarded ads.
 
 </td>
 <td width="50%" valign="top">
@@ -219,6 +219,12 @@ Read the project's [Privacy Policy](PRIVACY_POLICY.md) for more information. Adv
 ```bash
 git clone https://github.com/SamoTech/mandala-art-android.git
 cd mandala-art-android
+```
+
+The repository pins Gradle 9.3.1 via `gradle/wrapper/gradle-wrapper.properties`, but the Gradle wrapper scripts are not committed; CI generates them automatically. For a local build, generate them once using an installed Gradle 9.3.1:
+
+```bash
+gradle wrapper --gradle-version 9.3.1 --distribution-type bin
 ```
 
 Open the project in Android Studio and allow Gradle sync to finish.
