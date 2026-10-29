@@ -78,6 +78,10 @@ class MandalaRepository(private val dao: MandalaDao) {
         dao.deleteProgress(mandalaId)
     }
 
+    suspend fun resetProgress(mandalaId: String) {
+        dao.resetProgress(mandalaId)
+    }
+
     companion object {
         fun serializeColors(map: Map<String, Long>): String {
             if (map.isEmpty()) return ""
