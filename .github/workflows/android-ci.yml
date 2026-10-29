@@ -67,6 +67,19 @@ jobs:
       - name: Run unit tests
         run: ./gradlew --no-daemon testDebugUnitTest
 
+      - name: Run Android Lint (non-blocking)
+        continue-on-error: true
+        run: ./gradlew --no-daemon lintDebug
+
+      - name: Upload lint report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mandala-art-lint-report
+          path: app/build/reports/
+          if-no-files-found: ignore
+          retention-days: 14
+
       - name: Smoke-test release description without publishing
         run: bash scripts/test-release-body.sh
 
