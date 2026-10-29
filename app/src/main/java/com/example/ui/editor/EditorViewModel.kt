@@ -150,7 +150,7 @@ class EditorViewModel(
         _coloredRegions.value = emptyMap()
 
         viewModelScope.launch {
-            repository.deleteProgress(mandalaId)
+            repository.resetProgress(mandalaId)
         }
     }
 

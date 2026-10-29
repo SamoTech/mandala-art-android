@@ -16,6 +16,7 @@ import com.example.util.AppSettings
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -346,6 +347,53 @@ class ExampleRobolectricTest {
             }
         } finally {
             context.deleteDatabase(databaseName)
+        }
+    }
+
+    @Test
+    fun resetProgressKeepsFavoriteRecordAndRemovesNonFavoriteRecord() = runBlocking {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val inMemoryDb = Room.inMemoryDatabaseBuilder(context, MandalaDatabase::class.java)
+            .allowMainThreadQueries()
+            .build()
+        try {
+            val dao = inMemoryDb.mandalaDao()
+
+            // Favorite artwork: reset must preserve the record and the favorite flag.
+            dao.saveProgress(
+                MandalaProgressEntity(
+                    mandalaId = "reset_favorite_mandala",
+                    coloredRegionsJson = "petal_0:4278190335",
+                    percentCompleted = 0.5f,
+                    isFavorite = true,
+                    isCompleted = false,
+                    lastEditedTimestamp = 100L
+                )
+            )
+            dao.resetProgress("reset_favorite_mandala")
+
+            val favoriteAfterReset = dao.getProgressOnce("reset_favorite_mandala")
+            assertNotNull("Favorite record must survive reset", favoriteAfterReset)
+            assertTrue("Favorite flag must survive reset", favoriteAfterReset!!.isFavorite)
+            assertEquals("Colored regions must be cleared by reset", "", favoriteAfterReset.coloredRegionsJson)
+            assertEquals("Completion percentage must be cleared by reset", 0f, favoriteAfterReset.percentCompleted, 0.0001f)
+            assertFalse("Artwork must not be marked completed after reset", favoriteAfterReset.isCompleted)
+
+            // Non-favorite artwork: reset must remove the record (previous behavior).
+            dao.saveProgress(
+                MandalaProgressEntity(
+                    mandalaId = "reset_plain_mandala",
+                    coloredRegionsJson = "petal_0:4278190335",
+                    percentCompleted = 0.5f,
+                    isFavorite = false,
+                    isCompleted = false,
+                    lastEditedTimestamp = 100L
+                )
+            )
+            dao.resetProgress("reset_plain_mandala")
+            assertNull("Non-favorite record must be removed by reset", dao.getProgressOnce("reset_plain_mandala"))
+        } finally {
+            inMemoryDb.close()
         }
     }
 
