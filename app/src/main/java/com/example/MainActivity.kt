@@ -45,6 +45,7 @@ import com.example.data.CloudSaveManager
 import com.example.data.MandalaDatabase
 import com.example.data.MandalaRepository
 import com.example.generator.MandalaLibrary
+import com.example.model.LevelSystem
 import com.example.model.MandalaCategory
 import com.example.model.SavedArtwork
 import com.example.ui.editor.EditorScreen
@@ -124,6 +125,7 @@ fun MandalaApp(
     var bonusToUnlock by remember { mutableStateOf<String?>(null) }
     var adUnavailableTarget by remember { mutableStateOf<String?>(null) }
     var isAdRequestInProgress by remember { mutableStateOf(false) }
+    var lockedLevelTarget by remember { mutableStateOf<String?>(null) }
 
     fun navigateTo(screen: Screen) {
         screenStack.add(screen)
@@ -132,6 +134,20 @@ fun MandalaApp(
     fun navigateBack() {
         if (screenStack.size > 1) {
             screenStack.removeAt(screenStack.lastIndex)
+        }
+    }
+
+    // Combined unlock gate: premium (ad-unlock) designs plus free level progression.
+    val isDesignOpen: (String) -> Boolean = { id ->
+        appSettings.isDesignUnlocked(id) &&
+            LevelSystem.isDesignUnlockedByProgress(id, savedArtworksMap)
+    }
+
+    val requestUnlock: (String) -> Unit = { id ->
+        if (id in LevelSystem.ALL_LEVEL_DESIGN_IDS && !isDesignOpen(id)) {
+            lockedLevelTarget = id
+        } else {
+            bonusToUnlock = id
         }
     }
 
@@ -147,9 +163,9 @@ fun MandalaApp(
                 HomeScreen(
                     savedArtworks = savedArtworksMap,
                     outlineColor = outlineColor,
-                    isDesignUnlocked = { id -> appSettings.isDesignUnlocked(id) },
+                    isDesignUnlocked = { id -> isDesignOpen(id) },
                     onSelectMandala = { id -> navigateTo(Screen.Editor(id)) },
-                    onRequestUnlockBonus = { id -> bonusToUnlock = id },
+                    onRequestUnlockBonus = { id -> requestUnlock(id) },
                     onNavigateToGallery = { cat -> navigateTo(Screen.Gallery(cat)) },
                     onNavigateToMyArt = { navigateTo(Screen.MyArt) },
                     onNavigateToSettings = { navigateTo(Screen.Settings) },
@@ -166,9 +182,9 @@ fun MandalaApp(
                     initialCategory = screen.category,
                     savedArtworks = savedArtworksMap,
                     outlineColor = outlineColor,
-                    isDesignUnlocked = { id -> appSettings.isDesignUnlocked(id) },
+                    isDesignUnlocked = { id -> isDesignOpen(id) },
                     onSelectMandala = { id -> navigateTo(Screen.Editor(id)) },
-                    onRequestUnlockBonus = { id -> bonusToUnlock = id },
+                    onRequestUnlockBonus = { id -> requestUnlock(id) },
                     onToggleFavorite = { id, currentFav ->
                         scope.launch {
                             repository.toggleFavorite(id, currentFav)
@@ -253,7 +269,7 @@ fun MandalaApp(
             },
             text = {
                 Text(
-                    text = "Would you like to watch a short sponsored video to unlock \"${targetDesign.title}\" permanently? You can also continue enjoying all 34 free designs anytime."
+                    text = "Would you like to watch a short sponsored video to unlock \"${targetDesign.title}\" permanently? You can also continue enjoying all 52 free designs anytime."
                 )
             },
             confirmButton = {
@@ -288,7 +304,7 @@ fun MandalaApp(
                                     // Ad was closed or dismissed without earning reward: NEVER unlock bonus design
                                     Toast.makeText(
                                         context,
-                                        "Video was not completed. Watch the full video to unlock \"$designTitle\", or enjoy all 34 free designs anytime.",
+                                        "Video was not completed. Watch the full video to unlock \"$designTitle\", or enjoy all 52 free designs anytime.",
                                         Toast.LENGTH_LONG
                                     ).show()
                                 }
@@ -332,6 +348,36 @@ fun MandalaApp(
         )
     }
 
+    // Level Progression Locked Dialog
+    lockedLevelTarget?.let { targetId ->
+        val targetLevel = LevelSystem.levelOf(targetId) ?: 1
+        val remaining = LevelSystem.remainingToUnlock(targetLevel, savedArtworksMap)
+        AlertDialog(
+            onDismissRequest = { lockedLevelTarget = null },
+            title = {
+                Text(
+                    text = "Level $targetLevel Locked",
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Text(
+                    text = "This mandala belongs to Level $targetLevel. Complete $remaining more " +
+                        (if (remaining == 1) "design" else "designs") +
+                        " in Level ${targetLevel - 1} to unlock it. Keep coloring to level up!"
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = { lockedLevelTarget = null },
+                    modifier = Modifier.testTag("btn_dismiss_level_locked_dialog")
+                ) {
+                    Text("Keep Coloring")
+                }
+            }
+        )
+    }
+
     // Ad Unavailable / Retry Dialog
     adUnavailableTarget?.let { targetId ->
         val targetDesign = MandalaLibrary.getDesignById(targetId)
@@ -345,7 +391,7 @@ fun MandalaApp(
             },
             text = {
                 Text(
-                    text = "The sponsored video for \"${targetDesign.title}\" is not ready yet. Please check your internet connection and try again in a few moments.\n\nAll 34 standard mandala designs remain free and open to color without ads!"
+                    text = "The sponsored video for \"${targetDesign.title}\" is not ready yet. Please check your internet connection and try again in a few moments.\n\nAll 52 standard mandala designs remain free and open to color without ads!"
                 )
             },
             confirmButton = {

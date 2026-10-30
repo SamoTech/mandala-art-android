@@ -92,7 +92,7 @@ No artistic experience needed. Start with a mandala, explore your palette, and t
 
 ### ◉ A gallery of patterns
 
-Explore **86 algorithmic mandala designs** — 24 hand-crafted originals plus 62 generated variations — from floral geometry to intricate symmetrical forms. 34 designs are available free; others can be unlocked through optional rewarded ads.
+Explore **104 algorithmic mandala designs** — 24 hand-crafted originals plus 80 generated variations — from floral geometry to intricate symmetrical forms. 52 designs are available free; others can be unlocked through optional rewarded ads.
 
 </td>
 <td width="50%" valign="top">
