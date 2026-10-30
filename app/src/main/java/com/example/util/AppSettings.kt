@@ -51,7 +51,7 @@ class AppSettings(context: Context) {
     }
 
     fun isDesignUnlocked(designId: String): Boolean {
-        // Only special bonus designs require unlock; standard 22 designs are free by default
+        // Only special bonus designs require unlock; all non-bonus designs are free by default
         if (designId !in BONUS_DESIGNS) return true
         return _unlockedDesigns.value.contains(designId)
     }

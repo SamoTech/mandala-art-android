@@ -102,8 +102,8 @@ fun MyArtScreen(
             val saved = savedArtworks[design.id]
             when (selectedFilter) {
                 MyArtFilter.ALL -> saved != null && (saved.coloredRegions.isNotEmpty() || saved.isFavorite)
-                MyArtFilter.IN_PROGRESS -> saved != null && saved.percentCompleted > 0f && saved.percentCompleted < 0.99f
-                MyArtFilter.COMPLETED -> saved != null && saved.percentCompleted >= 0.99f
+                MyArtFilter.IN_PROGRESS -> saved != null && saved.percentCompleted > 0f && !saved.isCompleted
+                MyArtFilter.COMPLETED -> saved?.isCompleted == true
                 MyArtFilter.FAVORITES -> saved?.isFavorite == true
             }
         }
