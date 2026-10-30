@@ -31,8 +31,10 @@ object LevelSystem {
     val ALL_LEVEL_DESIGN_IDS: Set<String> = LEVEL_DESIGN_IDS.values.flatten().toSet()
 
     /** Returns the level a design belongs to, or null for non-level designs. */
-    fun levelOf(designId: String): Int? =
-        Regex("""^level(\d+)_mandala_\d+$""").find(designId)?.groupValues?.get(1)?.toIntOrNull()
+    fun levelOf(designId: String): Int? {
+        val level = Regex("""^level(\d+)_mandala_\d+$""").find(designId)?.groupValues?.get(1)?.toIntOrNull() ?: return null
+        return if (level in 1..LEVEL_COUNT) level else null
+    }
 
     /** Display name used in the gallery section header. */
     fun levelName(level: Int): String = when (level) {
