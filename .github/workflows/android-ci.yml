@@ -68,7 +68,14 @@ jobs:
           fi
 
       - name: Build debug APK
-        run: ./gradlew --no-daemon assembleDebug
+        run: |
+          set +e
+          ./gradlew --no-daemon assembleDebug > build-output.log 2>&1
+          status=$?
+          cat build-output.log
+          echo '--- error lines as annotations ---'
+          grep -E '^e: |error: ' build-output.log | while IFS= read -r line; do echo "::error::$line"; done || true
+          exit $status
 
       - name: Run unit tests
         run: ./gradlew --no-daemon testDebugUnitTest
