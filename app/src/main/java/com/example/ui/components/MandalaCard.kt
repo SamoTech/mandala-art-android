@@ -60,6 +60,7 @@ fun MandalaCard(
     val isFav = savedArtwork?.isFavorite == true
     val percent = savedArtwork?.percentCompleted ?: 0f
     val coloredRegions = savedArtwork?.coloredRegions ?: emptyMap()
+    val isCompleted = savedArtwork?.isCompleted == true
 
     Card(
         modifier = modifier
@@ -175,13 +176,13 @@ fun MandalaCard(
                         modifier = Modifier
                             .align(Alignment.BottomStart),
                         shape = RoundedCornerShape(12.dp),
-                        color = if (percent >= 0.99f) Color(0xFF4CAF50) else MaterialTheme.colorScheme.primaryContainer
+                        color = if (isCompleted) Color(0xFF4CAF50) else MaterialTheme.colorScheme.primaryContainer
                     ) {
                         Text(
-                            text = if (percent >= 0.99f) "Completed" else "${(percent * 100).toInt()}%",
+                            text = if (isCompleted) "Completed" else "${(percent * 100).toInt()}%",
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
-                            color = if (percent >= 0.99f) Color.White else MaterialTheme.colorScheme.primary,
+                            color = if (isCompleted) Color.White else MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
                         )
                     }
