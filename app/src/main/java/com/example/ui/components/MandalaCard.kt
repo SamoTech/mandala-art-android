@@ -42,6 +42,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.model.LevelSystem
 import com.example.model.MandalaDesign
 import com.example.model.SavedArtwork
 import com.example.ui.theme.PinkAccent
@@ -164,7 +165,7 @@ fun MandalaCard(
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = "Bonus",
+                                text = if (LevelSystem.levelOf(design.id) != null) "Level" else "Bonus",
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.Black
