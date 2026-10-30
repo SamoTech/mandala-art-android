@@ -32,7 +32,7 @@ object LevelSystem {
 
     /** Returns the level a design belongs to, or null for non-level designs. */
     fun levelOf(designId: String): Int? =
-        Regex("^level(\d+)_mandala_\d+$").find(designId)?.groupValues?.get(1)?.toIntOrNull()
+        Regex("""^level(\d+)_mandala_\d+$""").find(designId)?.groupValues?.get(1)?.toIntOrNull()
 
     /** Display name used in the gallery section header. */
     fun levelName(level: Int): String = when (level) {
