@@ -56,6 +56,7 @@ import com.example.model.MandalaPalettes
 import com.example.model.Palette
 import com.example.ui.theme.PinkAccent
 import com.example.ui.theme.PurplePrimary
+import com.example.ui.theme.glassStroke
 
 @Composable
 fun ColorPaletteBar(
@@ -77,7 +78,8 @@ fun ColorPaletteBar(
     Surface(
         modifier = modifier
             .fillMaxWidth()
-            .shadow(12.dp, RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)),
+            .shadow(12.dp, RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
+            .border(1.dp, glassStroke(), RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)),
         shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
         color = MaterialTheme.colorScheme.surface,
         tonalElevation = 4.dp

@@ -1,11 +1,15 @@
 package com.example.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 
 private val DarkColorScheme = darkColorScheme(
     primary = PurpleLight,
@@ -47,6 +51,32 @@ private val LightColorScheme = lightColorScheme(
     outline = OutlineLight
 )
 
+// Material Glass: larger, softer corner radii for every Material component.
+private val GlassShapes = Shapes(
+    extraSmall = RoundedCornerShape(10.dp),
+    small = RoundedCornerShape(14.dp),
+    medium = RoundedCornerShape(20.dp),
+    large = RoundedCornerShape(28.dp),
+    extraLarge = RoundedCornerShape(36.dp)
+)
+
+/** Soft diagonal gradient painted behind the app's translucent glass surfaces (light & dark variants). */
+@Composable
+fun mandalaGlassGradient(): Brush {
+    val dark = isSystemInDarkTheme()
+    return Brush.linearGradient(
+        if (dark) {
+            listOf(GlassGradientDarkTop, GlassGradientDarkMid, GlassGradientDarkBottom)
+        } else {
+            listOf(GlassGradientLightTop, GlassGradientLightMid, GlassGradientLightBottom)
+        }
+    )
+}
+
+/** Frosted hairline border color used to outline glass cards and bars. */
+@Composable
+fun glassStroke(): Color = if (isSystemInDarkTheme()) GlassStrokeDark else GlassStrokeLight
+
 @Composable
 fun MandalaTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -57,6 +87,7 @@ fun MandalaTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
+        shapes = GlassShapes,
         content = content
     )
 }

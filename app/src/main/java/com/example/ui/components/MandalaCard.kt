@@ -2,6 +2,7 @@ package com.example.ui.components
 
 import android.graphics.Color as AndroidColor
 import android.graphics.Paint
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -46,6 +47,7 @@ import com.example.model.LevelSystem
 import com.example.model.MandalaDesign
 import com.example.model.SavedArtwork
 import com.example.ui.theme.PinkAccent
+import com.example.ui.theme.glassStroke
 import kotlin.math.min
 
 @Composable
@@ -73,6 +75,7 @@ fun MandalaCard(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
+        border = BorderStroke(1.dp, glassStroke()),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
