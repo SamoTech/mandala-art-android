@@ -51,16 +51,16 @@ private val LightColorScheme = lightColorScheme(
     outline = OutlineLight
 )
 
-// Material Glass: larger, softer corner radii for every Material component.
+// Candy Pop: chunky, playful corner radii for every Material component.
 private val GlassShapes = Shapes(
-    extraSmall = RoundedCornerShape(10.dp),
-    small = RoundedCornerShape(14.dp),
-    medium = RoundedCornerShape(20.dp),
-    large = RoundedCornerShape(28.dp),
-    extraLarge = RoundedCornerShape(36.dp)
+    extraSmall = RoundedCornerShape(12.dp),
+    small = RoundedCornerShape(16.dp),
+    medium = RoundedCornerShape(22.dp),
+    large = RoundedCornerShape(30.dp),
+    extraLarge = RoundedCornerShape(40.dp)
 )
 
-/** Soft diagonal gradient painted behind the app's translucent glass surfaces (light & dark variants). */
+/** Vibrant candy gradient painted behind the app's translucent surfaces (light & dark variants). */
 @Composable
 fun mandalaGlassGradient(): Brush {
     val dark = isSystemInDarkTheme()
@@ -73,7 +73,7 @@ fun mandalaGlassGradient(): Brush {
     )
 }
 
-/** Frosted hairline border color used to outline glass cards and bars. */
+/** Candy outline color used to rim cards, bars, and chips. */
 @Composable
 fun glassStroke(): Color = if (isSystemInDarkTheme()) GlassStrokeDark else GlassStrokeLight
 

@@ -51,7 +51,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
@@ -65,8 +64,9 @@ import com.example.model.MandalaCategory
 import com.example.model.MandalaDesign
 import com.example.model.SavedArtwork
 import com.example.ui.components.MandalaCard
-import com.example.ui.theme.PinkAccent
-import com.example.ui.theme.PurpleDeep
+import com.example.ui.theme.PopGradientEnd
+import com.example.ui.theme.PopGradientMid
+import com.example.ui.theme.PopGradientStart
 import com.example.ui.theme.PurplePrimary
 
 import com.example.ads.BannerAdView
@@ -107,6 +107,10 @@ fun HomeScreen(
         }
     }
 
+    val heroGradient = Brush.linearGradient(
+        listOf(PopGradientStart, PopGradientMid, PopGradientEnd)
+    )
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -128,14 +132,14 @@ fun HomeScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    // Logo Emblem
+                    // Logo bubble with candy gradient
                     Box(
                         modifier = Modifier
-                            .size(46.dp)
+                            .size(48.dp)
                             .clip(CircleShape)
                             .background(
                                 Brush.linearGradient(
-                                    listOf(PurplePrimary, PinkAccent)
+                                    listOf(PopGradientStart, PopGradientEnd)
                                 )
                             ),
                         contentAlignment = Alignment.Center
@@ -180,81 +184,78 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Featured Hero Card with prominent Play button
+            // Featured Hero Card: bold candy gradient
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(24.dp))
+                    .clip(RoundedCornerShape(30.dp))
                     .clickable { onSelectMandala(featuredDesign.id) }
                     .testTag("hero_featured_card"),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+                shape = RoundedCornerShape(30.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(
-                            Brush.verticalGradient(
-                                listOf(
-                                    PurpleDeep.copy(alpha = 0.06f),
-                                    PinkAccent.copy(alpha = 0.12f)
-                                )
-                            )
-                        )
-                        .padding(20.dp)
+                        .background(heroGradient)
+                        .padding(22.dp)
                 ) {
                     Column {
-                        // Badge
+                        // Pill badge
                         Surface(
-                            shape = RoundedCornerShape(12.dp),
-                            color = PinkAccent.copy(alpha = 0.15f)
+                            shape = RoundedCornerShape(50.dp),
+                            color = Color.White.copy(alpha = 0.2f)
                         ) {
                             Row(
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 5.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.AutoAwesome,
                                     contentDescription = null,
-                                    tint = PinkAccent,
+                                    tint = Color.White,
                                     modifier = Modifier.size(14.dp)
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
                                     text = "Featured Artwork",
                                     fontSize = 11.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = PinkAccent
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = Color.White
                                 )
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(10.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
 
                         Text(
                             text = featuredDesign.title,
                             style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.ExtraBold,
+                            color = Color.White
                         )
 
                         Text(
                             text = "A calming sacred flower pattern with ${featuredDesign.regionCount} harmonious petals.",
                             fontSize = 13.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            color = Color.White.copy(alpha = 0.85f),
                             modifier = Modifier.padding(vertical = 4.dp)
                         )
 
-                        Spacer(modifier = Modifier.height(14.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
 
-                        // Play Now Button
+                        // Play Now pill button
                         Button(
                             onClick = { onSelectMandala(featuredDesign.id) },
-                            colors = ButtonDefaults.buttonColors(containerColor = PinkAccent),
-                            shape = RoundedCornerShape(14.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.White,
+                                contentColor = PurplePrimary
+                            ),
+                            shape = RoundedCornerShape(50.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(50.dp)
+                                .height(52.dp)
                                 .testTag("btn_hero_play_now")
                         ) {
                             Icon(
@@ -266,7 +267,7 @@ fun HomeScreen(
                             Text(
                                 text = stringResource(R.string.home_play_now),
                                 fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.ExtraBold
                             )
                         }
                     }
@@ -283,10 +284,10 @@ fun HomeScreen(
                 ElevatedCard(
                     modifier = Modifier
                         .weight(1f)
-                        .clip(RoundedCornerShape(18.dp))
+                        .clip(RoundedCornerShape(20.dp))
                         .clickable { onNavigateToGallery(null) }
                         .testTag("btn_explore_gallery"),
-                    shape = RoundedCornerShape(18.dp),
+                    shape = RoundedCornerShape(20.dp),
                     colors = CardDefaults.elevatedCardColors(
                         containerColor = MaterialTheme.colorScheme.surface
                     )
@@ -297,15 +298,19 @@ fun HomeScreen(
                     ) {
                         Box(
                             modifier = Modifier
-                                .size(42.dp)
+                                .size(44.dp)
                                 .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.primaryContainer),
+                                .background(
+                                    Brush.linearGradient(
+                                        listOf(PopGradientStart, PopGradientMid)
+                                    )
+                                ),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = Icons.Default.GridOn,
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
+                                tint = Color.White,
                                 modifier = Modifier.size(22.dp)
                             )
                         }
@@ -313,12 +318,13 @@ fun HomeScreen(
                         Column {
                             Text(
                                 text = "All Mandalas",
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.ExtraBold,
                                 fontSize = 14.sp
                             )
                             Text(
                                 text = "${MandalaLibrary.designs.size} Designs",
                                 fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
@@ -328,10 +334,10 @@ fun HomeScreen(
                 ElevatedCard(
                     modifier = Modifier
                         .weight(1f)
-                        .clip(RoundedCornerShape(18.dp))
+                        .clip(RoundedCornerShape(20.dp))
                         .clickable { onNavigateToMyArt() }
                         .testTag("btn_nav_my_art"),
-                    shape = RoundedCornerShape(18.dp),
+                    shape = RoundedCornerShape(20.dp),
                     colors = CardDefaults.elevatedCardColors(
                         containerColor = MaterialTheme.colorScheme.surface
                     )
@@ -342,15 +348,19 @@ fun HomeScreen(
                     ) {
                         Box(
                             modifier = Modifier
-                                .size(42.dp)
+                                .size(44.dp)
                                 .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.secondaryContainer),
+                                .background(
+                                    Brush.linearGradient(
+                                        listOf(PopGradientMid, PopGradientEnd)
+                                    )
+                                ),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Collections,
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.secondary,
+                                tint = Color.White,
                                 modifier = Modifier.size(22.dp)
                             )
                         }
@@ -358,13 +368,14 @@ fun HomeScreen(
                         Column {
                             Text(
                                 text = stringResource(R.string.home_my_art),
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.ExtraBold,
                                 fontSize = 14.sp
                             )
                             val count = savedArtworks.size
                             Text(
                                 text = if (count == 1) "1 Artwork" else "$count Artworks",
                                 fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
@@ -383,13 +394,13 @@ fun HomeScreen(
                 Text(
                     text = stringResource(R.string.home_daily_inspiration),
                     style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.ExtraBold
                 )
                 Text(
                     text = "Tap to color",
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.Bold
                 )
             }
 
@@ -411,7 +422,7 @@ fun HomeScreen(
             Text(
                 text = stringResource(R.string.home_categories),
                 style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.ExtraBold
             )
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -430,14 +441,14 @@ fun HomeScreen(
                         label = {
                             Text(
                                 text = cat.title,
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+                                fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.Medium
                             )
                         },
                         colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                            selectedLabelColor = MaterialTheme.colorScheme.primary
+                            selectedContainerColor = MaterialTheme.colorScheme.primary,
+                            selectedLabelColor = Color.White
                         ),
-                        shape = RoundedCornerShape(16.dp),
+                        shape = RoundedCornerShape(50.dp),
                         modifier = Modifier.testTag("home_category_chip_${cat.name.lowercase()}")
                     )
                 }

@@ -1,6 +1,5 @@
 package com.example.ui.components
 
-import android.graphics.Color as AndroidColor
 import android.graphics.Paint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
@@ -46,6 +45,7 @@ import androidx.compose.ui.unit.sp
 import com.example.model.LevelSystem
 import com.example.model.MandalaDesign
 import com.example.model.SavedArtwork
+import com.example.ui.theme.GoldAccent
 import com.example.ui.theme.PinkAccent
 import com.example.ui.theme.glassStroke
 import kotlin.math.min
@@ -68,14 +68,14 @@ fun MandalaCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(18.dp))
+            .clip(RoundedCornerShape(24.dp))
             .clickable { onSelect() }
             .testTag("mandala_card_${design.id}"),
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        border = BorderStroke(1.dp, glassStroke()),
+        border = BorderStroke(2.dp, glassStroke()),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
@@ -132,7 +132,8 @@ fun MandalaCard(
                         .align(Alignment.TopEnd)
                         .size(36.dp),
                     shape = CircleShape,
-                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
+                    color = Color.White.copy(alpha = 0.92f),
+                    border = BorderStroke(1.dp, glassStroke()),
                     shadowElevation = 2.dp
                 ) {
                     IconButton(
@@ -153,25 +154,25 @@ fun MandalaCard(
                     Surface(
                         modifier = Modifier
                             .align(Alignment.BottomStart),
-                        shape = RoundedCornerShape(12.dp),
-                        color = Color(0xFFFFB300)
+                        shape = RoundedCornerShape(50.dp),
+                        color = GoldAccent
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Lock,
                                 contentDescription = "Locked",
-                                tint = Color.Black,
+                                tint = Color(0xFF3F2A00),
                                 modifier = Modifier.size(12.dp)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
                                 text = if (LevelSystem.levelOf(design.id) != null) "Level" else "Bonus",
                                 fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Black
+                                fontWeight = FontWeight.ExtraBold,
+                                color = Color(0xFF3F2A00)
                             )
                         }
                     }
@@ -179,15 +180,15 @@ fun MandalaCard(
                     Surface(
                         modifier = Modifier
                             .align(Alignment.BottomStart),
-                        shape = RoundedCornerShape(12.dp),
-                        color = if (isCompleted) Color(0xFF4CAF50) else MaterialTheme.colorScheme.primaryContainer
+                        shape = RoundedCornerShape(50.dp),
+                        color = if (isCompleted) Color(0xFF16C779) else PinkAccent
                     ) {
                         Text(
-                            text = if (isCompleted) "Completed" else "${(percent * 100).toInt()}%",
+                            text = if (isCompleted) "Completed ✓" else "${(percent * 100).toInt()}%",
                             fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = if (isCompleted) Color.White else MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                            fontWeight = FontWeight.ExtraBold,
+                            color = Color.White,
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
                         )
                     }
                 }
@@ -202,7 +203,7 @@ fun MandalaCard(
                 Text(
                     text = design.title,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.ExtraBold,
                     maxLines = 1
                 )
 
@@ -218,12 +219,13 @@ fun MandalaCard(
                         text = "${design.difficulty.label} • ${design.category.title}",
                         fontSize = 12.sp,
                         color = Color(design.difficulty.color),
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.Bold
                     )
 
                     Text(
                         text = "${design.regionCount} areas",
                         fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -234,8 +236,8 @@ fun MandalaCard(
                         progress = { percent },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(4.dp)
-                            .clip(RoundedCornerShape(2.dp)),
+                            .height(6.dp)
+                            .clip(RoundedCornerShape(3.dp)),
                         color = PinkAccent,
                         trackColor = MaterialTheme.colorScheme.surfaceVariant
                     )
