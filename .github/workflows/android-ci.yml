@@ -68,7 +68,13 @@ jobs:
           fi
 
       - name: Build debug APK
-        run: ./gradlew --no-daemon assembleDebug
+        shell: bash
+        run: |
+          set +e
+          ./gradlew --no-daemon assembleDebug 2>&1 | tee build-output.log
+          STATUS=${PIPESTATUS[0]}
+          grep -E '^e: |error: ' build-output.log | while read -r line; do echo "::error::$line"; done
+          exit $STATUS
 
       - name: Run unit tests
         run: ./gradlew --no-daemon testDebugUnitTest
