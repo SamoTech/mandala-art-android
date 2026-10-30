@@ -103,7 +103,7 @@ class MainActivity : ComponentActivity() {
                         color = Color.Transparent
                     ) {
                         MandalaApp(
-                            activity = this,
+                            activity = this@MainActivity,
                             repository = repository,
                             appSettings = appSettings,
                             adMobManager = adMobManager,
