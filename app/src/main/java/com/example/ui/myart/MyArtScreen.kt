@@ -46,7 +46,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextButtonDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -303,7 +302,7 @@ fun MyArtScreen(
                                     // Continue / Edit button
                                     TextButton(
                                         onClick = { if (isLocked) onRequestUnlock(design.id) else onSelectMandala(design.id) },
-                                        colors = TextButtonDefaults.textButtonColors(
+                                        colors = ButtonDefaults.textButtonColors(
                                             containerColor = MaterialTheme.colorScheme.primaryContainer,
                                             contentColor = MaterialTheme.colorScheme.primary
                                         ),
