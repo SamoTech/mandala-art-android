@@ -87,6 +87,8 @@ fun MyArtScreen(
     onSelectMandala: (String) -> Unit,
     onToggleFavorite: (String, Boolean) -> Unit,
     onDeleteArtwork: (String) -> Unit,
+    isDesignUnlocked: (String) -> Boolean,
+    onRequestUnlock: (String) -> Unit,
     onNavigateToGallery: () -> Unit,
     onNavigateBack: () -> Unit
 ) {
@@ -261,6 +263,7 @@ fun MyArtScreen(
                 ) {
                     items(filteredDesigns, key = { it.id }) { design ->
                         val saved = savedArtworks[design.id]
+                        val isLocked = !isDesignUnlocked(design.id)
 
                         Card(
                             modifier = Modifier.fillMaxWidth(),
@@ -273,10 +276,11 @@ fun MyArtScreen(
                                     design = design,
                                     savedArtwork = saved,
                                     outlineColor = outlineColor,
-                                    onSelect = { onSelectMandala(design.id) },
+                                    onSelect = { if (isLocked) onRequestUnlock(design.id) else onSelectMandala(design.id) },
                                     onToggleFavorite = { isFav ->
                                         onToggleFavorite(design.id, isFav)
-                                    }
+                                    },
+                                    isLocked = isLocked
                                 )
 
                                 // Action Row: Continue, Share, Delete
@@ -289,7 +293,7 @@ fun MyArtScreen(
                                 ) {
                                     // Continue / Edit button
                                     TextButton(
-                                        onClick = { onSelectMandala(design.id) },
+                                        onClick = { if (isLocked) onRequestUnlock(design.id) else onSelectMandala(design.id) },
                                         modifier = Modifier.testTag("btn_continue_${design.id}")
                                     ) {
                                         Icon(

@@ -231,6 +231,8 @@ fun MandalaApp(
                             repository.deleteProgress(id)
                         }
                     },
+                    isDesignUnlocked = { id -> isDesignOpen(id) },
+                    onRequestUnlock = { id -> requestUnlock(id) },
                     onNavigateToGallery = { navigateTo(Screen.Gallery(null)) },
                     onNavigateBack = { navigateBack() }
                 )
