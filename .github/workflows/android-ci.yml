@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      release:
+        description: 'Publish a production release of the current main branch'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -103,52 +109,10 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
-  detect-production-changes:
-    name: Check whether app changes require a production release
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    outputs:
-      should_release: ${{ steps.filter.outputs.should_release }}
-    steps:
-      - name: Checkout repository history
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          fetch-depth: 0
-
-      - name: Detect app or build changes
-        id: filter
-        shell: bash
-        env:
-          BEFORE_SHA: ${{ github.event.before }}
-          AFTER_SHA: ${{ github.sha }}
-        run: |
-          set -euo pipefail
-
-          # An all-zero before SHA represents an initial push/new branch.
-          # Compare the pushed tree against an empty tree in that case.
-          if [[ -z "${BEFORE_SHA}" || "${BEFORE_SHA}" =~ ^0+$ ]]; then
-            DIFF_BASE="$(git hash-object -t tree /dev/null)"
-          elif git cat-file -e "${BEFORE_SHA}^{commit}" 2>/dev/null; then
-            DIFF_BASE="$BEFORE_SHA"
-          else
-            echo "::error::Push before SHA is not available locally; refusing to silently skip a potential production release."
-            exit 1
-          fi
-
-          CHANGED_FILES="$(git diff --name-only "$DIFF_BASE" "$AFTER_SHA")"
-          printf '%s\n' "$CHANGED_FILES"
-          if printf '%s\n' "$CHANGED_FILES" | grep -Eq '^(app/|gradle/|build\.gradle(\.kts)?$|settings\.gradle(\.kts)?$|gradle\.properties$|gradlew$|gradlew\.bat$)'; then
-            echo "should_release=true" >> "$GITHUB_OUTPUT"
-            echo "Application/build changes detected in the pushed range; production release is eligible."
-          else
-            echo "should_release=false" >> "$GITHUB_OUTPUT"
-            echo "No application/build changes detected in the pushed range; skipping production release."
-          fi
-
   build-sign-and-publish-production:
     name: Build, sign, and publish production release
-    needs: [build-and-test, detect-production-changes]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.detect-production-changes.outputs.should_release == 'true'
+    needs: build-and-test
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && inputs.release == true
     runs-on: ubuntu-latest
     timeout-minutes: 45
     permissions:
