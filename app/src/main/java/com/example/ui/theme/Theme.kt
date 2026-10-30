@@ -60,7 +60,7 @@ private val GlassShapes = Shapes(
     extraLarge = RoundedCornerShape(36.dp)
 )
 
-/** Soft diagonal gradient painted behind the app's translucent glass surfaces. */
+/** Soft diagonal gradient painted behind the app's translucent glass surfaces (light & dark variants). */
 @Composable
 fun mandalaGlassGradient(): Brush {
     val dark = isSystemInDarkTheme()
