@@ -119,7 +119,31 @@ object MandalaLibrary {
             Recipe("premium_mandala_50", "Dreamcatcher Mandala", MandalaCategory.GEOMETRIC, Difficulty.HARD, 14, 1)
         )
 
-        return (recipes + premiumRecipes).map { recipe ->
+        val levelRecipes = listOf(
+            // Level 1 - Blossom Path (Easy)
+            Recipe("level1_mandala_1", "Dawn Blossom", MandalaCategory.FLORAL, Difficulty.EASY, 10, 0),
+            Recipe("level1_mandala_2", "Simple Harmony", MandalaCategory.GEOMETRIC, Difficulty.EASY, 12, 1),
+            Recipe("level1_mandala_3", "Spring Petals", MandalaCategory.FLORAL, Difficulty.EASY, 10, 2),
+            Recipe("level1_mandala_4", "Copper Wheel", MandalaCategory.GEOMETRIC, Difficulty.EASY, 12, 3),
+            Recipe("level1_mandala_5", "Morning Star", MandalaCategory.GEOMETRIC, Difficulty.EASY, 14, 4),
+            Recipe("level1_mandala_6", "Gentle Bloom", MandalaCategory.FLORAL, Difficulty.EASY, 10, 5),
+            // Level 2 - Golden Flow (Medium)
+            Recipe("level2_mandala_1", "Sunrise Mosaic", MandalaCategory.GEOMETRIC, Difficulty.MEDIUM, 14, 6),
+            Recipe("level2_mandala_2", "Desert Bloom", MandalaCategory.FLORAL, Difficulty.MEDIUM, 16, 7),
+            Recipe("level2_mandala_3", "Twilight Wheel", MandalaCategory.GEOMETRIC, Difficulty.MEDIUM, 14, 8),
+            Recipe("level2_mandala_4", "Sapphire Garden", MandalaCategory.FLORAL, Difficulty.MEDIUM, 16, 9),
+            Recipe("level2_mandala_5", "Amber Lotus", MandalaCategory.INTRICATE, Difficulty.MEDIUM, 15, 10),
+            Recipe("level2_mandala_6", "Silver Compass", MandalaCategory.GEOMETRIC, Difficulty.MEDIUM, 18, 11),
+            // Level 3 - Master Circle (Hard)
+            Recipe("level3_mandala_1", "Cosmic Tapestry", MandalaCategory.INTRICATE, Difficulty.HARD, 18, 0),
+            Recipe("level3_mandala_2", "Royal Garden", MandalaCategory.FLORAL, Difficulty.HARD, 20, 1),
+            Recipe("level3_mandala_3", "Infinity Bloom", MandalaCategory.INTRICATE, Difficulty.HARD, 22, 2),
+            Recipe("level3_mandala_4", "Celestial Web", MandalaCategory.GEOMETRIC, Difficulty.HARD, 20, 3),
+            Recipe("level3_mandala_5", "Phoenix Wheel", MandalaCategory.INTRICATE, Difficulty.HARD, 24, 4),
+            Recipe("level3_mandala_6", "Emerald Crown", MandalaCategory.FLORAL, Difficulty.HARD, 22, 5)
+        )
+
+        return (recipes + premiumRecipes + levelRecipes).map { recipe ->
             val regions = mutableListOf<MandalaRegion>()
             regions.add(MandalaShapes.circle("${recipe.id}_core", radius = if (recipe.difficulty == Difficulty.HARD) 28f else 38f))
             val n = recipe.symmetry
