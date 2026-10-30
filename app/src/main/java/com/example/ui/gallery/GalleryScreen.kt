@@ -222,15 +222,15 @@ fun GalleryScreen(
                             )
                         }
                         items(allDesigns.filter { it.id in ids }, key = { it.id }) { design ->
-                    GalleryDesignCard(
-                        design = design,
-                        savedArtworks = savedArtworks,
-                        outlineColor = outlineColor,
-                        isDesignUnlocked = isDesignUnlocked,
-                        onSelectMandala = onSelectMandala,
-                        onRequestUnlockBonus = onRequestUnlockBonus,
-                        onToggleFavorite = onToggleFavorite
-                    )
+                            GalleryDesignCard(
+                                design = design,
+                                savedArtworks = savedArtworks,
+                                outlineColor = outlineColor,
+                                isDesignUnlocked = isDesignUnlocked,
+                                onSelectMandala = onSelectMandala,
+                                onRequestUnlockBonus = onRequestUnlockBonus,
+                                onToggleFavorite = onToggleFavorite
+                            )
                         }
                     }
                 }
