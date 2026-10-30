@@ -78,12 +78,18 @@ fun MandalaCanvas(
                         }
                     }
                 }
-                // Tap gesture for coloring or resetting zoom on double-tap
-                .pointerInput(isZoomPanMode, zoom, pan) {
+                // Double-tap zoom reset lives in its own gesture detector so
+                // single taps do not wait for the double-tap timeout (~300ms).
+                .pointerInput(Unit) {
                     detectTapGestures(
                         onDoubleTap = {
                             resetZoom()
-                        },
+                        }
+                    )
+                }
+                // Tap gesture for coloring; fires immediately on touch-up
+                .pointerInput(isZoomPanMode, zoom, pan) {
+                    detectTapGestures(
                         onTap = { tapOffset ->
                             if (!isZoomPanMode) {
                                 val canvasDim = min(size.width, size.height)
