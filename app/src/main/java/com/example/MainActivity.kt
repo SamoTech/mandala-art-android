@@ -337,7 +337,7 @@ fun MandalaApp(
                     },
                     enabled = !isAdRequestInProgress,
                     colors = ButtonDefaults.buttonColors(containerColor = PinkAccent),
-                    shape = RoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(50.dp),
                     modifier = Modifier.testTag("btn_watch_rewarded_ad")
                 ) {
                     Icon(
@@ -427,7 +427,7 @@ fun MandalaApp(
                         }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = PinkAccent),
-                    shape = RoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(50.dp),
                     modifier = Modifier.testTag("btn_retry_ad")
                 ) {
                     Text("Retry", fontWeight = FontWeight.Bold)
