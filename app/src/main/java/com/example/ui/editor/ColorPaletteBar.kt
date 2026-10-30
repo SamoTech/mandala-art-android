@@ -78,9 +78,9 @@ fun ColorPaletteBar(
     Surface(
         modifier = modifier
             .fillMaxWidth()
-            .shadow(12.dp, RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
-            .border(1.dp, glassStroke(), RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)),
-        shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
+            .shadow(12.dp, RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
+            .border(1.dp, glassStroke(), RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)),
+        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
         color = MaterialTheme.colorScheme.surface,
         tonalElevation = 4.dp
     ) {
@@ -117,10 +117,10 @@ fun ColorPaletteBar(
                                 )
                             },
                             colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                                selectedLabelColor = MaterialTheme.colorScheme.primary
+                                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                selectedLabelColor = Color.White
                             ),
-                            shape = RoundedCornerShape(16.dp),
+                            shape = RoundedCornerShape(50.dp),
                             modifier = Modifier.testTag("palette_tab_${palette.name.lowercase()}")
                         )
                     }
@@ -218,7 +218,7 @@ fun ColorPaletteBar(
                             Box(
                                 modifier = Modifier
                                     .size(46.dp)
-                                    .border(3.dp, PinkAccent, CircleShape)
+                                    .border(4.dp, PinkAccent, CircleShape)
                             )
                         }
 

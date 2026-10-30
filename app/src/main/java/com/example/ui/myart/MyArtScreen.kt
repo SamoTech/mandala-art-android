@@ -70,6 +70,10 @@ import com.example.model.MandalaDesign
 import com.example.model.SavedArtwork
 import com.example.ui.components.MandalaCard
 import com.example.ui.theme.PinkAccent
+import androidx.compose.ui.graphics.Brush
+import com.example.ui.theme.PopGradientEnd
+import com.example.ui.theme.PopGradientMid
+import com.example.ui.theme.PopGradientStart
 import com.example.util.ImageSharer
 
 enum class MyArtFilter(val title: String) {
@@ -202,13 +206,17 @@ fun MyArtScreen(
                         modifier = Modifier
                             .size(80.dp)
                             .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primaryContainer),
+                            .background(
+                                Brush.linearGradient(
+                                    listOf(PopGradientStart, PopGradientMid, PopGradientEnd)
+                                )
+                            ),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.Palette,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
+                            tint = Color.White,
                             modifier = Modifier.size(42.dp)
                         )
                     }
@@ -235,7 +243,7 @@ fun MyArtScreen(
                     Button(
                         onClick = onNavigateToGallery,
                         colors = ButtonDefaults.buttonColors(containerColor = PinkAccent),
-                        shape = RoundedCornerShape(14.dp),
+                        shape = RoundedCornerShape(50.dp),
                         modifier = Modifier.testTag("btn_empty_start_coloring")
                     ) {
                         Icon(
@@ -294,6 +302,11 @@ fun MyArtScreen(
                                     // Continue / Edit button
                                     TextButton(
                                         onClick = { if (isLocked) onRequestUnlock(design.id) else onSelectMandala(design.id) },
+                                        colors = ButtonDefaults.textButtonColors(
+                                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                            contentColor = MaterialTheme.colorScheme.primary
+                                        ),
+                                        shape = RoundedCornerShape(50.dp),
                                         modifier = Modifier.testTag("btn_continue_${design.id}")
                                     ) {
                                         Icon(

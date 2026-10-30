@@ -277,8 +277,8 @@ private fun LevelPackHeader(
     isUnlocked: Boolean
 ) {
     Surface(
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f),
-        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f),
+        shape = RoundedCornerShape(20.dp),
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 6.dp)
@@ -292,7 +292,7 @@ private fun LevelPackHeader(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = "Level $level · ${LevelSystem.levelName(level)}",
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.ExtraBold,
                     fontSize = 14.sp
                 )
                 Text(
