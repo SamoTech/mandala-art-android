@@ -16,12 +16,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
@@ -48,6 +50,8 @@ import androidx.compose.ui.unit.sp
 import com.example.R
 import com.example.generator.MandalaLibrary
 import com.example.model.Difficulty
+import com.example.model.LevelSystem
+import com.example.model.MandalaDesign
 import com.example.model.MandalaCategory
 import com.example.model.SavedArtwork
 import com.example.ui.components.MandalaCard
@@ -188,25 +192,125 @@ fun GalleryScreen(
                     .widthIn(max = 900.dp)
                     .testTag("gallery_grid")
             ) {
-                items(filteredList, key = { it.id }) { design ->
-                    val isLocked = !isDesignUnlocked(design.id)
-                    MandalaCard(
+                val showLevelSections = selectedCategory == MandalaCategory.ALL
+                val mainDesigns = if (showLevelSections) {
+                    filteredList.filter { it.id !in LevelSystem.ALL_LEVEL_DESIGN_IDS }
+                } else {
+                    filteredList
+                }
+
+                items(mainDesigns, key = { it.id }) { design ->
+                    GalleryDesignCard(
                         design = design,
-                        savedArtwork = savedArtworks[design.id],
+                        savedArtworks = savedArtworks,
                         outlineColor = outlineColor,
-                        isLocked = isLocked,
-                        onSelect = {
-                            if (isLocked) {
-                                onRequestUnlockBonus(design.id)
-                            } else {
-                                onSelectMandala(design.id)
-                            }
-                        },
-                        onToggleFavorite = { isFav ->
-                            onToggleFavorite(design.id, isFav)
-                        }
+                        isDesignUnlocked = isDesignUnlocked,
+                        onSelectMandala = onSelectMandala,
+                        onRequestUnlockBonus = onRequestUnlockBonus,
+                        onToggleFavorite = onToggleFavorite
                     )
                 }
+
+                if (showLevelSections) {
+                    LevelSystem.LEVEL_DESIGN_IDS.forEach { (level, ids) ->
+                        item(key = "level_header_$level", span = { GridItemSpan(maxLineSpan) }) {
+                            LevelPackHeader(
+                                level = level,
+                                completedCount = LevelSystem.completedCountInLevel(level, savedArtworks),
+                                totalDesigns = ids.size,
+                                isUnlocked = LevelSystem.isLevelUnlocked(level, savedArtworks)
+                            )
+                        }
+                        items(allDesigns.filter { it.id in ids }, key = { it.id }) { design ->
+                    GalleryDesignCard(
+                        design = design,
+                        savedArtworks = savedArtworks,
+                        outlineColor = outlineColor,
+                        isDesignUnlocked = isDesignUnlocked,
+                        onSelectMandala = onSelectMandala,
+                        onRequestUnlockBonus = onRequestUnlockBonus,
+                        onToggleFavorite = onToggleFavorite
+                    )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+private fun GalleryDesignCard(
+    design: MandalaDesign,
+    savedArtworks: Map<String, SavedArtwork>,
+    outlineColor: Long,
+    isDesignUnlocked: (String) -> Boolean,
+    onSelectMandala: (String) -> Unit,
+    onRequestUnlockBonus: (String) -> Unit,
+    onToggleFavorite: (String, Boolean) -> Unit
+) {
+    val isLocked = !isDesignUnlocked(design.id)
+    MandalaCard(
+        design = design,
+        savedArtwork = savedArtworks[design.id],
+        outlineColor = outlineColor,
+        isLocked = isLocked,
+        onSelect = {
+            if (isLocked) {
+                onRequestUnlockBonus(design.id)
+            } else {
+                onSelectMandala(design.id)
+            }
+        },
+        onToggleFavorite = { isFav ->
+            onToggleFavorite(design.id, isFav)
+        }
+    )
+}
+
+@Composable
+private fun LevelPackHeader(
+    level: Int,
+    completedCount: Int,
+    totalDesigns: Int,
+    isUnlocked: Boolean
+) {
+    Surface(
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f),
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp)
+            .testTag("level_header_$level")
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "Level $level · ${LevelSystem.levelName(level)}",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp
+                )
+                Text(
+                    text = if (isUnlocked) {
+                        "$completedCount / $totalDesigns completed"
+                    } else {
+                        "Locked — complete ${LevelSystem.REQUIRED_COMPLETIONS_TO_UNLOCK} designs in Level ${level - 1}"
+                    },
+                    fontSize = 11.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            if (!isUnlocked) {
+                Icon(
+                    imageVector = Icons.Filled.Lock,
+                    contentDescription = "Level locked",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
     }
