@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [MandalaProgressEntity::class], version = 1, exportSchema = false)
+@Database(entities = [MandalaProgressEntity::class], version = 1, exportSchema = true)
 abstract class MandalaDatabase : RoomDatabase() {
     abstract fun mandalaDao(): MandalaDao
 
