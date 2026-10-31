@@ -70,7 +70,7 @@ object ProgressSyncMerge {
         // tombstone plus a field mutation newer than it.
         val newestFieldRevision = maxOf(progress.second, favorite.second)
         val observedDeletion = restore.second == deletion.second
-        val hasPostDeletionMutation = newestFieldRevision.counter > deletion.second.counter
+        val hasPostDeletionMutation = newestFieldRevision.compareTo(deletion.second) > 0
         val deleted = deletion.first && !(observedDeletion && hasPostDeletionMutation)
 
         return MandalaProgressEntity(
