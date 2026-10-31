@@ -292,7 +292,7 @@ private fun LevelPackHeader(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = stringResource(R.string.gallery_level_title, level, stringResource(levelNameResource(level))),
+                    text = stringResource(R.string.gallery_level_title, level, levelDisplayName(level)),
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 14.sp
                 )
@@ -329,9 +329,10 @@ private val MandalaCategory.labelResource: Int
         MandalaCategory.INTRICATE -> R.string.category_intricate
     }
 
-private fun levelNameResource(level: Int): Int = when (level) {
-    1 -> R.string.gallery_level_name_blossom_path
-    2 -> R.string.gallery_level_name_golden_flow
-    3 -> R.string.gallery_level_name_master_circle
-    else -> R.string.gallery_level_title
+@Composable
+private fun levelDisplayName(level: Int): String = when (level) {
+    1 -> stringResource(R.string.gallery_level_name_blossom_path)
+    2 -> stringResource(R.string.gallery_level_name_golden_flow)
+    3 -> stringResource(R.string.gallery_level_name_master_circle)
+    else -> stringResource(R.string.gallery_level_name_fallback, level)
 }
