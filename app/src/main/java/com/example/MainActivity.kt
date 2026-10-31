@@ -129,12 +129,20 @@ fun MandalaApp(
 ) {
     val context = LocalContext.current
 
+    val screenStack = remember { mutableStateListOf<Screen>(Screen.Home) }
+    var observedOwnerUid by remember { mutableStateOf(repository.currentOwnerUid) }
+
     DisposableEffect(repository, cloudSaveManager) {
-        val stopObserving = cloudSaveManager.observeAuthState(repository::setOwnerUid)
+        val stopObserving = cloudSaveManager.observeAuthState { uid ->
+            repository.setOwnerUid(uid)
+            if (uid != observedOwnerUid) {
+                observedOwnerUid = uid
+                screenStack.clear()
+                screenStack.add(Screen.Home)
+            }
+        }
         onDispose { stopObserving() }
     }
-
-    val screenStack = remember { mutableStateListOf<Screen>(Screen.Home) }
     val currentScreen = screenStack.lastOrNull() ?: Screen.Home
 
     val scope = rememberCoroutineScope()
@@ -223,7 +231,8 @@ fun MandalaApp(
                     factory = EditorViewModel.Factory(
                         mandalaId = screen.mandalaId,
                         repository = repository,
-                        appSettings = appSettings
+                        appSettings = appSettings,
+                        ownerUid = repository.currentOwnerUid
                     )
                 )
 
