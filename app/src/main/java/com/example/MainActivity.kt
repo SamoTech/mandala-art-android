@@ -69,6 +69,7 @@ import com.example.ui.theme.MandalaTheme
 import com.example.ui.theme.PinkAccent
 import com.example.ui.theme.mandalaGlassGradient
 import com.example.util.AppSettings
+import com.example.util.StartupRestoreGate
 import kotlinx.coroutines.launch
 
 sealed class Screen {
@@ -148,7 +149,7 @@ fun MandalaApp(
 
     val screenStack = remember { mutableStateListOf<Screen>(Screen.Home) }
     var observedOwnerUid by remember { mutableStateOf(repository.currentOwnerUid) }
-    var initialAuthStateObserved by remember { mutableStateOf(false) }
+    val startupRestoreGate = remember { StartupRestoreGate() }
     var startupRestoreRequested by remember { mutableStateOf(false) }
     var cloudRestoreLoading by remember { mutableStateOf(false) }
     var cloudRestoreFailed by remember { mutableStateOf(false) }
@@ -156,9 +157,10 @@ fun MandalaApp(
 
     DisposableEffect(repository, cloudSaveManager) {
         val stopObserving = cloudSaveManager.observeAuthState { uid ->
-            if (!initialAuthStateObserved) {
-                initialAuthStateObserved = true
-                startupRestoreRequested = uid.isNotBlank()
+            // Firebase may report null before persisted auth finishes restoring.
+            // Trigger restore on the first non-empty UID, not on the first callback.
+            if (startupRestoreGate.onAuthStateChanged(uid) != null) {
+                startupRestoreRequested = true
             }
             repository.setOwnerUid(uid)
             if (uid != observedOwnerUid) {
