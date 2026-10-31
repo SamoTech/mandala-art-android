@@ -79,11 +79,11 @@ import com.example.ui.theme.PopGradientMid
 import com.example.ui.theme.PopGradientStart
 import com.example.util.ImageSharer
 
-enum class MyArtFilter(val title: String) {
-    ALL("All Saved"),
-    IN_PROGRESS("In Progress"),
-    COMPLETED("Completed"),
-    FAVORITES("Favorites")
+enum class MyArtFilter(val titleRes: Int) {
+    ALL(R.string.my_art_filter_all),
+    IN_PROGRESS(R.string.my_art_filter_in_progress),
+    COMPLETED(R.string.my_art_filter_completed),
+    FAVORITES(R.string.my_art_filter_favorites)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -148,7 +148,7 @@ fun MyArtScreen(
                             ) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                    contentDescription = "Back"
+                                    contentDescription = stringResource(R.string.navigation_back)
                                 )
                             }
                         },
@@ -172,7 +172,7 @@ fun MyArtScreen(
                                 onClick = { selectedFilter = filter },
                                 label = {
                                     Text(
-                                        text = filter.title,
+                                        text = stringResource(filter.titleRes),
                                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
                                     )
                                 },
@@ -228,7 +228,7 @@ fun MyArtScreen(
                     Spacer(modifier = Modifier.height(18.dp))
 
                     Text(
-                        text = "No saved mandalas in this view",
+                        text = stringResource(R.string.my_art_no_saved_in_view),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
@@ -257,7 +257,7 @@ fun MyArtScreen(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Browse Gallery",
+                            text = stringResource(R.string.my_art_browse_gallery),
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -321,7 +321,7 @@ fun MyArtScreen(
                                         )
                                         Spacer(modifier = Modifier.width(4.dp))
                                         Text(
-                                            text = "Continue",
+                                            text = stringResource(R.string.my_art_continue),
                                             fontSize = 12.sp,
                                             fontWeight = FontWeight.Bold
                                         )
@@ -343,7 +343,7 @@ fun MyArtScreen(
                                                     } catch (error: Exception) {
                                                         Toast.makeText(
                                                             context,
-                                                            "Unable to export artwork. Please try again.",
+                                                            context.getString(R.string.my_art_export_error),
                                                             Toast.LENGTH_LONG
                                                         ).show()
                                                     }
@@ -353,7 +353,7 @@ fun MyArtScreen(
                                         ) {
                                             Icon(
                                                 imageVector = Icons.Default.Share,
-                                                contentDescription = "Share",
+                                                contentDescription = stringResource(R.string.my_art_share),
                                                 tint = PinkAccent,
                                                 modifier = Modifier.size(18.dp)
                                             )
@@ -365,7 +365,7 @@ fun MyArtScreen(
                                         ) {
                                             Icon(
                                                 imageVector = Icons.Default.Delete,
-                                                contentDescription = "Delete",
+                                                contentDescription = stringResource(R.string.my_art_delete),
                                                 tint = MaterialTheme.colorScheme.error,
                                                 modifier = Modifier.size(18.dp)
                                             )
@@ -385,7 +385,7 @@ fun MyArtScreen(
         AlertDialog(
             onDismissRequest = { artworkToDelete = null },
             title = {
-                Text(text = "Delete Saved Artwork?", fontWeight = FontWeight.Bold)
+                Text(text = stringResource(R.string.my_art_delete_title), fontWeight = FontWeight.Bold)
             },
             text = {
                 Text(text = "Are you sure you want to remove your colored progress for \"${target.title}\"?")
@@ -395,7 +395,7 @@ fun MyArtScreen(
                     onClick = {
                         onDeleteArtwork(target.id)
                         artworkToDelete = null
-                        Toast.makeText(context, "Artwork removed", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.my_art_deleted_toast), Toast.LENGTH_SHORT).show()
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
                     modifier = Modifier.testTag("btn_confirm_delete_artwork")
