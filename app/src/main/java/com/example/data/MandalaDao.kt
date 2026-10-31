@@ -97,6 +97,9 @@ interface MandalaDao {
             )
         } else {
             existing.copy(
+                coloredRegionsJson = if (existing.isDeleted) "" else existing.coloredRegionsJson,
+                percentCompleted = if (existing.isDeleted) 0f else existing.percentCompleted,
+                isCompleted = if (existing.isDeleted) false else existing.isCompleted,
                 isFavorite = isFavorite,
                 lastEditedTimestamp = timestamp,
                 favoriteRevision = revision,
