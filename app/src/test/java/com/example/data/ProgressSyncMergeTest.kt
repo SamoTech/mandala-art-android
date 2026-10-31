@@ -51,6 +51,25 @@ class ProgressSyncMergeTest {
         assertEquals(9L, merged.favoriteRevision)
     }
 
+    @Test fun conflictingEqualRevisionProgressPayloadIsChosenAtomically() {
+        val local = record(
+            progress = "aaa",
+            progressRevision = 5,
+            progressActor = "same-device"
+        ).copy(percentCompleted = 0.1f, isCompleted = false)
+        val remote = record(
+            progress = "zzz",
+            progressRevision = 5,
+            progressActor = "same-device"
+        ).copy(percentCompleted = 0.9f, isCompleted = true)
+
+        val merged = ProgressSyncMerge.merge(local, remote)!!
+
+        assertEquals("zzz", merged.coloredRegionsJson)
+        assertEquals(0.9f, merged.percentCompleted, 0.0001f)
+        assertTrue(merged.isCompleted)
+    }
+
     @Test fun newerProgressWinsIndependentlyOfFavoriteRevision() {
         val local = record(progress = "older", progressRevision = 3, favoriteRevision = 20)
         val remote = record(progress = "newer", progressRevision = 4, favoriteRevision = 2)
