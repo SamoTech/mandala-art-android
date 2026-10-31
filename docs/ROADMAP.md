@@ -3,7 +3,7 @@
 > **Status:** Living execution plan  
 > **Baseline reviewed:** 2026-10-31  
 > **Repository:** [SamoTech/mandala-art-android](https://github.com/SamoTech/mandala-art-android)  
-> **Current planning baseline:** `main` at `51e96fef1bef38f28c7cf4b7b1cb9b18961c6d80`
+> **Current planning baseline:** `main` at `3b4ac9c1c99915fcd2646640a8408957e6d10fa2`
 
 This document is the canonical roadmap for product and engineering work on Mandala Art. New work should follow the sequence, dependencies, acceptance criteria, and delivery rules below. It is intentionally milestone-based rather than date-based: a milestone advances only when its exit criteria are demonstrated.
 
@@ -58,14 +58,15 @@ The following reflects a source review of `main` on 2026-10-31. “Implemented�
 
 Work items:
 
-- [ ] Reproduce and audit the editor autosave path when Firebase account changes while the editor is open.
-- [ ] Trace the complete lifecycle: editor ViewModel ownership, navigation stack reset, `viewModelScope` cancellation, pending worker signal, `flushPendingSave()`, and repository owner UID.
-- [ ] Define an explicit policy for pending edits on account switch: persist to the original owner partition before disposal, or block/suspend the switch until a bounded flush completes. Never silently save to the newly active account.
-- [ ] Add deterministic tests for account switch before debounce, during an in-flight save, after a failed save, and during navigation/ON_STOP.
-- [ ] Review autosave error recovery. A failed background write must remain retryable and observable; avoid unbounded retry loops.
-- [ ] Add focused DAO/repository tests proving favorite changes persist the timestamp and independent favorite revision without overwriting newer progress.
-- [ ] Expand sync/tombstone tests for offline edits, delete-vs-edit races, restore proof, repeated sync, and account isolation.
-- [ ] Verify sync failure is surfaced to the UI and never reported as success when server access or reconciliation fails.
+- [x] Reproduce and audit the editor autosave path when Firebase account changes while the editor is open.
+- [x] Trace the complete lifecycle: editor ViewModel ownership, navigation stack reset, `viewModelScope` cancellation, pending worker signal, `flushPendingSave()`, and repository owner UID.
+- [x] Define an explicit policy for pending edits on account switch: persist to the original owner partition before disposal, or block/suspend the switch until a bounded flush completes. Never silently save to the newly active account.
+- [x] Cover a pending editor save across an account switch before debounce.
+- [ ] Add deterministic UID-ownership tests for account switches during an in-flight save, after a failed save, and during navigation/ON_STOP.
+- [x] Review autosave error recovery. A failed background write must remain retryable and observable; avoid unbounded retry loops.
+- [x] Add focused DAO/repository tests proving favorite changes persist the timestamp and independent favorite revision without overwriting newer progress.
+- [x] Expand sync/tombstone tests for offline edits, delete-vs-edit races, restore proof, repeated sync, and account isolation.
+- [x] Verify sync failure is surfaced to the UI and never reported as success when server access or reconciliation fails.
 
 **Acceptance / exit criteria:**
 
@@ -76,7 +77,7 @@ Work items:
 - Firestore emulator security tests, Android unit tests, lint, and debug build pass.
 - Manual test on a physical device: edit, switch account from another screen/session, return/sign in, and verify each account sees only its own data.
 
-**Do not start feature work that changes editor persistence or cloud schema in parallel with this milestone.**
+**Progress evidence:** PRs #29–#34 are merged; the post-merge workflow for `3b4ac9c1c99915fcd2646640a8408957e6d10fa2` passed Android build/unit tests and Firestore security rules. The production release job was skipped as expected. Physical-device verification was reported complete by the user on 2026-10-31. Automated sync tests exercise the deterministic reconciliation/merge layer, not live Firestore end-to-end tests. M0 remains open because the editor account-switch test does not yet cover in-flight save, failed save, and navigation/ON_STOP UID-ownership timing boundaries.
 
 ### M1 — Arabic localization and accessibility foundation (P1)
 
@@ -234,9 +235,9 @@ The following is the working queue. Do not skip ahead because a later feature is
 
 | Order | Work item | Priority | Status |
 |---:|---|---|---|
-| 1 | Autosave/account-switch lifecycle audit and regression tests | P0 | Regression test merged; physical-device lifecycle verification remains |
-| 2 | Favorite timestamp persistence and tombstone edge-case coverage | P0 | Tests merged and post-merge CI passed |
-| 3 | End-to-end account isolation and offline sync regression pass | P0 | In progress — deterministic reconciler coverage |
+| 1 | Autosave/account-switch lifecycle audit and regression tests | P0 | In progress — PR #32 covers pending save before debounce; in-flight/failure/ON_STOP UID timing tests remain |
+| 2 | Favorite timestamp persistence and tombstone edge-case coverage | P0 | Completed — PR #33; post-merge CI passed |
+| 3 | Offline sync and account-isolation regression coverage | P0 | Completed — PR #34; post-merge Android and Firestore CI passed; device verification user-reported |
 | 4 | Arabic resources and RTL pass | P1 | Planned |
 | 5 | Release R8/minification experiment with measured comparison | P1 | Planned |
 | 6 | Profile gallery and share paths; optimize only measured bottlenecks | P1 | Planned |
@@ -308,4 +309,4 @@ Every change to priority or scope must include a short reason. Do not silently r
 
 ---
 
-**Current next action:** Complete M0 item 3 — verify offline failure/retry, remote-only pull, idempotent reconciliation, and cross-account rejection. Then record physical-device verification still required before M0 can exit.
+**Current next action:** Complete M0 item 1 — add deterministic UID-ownership tests for account switches during an in-flight save, after a failed save, and during navigation/ON_STOP. Keep M1 blocked until M0 exit criteria are demonstrated.
