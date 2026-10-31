@@ -45,7 +45,7 @@ class LocalizationResourceTest {
             )
             assertEquals(
                 "Formatting arguments differ in plural $name",
-                source.plurals.values.flatMap(::formatTokens).sorted(),
+                source.plurals.values.flatMap(::formatTokens).distinct().sorted(),
                 translated.plurals.values.flatMap(::formatTokens).distinct().sorted()
             )
         }
