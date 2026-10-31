@@ -74,7 +74,7 @@ class AppSettings(context: Context) {
     }
 
     companion object {
-        private const val KEY_LANGUAGE = "key_language"
+        const val KEY_LANGUAGE = "key_language"
         private const val KEY_SOUND = "key_sound"
         private const val KEY_HAPTIC = "key_haptic"
         private const val KEY_OUTLINE = "key_outline"
