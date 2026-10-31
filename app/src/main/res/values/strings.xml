@@ -108,4 +108,22 @@
     <string name="editor_complete_video_to_unlock_color">Complete the video to unlock this color.</string>
     <string name="reward_video_not_ready">Video ad is not ready. Try again shortly.</string>
     <string name="reward_unable_to_show_ad_retry">Unable to show the ad. Please try again.</string>
+
+    <string name="color_picker_title">Pick Custom Color</string>
+    <string name="color_picker_red">Red: %1$d</string>
+    <string name="color_picker_green">Green: %1$d</string>
+    <string name="color_picker_blue">Blue: %1$d</string>
+    <string name="color_picker_select">Select</string>
+    <string name="color_palette_locked">Locked color</string>
+    <string name="mandala_favorite">Favorite</string>
+    <string name="mandala_locked">Locked</string>
+    <string name="mandala_level">Level</string>
+    <string name="mandala_bonus">Bonus</string>
+    <string name="mandala_completed">Completed ✓</string>
+    <string name="mandala_progress_percent">%1$d%%</string>
+    <plurals name="mandala_region_count">
+        <item quantity="one">%1$d area</item>
+        <item quantity="other">%1$d areas</item>
+    </plurals>
+
 </resources>
