@@ -214,8 +214,8 @@ object MandalaLibrary {
     fun getDesignById(id: String): MandalaDesign =
         findDesignById(id) ?: throw NoSuchElementException("Unknown mandala design ID: $id")
 
-    fun dailyInspiration(date: java.time.LocalDate): MandalaDesign =
-        dailyInspirationForDate(date, designs)
+    fun dailyInspiration(year: Int, dayOfYear: Int): MandalaDesign =
+        dailyInspirationForDate(year, dayOfYear, designs)
 
     // 1. Lotus Bloom (Easy / Floral - 25 regions)
     private fun createLotusBloom(): MandalaDesign {
