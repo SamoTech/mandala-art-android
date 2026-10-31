@@ -49,7 +49,7 @@ class EditorLifecycleSaveObserverTest {
         val releaseSave = CompletableDeferred<Unit>()
         val observedOwnerUids = mutableListOf<String>()
         val lifecycleOwner = object : LifecycleOwner {
-            override val lifecycle = LifecycleRegistry(this, false)
+            override val lifecycle = LifecycleRegistry(this)
         }
         var observer: EditorLifecycleSaveObserver? = null
 
@@ -113,7 +113,7 @@ class EditorLifecycleSaveObserverTest {
     @Test
     fun closingObserverDetachesItFromFurtherLifecycleEvents() = runTest {
         val lifecycleOwner = object : LifecycleOwner {
-            override val lifecycle = LifecycleRegistry(this, false)
+            override val lifecycle = LifecycleRegistry(this)
         }
         var flushCount = 0
         val observer = EditorLifecycleSaveObserver(
