@@ -42,9 +42,6 @@ object ProgressSyncMerge {
         require(local.ownerUid == remote.ownerUid) {
             "Cannot merge progress owned by different accounts."
         }
-        require(local.ownerUid == remote.ownerUid) {
-            "Cannot merge progress owned by different accounts."
-        }
 
         val localProgressRevision = local.progressRevision.toRevision(local.progressActor)
         val remoteProgressRevision = remote.progressRevision.toRevision(remote.progressActor)
