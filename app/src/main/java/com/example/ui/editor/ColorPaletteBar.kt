@@ -89,7 +89,6 @@ fun ColorPaletteBar(
                 .fillMaxWidth()
                 .padding(vertical = 12.dp)
         ) {
-            // Palette Tabs & Quick Tool Action Buttons
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -97,7 +96,6 @@ fun ColorPaletteBar(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                // Category Pills (Scrollable)
                 Row(
                     modifier = Modifier
                         .weight(1f)
@@ -127,8 +125,6 @@ fun ColorPaletteBar(
                 }
 
                 Spacer(modifier = Modifier.width(8.dp))
-
-                // Custom Color Picker Icon
                 IconButton(
                     onClick = onOpenColorPicker,
                     modifier = Modifier
@@ -147,8 +143,6 @@ fun ColorPaletteBar(
                 }
 
                 Spacer(modifier = Modifier.width(6.dp))
-
-                // Eraser Toggle Button
                 IconButton(
                     onClick = onToggleEraser,
                     modifier = Modifier
@@ -167,8 +161,6 @@ fun ColorPaletteBar(
                 }
 
                 Spacer(modifier = Modifier.width(6.dp))
-
-                // Zoom / Pan Mode Toggle Button
                 IconButton(
                     onClick = onToggleZoomPan,
                     modifier = Modifier
@@ -188,8 +180,6 @@ fun ColorPaletteBar(
             }
 
             Spacer(modifier = Modifier.height(10.dp))
-
-            // Color Swatches Row
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -213,7 +203,6 @@ fun ColorPaletteBar(
                             },
                         contentAlignment = Alignment.Center
                     ) {
-                        // Outer selection ring
                         if (isCurrent) {
                             Box(
                                 modifier = Modifier
@@ -222,7 +211,6 @@ fun ColorPaletteBar(
                             )
                         }
 
-                        // Inner Color Circle
                         Box(
                             modifier = Modifier
                                 .size(if (isCurrent) 36.dp else 42.dp)
@@ -231,7 +219,12 @@ fun ColorPaletteBar(
                                 .border(1.dp, Color(0x33000000), CircleShape)
                         )
                         if (!isColorUnlocked(colorLong)) {
-                            Icon(imageVector = Icons.Default.Lock, contentDescription = "Locked color", tint = Color.White, modifier = Modifier.size(16.dp))
+                            Icon(
+                                imageVector = Icons.Default.Lock,
+                                contentDescription = stringResource(R.string.color_palette_locked),
+                                tint = Color.White,
+                                modifier = Modifier.size(16.dp)
+                            )
                         }
                     }
                 }
