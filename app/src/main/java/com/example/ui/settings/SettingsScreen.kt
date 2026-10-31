@@ -88,6 +88,8 @@ fun SettingsScreen(
 
     var showPrivacyPolicyDialog by remember { mutableStateOf(false) }
     var showLicensesDialog by remember { mutableStateOf(false) }
+    var showDeleteAccountDialog by remember { mutableStateOf(false) }
+    var deleteAccountPassword by remember { mutableStateOf("") }
     var cloudEmail by remember { mutableStateOf("") }
     var cloudPassword by remember { mutableStateOf("") }
     var createCloudAccount by remember { mutableStateOf(false) }
@@ -477,6 +479,13 @@ fun SettingsScreen(
                                     enabled = !cloudBusy,
                                     modifier = Modifier.fillMaxWidth().testTag("btn_cloud_sign_out")
                                 ) { Text("Sign Out") }
+                                OutlinedButton(
+                                    onClick = { showDeleteAccountDialog = true },
+                                    enabled = !cloudBusy,
+                                    modifier = Modifier.fillMaxWidth().testTag("btn_cloud_delete_account")
+                                ) {
+                                    Text("Delete Account & Cloud Data", color = MaterialTheme.colorScheme.error)
+                                }
                             } else {
                                 Text(
                                     "Create an account or sign in to back up your coloring progress across devices.",
@@ -644,6 +653,71 @@ fun SettingsScreen(
                     colors = ButtonDefaults.buttonColors(containerColor = PinkAccent)
                 ) {
                     Text("Close")
+                }
+            }
+        )
+    }
+
+    // Account deletion requires explicit confirmation and recent authentication.
+    if (showDeleteAccountDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                if (!cloudBusy) {
+                    showDeleteAccountDialog = false
+                    deleteAccountPassword = ""
+                }
+            },
+            title = {
+                Text("Delete Account & Cloud Data", fontWeight = FontWeight.Bold)
+            },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(
+                        "This permanently deletes your Firebase account, its cloud saves, and this account's local progress. Guest progress and other accounts on this device are kept. Enter your password to reauthenticate."
+                    )
+                    OutlinedTextField(
+                        value = deleteAccountPassword,
+                        onValueChange = { deleteAccountPassword = it },
+                        label = { Text("Account password") },
+                        singleLine = true,
+                        visualTransformation = PasswordVisualTransformation(),
+                        enabled = !cloudBusy,
+                        modifier = Modifier.fillMaxWidth().testTag("field_delete_account_password")
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteAccountDialog = false
+                        cloudScope.launch {
+                            cloudBusy = true
+                            cloudMessage = null
+                            cloudMessage = try {
+                                cloudSaveManager?.deleteAccount(deleteAccountPassword)
+                                "Account deletion completed."
+                            } catch (error: Exception) {
+                                error.localizedMessage ?: "Account deletion failed. You can retry from this account."
+                            } finally {
+                                deleteAccountPassword = ""
+                                cloudBusy = false
+                            }
+                        }
+                    },
+                    enabled = !cloudBusy && deleteAccountPassword.isNotBlank()
+                ) {
+                    Text("Delete permanently", color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteAccountDialog = false
+                        deleteAccountPassword = ""
+                    },
+                    enabled = !cloudBusy
+                ) {
+                    Text("Cancel")
                 }
             }
         )
