@@ -1,0 +1,26 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "0685a95cf4d7a0b632c40a2a0a07f131",
+    "entities": [
+      {
+        "tableName": "mandala_progress",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`mandalaId` TEXT NOT NULL, `coloredRegionsJson` TEXT NOT NULL, `percentCompleted` REAL NOT NULL, `isFavorite` INTEGER NOT NULL, `isCompleted` INTEGER NOT NULL, `lastEditedTimestamp` INTEGER NOT NULL, PRIMARY KEY(`mandalaId`))",
+        "fields": [
+          {"fieldPath":"mandalaId","columnName":"mandalaId","affinity":"TEXT","notNull":true},
+          {"fieldPath":"coloredRegionsJson","columnName":"coloredRegionsJson","affinity":"TEXT","notNull":true},
+          {"fieldPath":"percentCompleted","columnName":"percentCompleted","affinity":"REAL","notNull":true},
+          {"fieldPath":"isFavorite","columnName":"isFavorite","affinity":"INTEGER","notNull":true},
+          {"fieldPath":"isCompleted","columnName":"isCompleted","affinity":"INTEGER","notNull":true},
+          {"fieldPath":"lastEditedTimestamp","columnName":"lastEditedTimestamp","affinity":"INTEGER","notNull":true}
+        ],
+        "primaryKey": {"autoGenerate":false,"columnNames":["mandalaId"]}
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0685a95cf4d7a0b632c40a2a0a07f131')"
+    ]
+  }
+}
