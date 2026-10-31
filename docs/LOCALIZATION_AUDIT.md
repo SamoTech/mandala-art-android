@@ -1,6 +1,6 @@
 # M1 Localization & Accessibility Audit
 
-**Repository baseline:** `main` at `95bb4d659d015681cc94ddd58568ab8884c75cfa`  
+**Repository baseline:** `main` at `ab70db9c085410644baee1ba3362fe3d3100b327`  
 **Audit date:** 2026-10-31  
 **Scope:** Android user-visible text, locale resources, accessibility labels, and RTL-sensitive UI.
 
@@ -62,7 +62,7 @@ Static review of the primary Compose screens after Arabic resource integration f
 - Rows, horizontal scrolling containers, and lazy horizontal lists rely on Compose's current `LayoutDirection`; this is intentional but still requires rendered UI verification.
 - Reviewed `contentDescription = null` usages are decorative icons or icons nested inside controls that also expose visible text. Icon-only controls in the reviewed flows use localized descriptions.
 
-The current PR adds Robolectric locale smoke tests that verify the manifest RTL flag, Arabic configuration direction and resource resolution, and unchanged English LTR/resource resolution. These tests validate Android locale configuration; they do not prove Compose screenshot geometry, TalkBack traversal, or physical-device typography.
+PR #49 merged Robolectric locale smoke tests that verify the manifest RTL flag, Arabic configuration direction and resource resolution, and unchanged English LTR/resource resolution. The PR's Android debug build, unit tests, Android lint, and Firestore security rules all passed on head `f0db056696d91cd578836e91e73cc5172da4aefa`; Codex review completed with no findings and no open review threads. These tests validate Android locale configuration; they do not prove Compose screenshot geometry, TalkBack traversal, or physical-device typography. No post-merge workflow run was returned for merge commit `ab70db9c085410644baee1ba3362fe3d3100b327`.
 
 ## 6. RTL and typography verification targets
 
@@ -88,4 +88,4 @@ The current PR adds Robolectric locale smoke tests that verify the manifest RTL 
 - Rewriting the visual design system or changing navigation behavior.
 - Assuming that `supportsRtl=true` proves full RTL correctness.
 
-**Current M1 status:** English UI extraction and dynamic-label resource mapping are implemented in merged PRs #43–#47. Arabic translations and resource parity tests are being introduced in the current PR. Full RTL, typography, TalkBack, and physical-device verification remain open.
+**Current M1 status:** English UI extraction and dynamic-label resource mapping are merged in PRs #43–#47. Arabic translations and 164-key resource parity checks are merged in PR #48. Arabic RTL/English LTR locale smoke tests and static RTL source review are merged in PR #49. PR #49 CI passed on its exact head SHA and Codex reported no findings. Full rendered Compose RTL, typography, TalkBack, and physical-device verification remain open; M1 is not complete.
