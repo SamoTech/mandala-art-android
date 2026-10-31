@@ -18,5 +18,7 @@ data class MandalaProgressEntity(
     @ColumnInfo(defaultValue = "'legacy'") val favoriteActor: String = "legacy",
     @ColumnInfo(defaultValue = "0") val isDeleted: Boolean = false,
     @ColumnInfo(defaultValue = "0") val deletionRevision: Long = 0L,
-    @ColumnInfo(defaultValue = "'legacy'") val deletionActor: String = "legacy"
+    @ColumnInfo(defaultValue = "'legacy'") val deletionActor: String = "legacy",
+    @ColumnInfo(defaultValue = "0") val restoredDeletionRevision: Long = 0L,
+    @ColumnInfo(defaultValue = "'legacy'") val restoredDeletionActor: String = "legacy"
 )
