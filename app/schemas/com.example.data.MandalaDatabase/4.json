@@ -2,36 +2,145 @@
   "formatVersion": 1,
   "database": {
     "version": 4,
-    "identityHash": "b3a13762dfbcead71031e1fd487a0884",
+    "identityHash": "5c29080bc3558e2a4f6d7e46322ba80e",
     "entities": [
       {
         "tableName": "mandala_progress",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`mandalaId` TEXT NOT NULL, `coloredRegionsJson` TEXT NOT NULL, `percentCompleted` REAL NOT NULL, `isFavorite` INTEGER NOT NULL, `isCompleted` INTEGER NOT NULL, `lastEditedTimestamp` INTEGER NOT NULL, `progressRevision` INTEGER NOT NULL DEFAULT 0, `progressActor` TEXT NOT NULL DEFAULT 'legacy', `favoriteRevision` INTEGER NOT NULL DEFAULT 0, `favoriteActor` TEXT NOT NULL DEFAULT 'legacy', `isDeleted` INTEGER NOT NULL DEFAULT 0, `deletionRevision` INTEGER NOT NULL DEFAULT 0, `deletionActor` TEXT NOT NULL DEFAULT 'legacy', `restoredDeletionRevision` INTEGER NOT NULL DEFAULT 0, `restoredDeletionActor` TEXT NOT NULL DEFAULT 'legacy', `restorationEventRevision` INTEGER NOT NULL DEFAULT 0, `restorationEventActor` TEXT NOT NULL DEFAULT 'legacy', PRIMARY KEY(`mandalaId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`mandalaId` TEXT NOT NULL, `ownerUid` TEXT NOT NULL DEFAULT '', `coloredRegionsJson` TEXT NOT NULL, `percentCompleted` REAL NOT NULL, `isFavorite` INTEGER NOT NULL, `isCompleted` INTEGER NOT NULL, `lastEditedTimestamp` INTEGER NOT NULL, `progressRevision` INTEGER NOT NULL DEFAULT 0, `progressActor` TEXT NOT NULL DEFAULT 'legacy', `favoriteRevision` INTEGER NOT NULL DEFAULT 0, `favoriteActor` TEXT NOT NULL DEFAULT 'legacy', `isDeleted` INTEGER NOT NULL DEFAULT 0, `deletionRevision` INTEGER NOT NULL DEFAULT 0, `deletionActor` TEXT NOT NULL DEFAULT 'legacy', `restoredDeletionRevision` INTEGER NOT NULL DEFAULT 0, `restoredDeletionActor` TEXT NOT NULL DEFAULT 'legacy', `restorationEventRevision` INTEGER NOT NULL DEFAULT 0, `restorationEventActor` TEXT NOT NULL DEFAULT 'legacy', PRIMARY KEY(`mandalaId`, `ownerUid`))",
         "fields": [
-          {"fieldPath":"mandalaId","columnName":"mandalaId","affinity":"TEXT","notNull":true},
-          {"fieldPath":"coloredRegionsJson","columnName":"coloredRegionsJson","affinity":"TEXT","notNull":true},
-          {"fieldPath":"percentCompleted","columnName":"percentCompleted","affinity":"REAL","notNull":true},
-          {"fieldPath":"isFavorite","columnName":"isFavorite","affinity":"INTEGER","notNull":true},
-          {"fieldPath":"isCompleted","columnName":"isCompleted","affinity":"INTEGER","notNull":true},
-          {"fieldPath":"lastEditedTimestamp","columnName":"lastEditedTimestamp","affinity":"INTEGER","notNull":true},
-          {"fieldPath":"progressRevision","columnName":"progressRevision","affinity":"INTEGER","notNull":true,"defaultValue":"0"},
-          {"fieldPath":"progressActor","columnName":"progressActor","affinity":"TEXT","notNull":true,"defaultValue":"'legacy'"},
-          {"fieldPath":"favoriteRevision","columnName":"favoriteRevision","affinity":"INTEGER","notNull":true,"defaultValue":"0"},
-          {"fieldPath":"favoriteActor","columnName":"favoriteActor","affinity":"TEXT","notNull":true,"defaultValue":"'legacy'"},
-          {"fieldPath":"isDeleted","columnName":"isDeleted","affinity":"INTEGER","notNull":true,"defaultValue":"0"},
-          {"fieldPath":"deletionRevision","columnName":"deletionRevision","affinity":"INTEGER","notNull":true,"defaultValue":"0"},
-          {"fieldPath":"deletionActor","columnName":"deletionActor","affinity":"TEXT","notNull":true,"defaultValue":"'legacy'"},
-          {"fieldPath":"restoredDeletionRevision","columnName":"restoredDeletionRevision","affinity":"INTEGER","notNull":true,"defaultValue":"0"},
-          {"fieldPath":"restoredDeletionActor","columnName":"restoredDeletionActor","affinity":"TEXT","notNull":true,"defaultValue":"'legacy'"},
-          {"fieldPath":"restorationEventRevision","columnName":"restorationEventRevision","affinity":"INTEGER","notNull":true,"defaultValue":"0"},
-          {"fieldPath":"restorationEventActor","columnName":"restorationEventActor","affinity":"TEXT","notNull":true,"defaultValue":"'legacy'"}
+          {
+            "fieldPath": "mandalaId",
+            "columnName": "mandalaId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ownerUid",
+            "columnName": "ownerUid",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "coloredRegionsJson",
+            "columnName": "coloredRegionsJson",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "percentCompleted",
+            "columnName": "percentCompleted",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isFavorite",
+            "columnName": "isFavorite",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isCompleted",
+            "columnName": "isCompleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastEditedTimestamp",
+            "columnName": "lastEditedTimestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "progressRevision",
+            "columnName": "progressRevision",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "progressActor",
+            "columnName": "progressActor",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'legacy'"
+          },
+          {
+            "fieldPath": "favoriteRevision",
+            "columnName": "favoriteRevision",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "favoriteActor",
+            "columnName": "favoriteActor",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'legacy'"
+          },
+          {
+            "fieldPath": "isDeleted",
+            "columnName": "isDeleted",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "deletionRevision",
+            "columnName": "deletionRevision",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "deletionActor",
+            "columnName": "deletionActor",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'legacy'"
+          },
+          {
+            "fieldPath": "restoredDeletionRevision",
+            "columnName": "restoredDeletionRevision",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "restoredDeletionActor",
+            "columnName": "restoredDeletionActor",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'legacy'"
+          },
+          {
+            "fieldPath": "restorationEventRevision",
+            "columnName": "restorationEventRevision",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "restorationEventActor",
+            "columnName": "restorationEventActor",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'legacy'"
+          }
         ],
-        "primaryKey": {"autoGenerate":false,"columnNames":["mandalaId"]}
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "mandalaId",
+            "ownerUid"
+          ]
+        }
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b3a13762dfbcead71031e1fd487a0884')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5c29080bc3558e2a4f6d7e46322ba80e')"
     ]
   }
 }
