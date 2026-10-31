@@ -60,6 +60,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -82,6 +83,7 @@ fun SettingsScreen(
     cloudSaveManager: CloudSaveManager? = null,
     onNavigateBack: () -> Unit
 ) {
+    val context = LocalContext.current
     val soundEnabled by appSettings.soundEnabled.collectAsState()
     val hapticEnabled by appSettings.hapticEnabled.collectAsState()
     val outlineColor by appSettings.outlineColor.collectAsState()
@@ -98,10 +100,10 @@ fun SettingsScreen(
     val cloudScope = rememberCoroutineScope()
 
     val outlineColorOptions = listOf(
-        Pair("Classic Black", 0xFF212121L),
-        Pair("Charcoal", 0xFF455A64L),
-        Pair("Deep Indigo", 0xFF1A237EL),
-        Pair("Espresso", 0xFF3E2723L)
+        Triple(R.string.settings_outline_classic_black, 0xFF212121L, "classic_black"),
+        Triple(R.string.settings_outline_charcoal, 0xFF455A64L, "charcoal"),
+        Triple(R.string.settings_outline_deep_indigo, 0xFF1A237EL, "deep_indigo"),
+        Triple(R.string.settings_outline_espresso, 0xFF3E2723L, "espresso")
     )
 
     // Consume Back while an account deletion is running. Leaving this screen
@@ -136,7 +138,7 @@ fun SettingsScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Back"
+                                contentDescription = context.getString(R.string.navigation_back)
                             )
                         }
                     },
@@ -164,7 +166,7 @@ fun SettingsScreen(
             ) {
                 // Audio & Haptics Section
                 Text(
-                    text = "Feedback & Experience",
+                    text = stringResource(R.string.settings_feedback_section),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
@@ -205,7 +207,7 @@ fun SettingsScreen(
                                         fontSize = 15.sp
                                     )
                                     Text(
-                                        text = "Subtle click on region coloring",
+                                        text = stringResource(R.string.settings_sound_description),
                                         fontSize = 12.sp,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -254,7 +256,7 @@ fun SettingsScreen(
                                         fontSize = 15.sp
                                     )
                                     Text(
-                                        text = "Gentle tactile pulse on tap",
+                                        text = stringResource(R.string.settings_haptics_description),
                                         fontSize = 12.sp,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -276,7 +278,7 @@ fun SettingsScreen(
 
                 // Outline Style Section
                 Text(
-                    text = "Artwork Outlines",
+                    text = stringResource(R.string.settings_outline_section),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
@@ -289,7 +291,7 @@ fun SettingsScreen(
                 ) {
                     Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
                         Text(
-                            text = "Choose the line stroke color for your mandalas:",
+                            text = stringResource(R.string.settings_outline_description),
                             fontSize = 13.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -300,7 +302,7 @@ fun SettingsScreen(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            outlineColorOptions.forEach { (label, colorLong) ->
+                            outlineColorOptions.forEach { (labelRes, colorLong, testTagSuffix) ->
                                 val isSelected = outlineColor == colorLong
                                 Column(
                                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -308,7 +310,7 @@ fun SettingsScreen(
                                         .clip(RoundedCornerShape(12.dp))
                                         .clickable { appSettings.setOutlineColor(colorLong) }
                                         .padding(8.dp)
-                                        .testTag("outline_opt_${label.lowercase().replace(' ', '_')}")
+                                        .testTag("outline_opt_$testTagSuffix")
                                 ) {
                                     Box(
                                         modifier = Modifier
@@ -323,7 +325,7 @@ fun SettingsScreen(
                                     )
                                     Spacer(modifier = Modifier.height(6.dp))
                                     Text(
-                                        text = label,
+                                        text = stringResource(labelRes),
                                         fontSize = 11.sp,
                                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
                                     )
@@ -335,7 +337,7 @@ fun SettingsScreen(
 
                 // Privacy & Legal Compliance Section (Google Play / AdMob UMP Requirement)
                 Text(
-                    text = "Privacy & Legal",
+                    text = stringResource(R.string.settings_privacy_legal_section),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
@@ -367,7 +369,7 @@ fun SettingsScreen(
                                 modifier = Modifier.size(18.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Privacy Policy & Data Safety", fontWeight = FontWeight.SemiBold)
+                            Text(stringResource(R.string.settings_privacy_policy), fontWeight = FontWeight.SemiBold)
                         }
 
                         // Open Source Licenses & Copyright Notice
@@ -385,7 +387,7 @@ fun SettingsScreen(
                                 modifier = Modifier.size(18.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Licenses & Attribution", fontWeight = FontWeight.SemiBold)
+                            Text(stringResource(R.string.settings_licenses), fontWeight = FontWeight.SemiBold)
                         }
 
                         // UMP Consent Management button
@@ -404,7 +406,7 @@ fun SettingsScreen(
                                     modifier = Modifier.size(18.dp)
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text("Manage Ad & Privacy Consent", fontWeight = FontWeight.SemiBold)
+                                Text(stringResource(R.string.settings_manage_consent), fontWeight = FontWeight.SemiBold)
                             }
                         }
                     }
@@ -413,7 +415,7 @@ fun SettingsScreen(
                 // Optional cloud save section. Local Room saves remain available without an account.
                 if (cloudSaveManager != null) {
                     Text(
-                        text = "Cloud Save",
+                        text = stringResource(R.string.settings_cloud_save),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
@@ -429,9 +431,9 @@ fun SettingsScreen(
                         ) {
                             val signedInUser = cloudSaveManager.currentUser
                             if (signedInUser != null) {
-                                Text("Signed in as ${signedInUser.email ?: "Firebase user"}")
+                                Text(stringResource(R.string.settings_signed_in_as, signedInUser.email ?: context.getString(R.string.settings_firebase_user)))
                                 Text(
-                                    "Your local progress stays available offline. Sync merges coloring, favorites, and deletions independently across devices.",
+                                    stringResource(R.string.settings_cloud_sync_description),
                                     fontSize = 12.sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -442,18 +444,18 @@ fun SettingsScreen(
                                             cloudMessage = null
                                             cloudMessage = try {
                                                 cloudSaveManager.syncProgress()
-                                                "Cloud sync completed."
+                                                context.getString(R.string.settings_cloud_sync_completed)
                                             } catch (error: Exception) {
-                                                error.localizedMessage ?: "Cloud sync failed. Check your connection and Firestore rules."
+                                                error.localizedMessage ?: context.getString(R.string.settings_cloud_sync_failed)
                                             }
                                             cloudBusy = false
                                         }
                                     },
                                     enabled = !cloudBusy,
                                     modifier = Modifier.fillMaxWidth().testTag("btn_cloud_sync")
-                                ) { Text(if (cloudBusy) "Syncing..." else "Sync Progress") }
+                                ) { Text(if (cloudBusy) stringResource(R.string.settings_syncing) else stringResource(R.string.settings_sync_progress)) }
                                 Text(
-                                    "This is an optional one-time merge of local-only saves into this account. The original local copy is retained. Use it only when the local work belongs to you.",
+                                    stringResource(R.string.settings_import_description),
                                     fontSize = 12.sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -464,48 +466,48 @@ fun SettingsScreen(
                                             cloudMessage = null
                                             cloudMessage = try {
                                                 cloudSaveManager.importAnonymousProgress()
-                                                "Local progress imported; the local copy remains available."
+                                                context.getString(R.string.settings_import_completed)
                                             } catch (error: Exception) {
-                                                error.localizedMessage ?: "Import failed."
+                                                error.localizedMessage ?: context.getString(R.string.settings_import_failed)
                                             }
                                             cloudBusy = false
                                         }
                                     },
                                     enabled = !cloudBusy,
                                     modifier = Modifier.fillMaxWidth().testTag("btn_cloud_import_local")
-                                ) { Text(if (cloudBusy) "Importing..." else "Import Local Progress") }
+                                ) { Text(if (cloudBusy) stringResource(R.string.settings_importing) else stringResource(R.string.settings_import_local)) }
                                 OutlinedButton(
                                     onClick = {
                                         cloudSaveManager.signOut()
-                                        cloudMessage = "Signed out. Local progress remains on this device."
+                                        cloudMessage = context.getString(R.string.settings_signed_out)
                                     },
                                     enabled = !cloudBusy,
                                     modifier = Modifier.fillMaxWidth().testTag("btn_cloud_sign_out")
-                                ) { Text("Sign Out") }
+                                ) { Text(stringResource(R.string.settings_sign_out)) }
                                 OutlinedButton(
                                     onClick = { showDeleteAccountDialog = true },
                                     enabled = !cloudBusy,
                                     modifier = Modifier.fillMaxWidth().testTag("btn_cloud_delete_account")
                                 ) {
-                                    Text("Delete Account & Cloud Data", color = MaterialTheme.colorScheme.error)
+                                    Text(stringResource(R.string.settings_delete_account), color = MaterialTheme.colorScheme.error)
                                 }
                             } else {
                                 Text(
-                                    "Create an account or sign in to back up your coloring progress across devices.",
+                                    stringResource(R.string.settings_cloud_sign_in_description),
                                     fontSize = 13.sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                                 OutlinedTextField(
                                     value = cloudEmail,
                                     onValueChange = { cloudEmail = it },
-                                    label = { Text("Email") },
+                                    label = { Text(stringResource(R.string.settings_email)) },
                                     singleLine = true,
                                     modifier = Modifier.fillMaxWidth().testTag("field_cloud_email")
                                 )
                                 OutlinedTextField(
                                     value = cloudPassword,
                                     onValueChange = { cloudPassword = it },
-                                    label = { Text("Password (at least 6 characters)") },
+                                    label = { Text(stringResource(R.string.settings_password_hint)) },
                                     singleLine = true,
                                     visualTransformation = PasswordVisualTransformation(),
                                     modifier = Modifier.fillMaxWidth().testTag("field_cloud_password")
@@ -517,7 +519,7 @@ fun SettingsScreen(
                                         enabled = !cloudBusy
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text(if (createCloudAccount) "Create new account" else "I already have an account")
+                                    Text(if (createCloudAccount) stringResource(R.string.settings_create_new_account) else stringResource(R.string.settings_existing_account))
                                 }
                                 Button(
                                     onClick = {
@@ -531,9 +533,9 @@ fun SettingsScreen(
                                                     cloudSaveManager.signIn(cloudEmail, cloudPassword)
                                                 }
                                                 cloudPassword = ""
-                                                "Signed in. Cloud sync completed."
+                                                context.getString(R.string.settings_sign_in_completed)
                                             } catch (error: Exception) {
-                                                error.localizedMessage ?: "Could not sign in. Check your details and connection."
+                                                error.localizedMessage ?: context.getString(R.string.settings_sign_in_failed)
                                             }
                                             cloudBusy = false
                                         }
@@ -541,7 +543,7 @@ fun SettingsScreen(
                                     enabled = !cloudBusy && cloudEmail.contains("@") && cloudPassword.length >= 6,
                                     modifier = Modifier.fillMaxWidth().testTag("btn_cloud_auth")
                                 ) {
-                                    Text(if (cloudBusy) "Please wait..." else if (createCloudAccount) "Create Account & Sync" else "Sign In & Sync")
+                                    Text(if (cloudBusy) stringResource(R.string.settings_please_wait) else if (createCloudAccount) stringResource(R.string.settings_create_account_sync) else stringResource(R.string.settings_sign_in_sync))
                                 }
                             }
                             cloudMessage?.let {
@@ -590,7 +592,7 @@ fun SettingsScreen(
                                     fontSize = 16.sp
                                 )
                                 Text(
-                                    text = "Version ${BuildConfig.VERSION_NAME} • Native Android",
+                                    text = stringResource(R.string.settings_version, BuildConfig.VERSION_NAME),
                                     fontSize = 12.sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -609,7 +611,7 @@ fun SettingsScreen(
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
-                            text = "• 104 original algorithmic vector designs\n• Offline-first local saves with optional cloud backup\n• 5 relaxing curated color themes\n• Unlimited Undo & Redo with zoom & pan",
+                            text = stringResource(R.string.settings_feature_summary),
                             fontSize = 12.sp,
                             lineHeight = 18.sp,
                             color = MaterialTheme.colorScheme.onSurface
@@ -625,7 +627,7 @@ fun SettingsScreen(
         AlertDialog(
             onDismissRequest = { showPrivacyPolicyDialog = false },
             title = {
-                Text("Privacy Policy & Data Safety", fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.settings_privacy_policy), fontWeight = FontWeight.Bold)
             },
             text = {
                 Column(
@@ -655,7 +657,7 @@ fun SettingsScreen(
                     onClick = { showPrivacyPolicyDialog = false },
                     colors = ButtonDefaults.buttonColors(containerColor = PinkAccent)
                 ) {
-                    Text("Close")
+                    Text(stringResource(R.string.dialog_close))
                 }
             }
         )
@@ -671,7 +673,7 @@ fun SettingsScreen(
                 }
             },
             title = {
-                Text("Delete Account & Cloud Data", fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.settings_delete_account), fontWeight = FontWeight.Bold)
             },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -681,7 +683,7 @@ fun SettingsScreen(
                     OutlinedTextField(
                         value = deleteAccountPassword,
                         onValueChange = { deleteAccountPassword = it },
-                        label = { Text("Account password") },
+                        label = { Text(stringResource(R.string.settings_account_password)) },
                         singleLine = true,
                         visualTransformation = PasswordVisualTransformation(),
                         enabled = !cloudBusy,
@@ -700,7 +702,7 @@ fun SettingsScreen(
                                 cloudSaveManager?.deleteAccount(deleteAccountPassword)
                                 "Account deletion completed."
                             } catch (error: Exception) {
-                                error.localizedMessage ?: "Account deletion failed. You can retry from this account."
+                                error.localizedMessage ?: context.getString(R.string.settings_account_delete_failed)
                             } finally {
                                 deleteAccountPassword = ""
                                 cloudBusy = false
@@ -709,7 +711,7 @@ fun SettingsScreen(
                     },
                     enabled = !cloudBusy && deleteAccountPassword.isNotBlank()
                 ) {
-                    Text("Delete permanently", color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(R.string.settings_delete_permanently), color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
@@ -720,7 +722,7 @@ fun SettingsScreen(
                     },
                     enabled = !cloudBusy
                 ) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.dialog_cancel))
                 }
             }
         )
@@ -731,7 +733,7 @@ fun SettingsScreen(
         AlertDialog(
             onDismissRequest = { showLicensesDialog = false },
             title = {
-                Text("Licenses & Attribution", fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.settings_licenses), fontWeight = FontWeight.Bold)
             },
             text = {
                 Column(
@@ -762,7 +764,7 @@ fun SettingsScreen(
                     onClick = { showLicensesDialog = false },
                     colors = ButtonDefaults.buttonColors(containerColor = PinkAccent)
                 ) {
-                    Text("Close")
+                    Text(stringResource(R.string.dialog_close))
                 }
             }
         )

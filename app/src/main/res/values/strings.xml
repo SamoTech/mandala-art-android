@@ -126,4 +126,51 @@
         <item quantity="other">%1$d areas</item>
     </plurals>
 
+
+    <string name="settings_feedback_section">Feedback &amp; Experience</string>
+    <string name="settings_sound_description">Subtle click on region coloring</string>
+    <string name="settings_haptics_description">Gentle tactile pulse on tap</string>
+    <string name="settings_outline_section">Artwork Outlines</string>
+    <string name="settings_outline_description">Choose the line stroke color for your mandalas:</string>
+    <string name="settings_outline_classic_black">Classic Black</string>
+    <string name="settings_outline_charcoal">Charcoal</string>
+    <string name="settings_outline_deep_indigo">Deep Indigo</string>
+    <string name="settings_outline_espresso">Espresso</string>
+    <string name="settings_privacy_legal_section">Privacy &amp; Legal</string>
+    <string name="settings_privacy_policy">Privacy Policy &amp; Data Safety</string>
+    <string name="settings_licenses">Licenses &amp; Attribution</string>
+    <string name="settings_manage_consent">Manage Ad &amp; Privacy Consent</string>
+    <string name="settings_cloud_save">Cloud Save</string>
+    <string name="settings_firebase_user">Firebase user</string>
+    <string name="settings_signed_in_as">Signed in as %1$s</string>
+    <string name="settings_cloud_sync_description">Your local progress stays available offline. Sync merges coloring, favorites, and deletions independently across devices.</string>
+    <string name="settings_cloud_sync_completed">Cloud sync completed.</string>
+    <string name="settings_cloud_sync_failed">Cloud sync failed. Check your connection and Firestore rules.</string>
+    <string name="settings_syncing">Syncing...</string>
+    <string name="settings_sync_progress">Sync Progress</string>
+    <string name="settings_import_description">This is an optional one-time merge of local-only saves into this account. The original local copy is retained. Use it only when the local work belongs to you.</string>
+    <string name="settings_import_completed">Local progress imported; the local copy remains available.</string>
+    <string name="settings_import_failed">Import failed.</string>
+    <string name="settings_importing">Importing...</string>
+    <string name="settings_import_local">Import Local Progress</string>
+    <string name="settings_signed_out">Signed out. Local progress remains on this device.</string>
+    <string name="settings_sign_out">Sign Out</string>
+    <string name="settings_delete_account">Delete Account &amp; Cloud Data</string>
+    <string name="settings_cloud_sign_in_description">Create an account or sign in to back up your coloring progress across devices.</string>
+    <string name="settings_email">Email</string>
+    <string name="settings_password_hint">Password (at least 6 characters)</string>
+    <string name="settings_create_new_account">Create new account</string>
+    <string name="settings_existing_account">I already have an account</string>
+    <string name="settings_sign_in_completed">Signed in. Cloud sync completed.</string>
+    <string name="settings_sign_in_failed">Could not sign in. Check your details and connection.</string>
+    <string name="settings_please_wait">Please wait...</string>
+    <string name="settings_create_account_sync">Create Account &amp; Sync</string>
+    <string name="settings_sign_in_sync">Sign In &amp; Sync</string>
+    <string name="settings_version">Version %1$s • Native Android</string>
+    <string name="settings_feature_summary">• 104 original algorithmic vector designs\n• Offline-first local saves with optional cloud backup\n• 5 relaxing curated color themes\n• Unlimited Undo &amp; Redo with zoom &amp; pan</string>
+    <string name="settings_account_password">Account password</string>
+    <string name="settings_account_delete_failed">Account deletion failed. You can retry from this account.</string>
+    <string name="settings_delete_permanently">Delete permanently</string>
+    <string name="dialog_close">Close</string>
+
 </resources>
