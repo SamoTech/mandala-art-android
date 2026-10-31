@@ -116,7 +116,7 @@ class ProgressSyncMergeTest {
         assertEquals("offline-edit", merged.coloredRegionsJson)
     }
 
-    @Test fun concurrentForeignEditCannotBorrowAnotherDevicesRestoreProof() {
+    @Test fun explicitRestoreProofSurvivesHigherConcurrentForeignEdit() {
         val observedTombstone = record(deleted = true, deletionRevision = 8, deletionActor = "device-b")
         val restoreEvent = record(
             progress = "restored",
@@ -138,7 +138,7 @@ class ProgressSyncMergeTest {
             unobservedForeignEdit
         )!!
 
-        assertTrue("A foreign edit must not borrow another device's restore acknowledgement", merged.isDeleted)
+        assertFalse("A real restore event remains valid even when a foreign field edit wins", merged.isDeleted)
         assertEquals("offline-newer", merged.coloredRegionsJson)
     }
 
@@ -168,6 +168,46 @@ class ProgressSyncMergeTest {
         assertTrue(merged.isDeleted)
         assertEquals(10L, merged.deletionRevision)
         assertEquals("device-c", merged.deletionActor)
+    }
+
+    @Test fun proofForNewerDeletionIsNotMaskedByOlderHighCounterProof() {
+        val olderRestoreProof = record(
+            progress = "older-restored",
+            progressRevision = 100,
+            progressActor = "device-a",
+            restoredDeletionRevision = 8,
+            restoredDeletionActor = "device-b",
+            restorationEventRevision = 100,
+            restorationEventActor = "device-a"
+        )
+        val newerTombstone = record(
+            progress = "before-new-delete",
+            progressRevision = 11,
+            progressActor = "device-c",
+            deleted = true,
+            deletionRevision = 12,
+            deletionActor = "device-c"
+        )
+        val restoreNewerDeletion = record(
+            progress = "newly-restored",
+            progressRevision = 13,
+            progressActor = "device-d",
+            deleted = false,
+            deletionRevision = 12,
+            deletionActor = "device-c",
+            restoredDeletionRevision = 12,
+            restoredDeletionActor = "device-c",
+            restorationEventRevision = 13,
+            restorationEventActor = "device-d"
+        )
+
+        val firstMerge = ProgressSyncMerge.merge(olderRestoreProof, newerTombstone)!!
+        val finalMerge = ProgressSyncMerge.merge(firstMerge, restoreNewerDeletion)!!
+
+        assertFalse(finalMerge.isDeleted)
+        assertEquals(12L, finalMerge.deletionRevision)
+        assertEquals(12L, finalMerge.restoredDeletionRevision)
+        assertEquals("device-c", finalMerge.restoredDeletionActor)
     }
 
     @Test fun concurrentCountersUseActorIdAsDeterministicTieBreaker() {
