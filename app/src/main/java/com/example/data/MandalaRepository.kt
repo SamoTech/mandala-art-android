@@ -95,7 +95,7 @@ class MandalaRepository(
             mandalaId = mandalaId,
             timestamp = System.currentTimeMillis(),
             actor = deviceActorId,
-            ownerUid = activeOwnerUid.value
+            ownerUid = ownerUid
         )
     }
 
