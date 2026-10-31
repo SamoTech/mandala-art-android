@@ -42,4 +42,38 @@
     <string name="settings_outline_color">Outline Color</string>
     <string name="settings_about">About Mandala Art</string>
     <string name="settings_about_desc">A mindful native coloring studio crafted with pure geometry and soothing palettes.</string>
+    <string name="navigation_back">Back</string>
+    <string name="home_featured_artwork">Featured Artwork</string>
+    <string name="home_featured_artwork_description">A calming sacred flower pattern with %1$d harmonious petals.</string>
+    <string name="home_all_mandalas">All Mandalas</string>
+    <string name="home_tap_to_color">Tap to color</string>
+    <plurals name="home_design_count">
+        <item quantity="one">%d Design</item>
+        <item quantity="other">%d Designs</item>
+    </plurals>
+    <plurals name="home_artwork_count">
+        <item quantity="one">%d Artwork</item>
+        <item quantity="other">%d Artworks</item>
+    </plurals>
+    <plurals name="gallery_original_mandala_count">
+        <item quantity="one">%d Original Mandala</item>
+        <item quantity="other">%d Original Mandalas</item>
+    </plurals>
+    <string name="gallery_level_title">Level %1$d · %2$s</string>
+    <string name="gallery_completed_progress">%1$d / %2$d completed</string>
+    <string name="gallery_locked_hint">Locked — complete %1$d designs in Level %2$d</string>
+    <string name="gallery_level_locked">Level locked</string>
+    <string name="my_art_filter_all">All Saved</string>
+    <string name="my_art_filter_in_progress">In Progress</string>
+    <string name="my_art_filter_completed">Completed</string>
+    <string name="my_art_filter_favorites">Favorites</string>
+    <string name="my_art_no_saved_in_view">No saved mandalas in this view</string>
+    <string name="my_art_browse_gallery">Browse Gallery</string>
+    <string name="my_art_continue">Continue</string>
+    <string name="my_art_share">Share</string>
+    <string name="my_art_delete">Delete</string>
+    <string name="my_art_export_error">Unable to export artwork. Please try again.</string>
+    <string name="my_art_delete_title">Delete Saved Artwork?</string>
+    <string name="my_art_delete_message">Are you sure you want to remove your colored progress for “%1$s”?</string>
+    <string name="my_art_deleted_toast">Artwork removed</string>
 </resources>
