@@ -9,13 +9,13 @@ set -euo pipefail
   printf '%s\n' '## Mandala Art for Android' ''
   printf '%s\n' 'A signed production build of Mandala Art, a mandala coloring studio for Android.' ''
   printf '%s\n' '## Download and install' ''
-  printf '%s\n' "1. Download \`Mandala-Art-${RELEASE_TAG}.apk\` from the Assets section."
-  printf '%s\n' '2. Open the APK on your Android device and follow the installation prompts.'
-  printf '%s\n' '3. To update an existing installation, install over the current app. Do not uninstall the app or clear its data as part of a normal update.' ''
+  printf '%s\n' "1. Download \`Mandala-Art-${RELEASE_TAG}.apk\` from the Assets section to install directly on an Android device."
+  printf '%s\n' "2. Download \`Mandala-Art-${RELEASE_TAG}.aab\` to upload the app bundle to Google Play Console. Do not install the AAB directly."
+  printf '%s\n' '3. To update an existing installation from the APK, install over the current app. Do not uninstall the app or clear its data as part of a normal update.' ''
   printf '%s\n' '## Build and integrity' ''
   printf '%s\n' '- The debug build and unit tests passed in GitHub Actions before publication.'
-  printf '%s\n' '- The production APK signature was verified with `apksigner`.'
-  printf '%s\n' '- `SHA256SUMS.txt` contains the APK SHA-256 checksum for integrity verification.' ''
+  printf '%s\n' '- The production APK signature was verified with `apksigner`; the AAB signature was verified with `jarsigner`.'
+  printf '%s\n' '- `SHA256SUMS.txt` contains SHA-256 checksums for both release artifacts.' ''
   printf '%s\n' '## Changes in this release' ''
   printf '%s\n' "${NOTES}"
 } > release-body.md
