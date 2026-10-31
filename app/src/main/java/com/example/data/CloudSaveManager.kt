@@ -109,9 +109,9 @@ class CloudSaveManager(
         val uid = auth.currentUser?.uid ?: error("Sign in to sync your progress.")
         val collection = firestore.collection("users").document(uid).collection("mandalaProgress")
 
-        // Snapshot supplies the document IDs. Each document is re-read inside a
-        // transaction before its merge/write, avoiding stale snapshot overwrites.
-        val remoteSnapshot = collection.get().await()
+        // Discover IDs from the server, never from a possibly stale local cache.
+        // An offline/cache-only response must fail rather than report a false sync success.
+        val remoteSnapshot = collection.get(Source.SERVER).await()
         ensureSameAccount(uid)
         // Only this Firebase UID's local partition participates in this sync.
         // Anonymous and other-account rows are never candidates for upload.
@@ -120,26 +120,28 @@ class CloudSaveManager(
 
         for (id in ids) {
             ensureSameAccount(uid)
-            val localCandidate = dao.getProgressOnce(id, uid)
             val document = collection.document(id)
 
-            val serverMerged = firestore.runTransaction { transaction ->
-                check(auth.currentUser?.uid == uid) {
-                    "Account changed during cloud sync; retry with the active account."
+            ProgressSyncReconciler.reconcile(
+                readLocal = { dao.getProgressOnce(id, uid) },
+                syncRemote = { localCandidate ->
+                    ensureSameAccount(uid)
+                    firestore.runTransaction { transaction ->
+                        check(auth.currentUser?.uid == uid) {
+                            "Account changed during cloud sync; retry with the active account."
+                        }
+                        val snapshot = transaction.get(document)
+                        val remote = if (snapshot.exists()) snapshot.toProgressEntity(uid) else null
+                        val merged = ProgressSyncMerge.merge(localCandidate, remote)
+                        if (merged != null) transaction.set(document, merged.toCloudMap())
+                        merged
+                    }.await()
+                },
+                applyRemote = { serverMerged ->
+                    ensureSameAccount(uid)
+                    dao.mergeProgress(serverMerged.copy(ownerUid = uid))
                 }
-                val snapshot = transaction.get(document)
-                val remote = if (snapshot.exists()) snapshot.toProgressEntity(uid) else null
-                val merged = ProgressSyncMerge.merge(localCandidate, remote)
-                if (merged != null) transaction.set(document, merged.toCloudMap())
-                merged
-            }.await()
-
-            ensureSameAccount(uid)
-            if (serverMerged != null) {
-                // This DAO transaction re-reads the current local row, so a
-                // concurrent editor write is not replaced by our stale candidate.
-                dao.mergeProgress(serverMerged.copy(ownerUid = uid))
-            }
+            )
         }
         ensureSameAccount(uid)
     }
