@@ -66,6 +66,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.BuildConfig
 import com.example.R
 import com.example.data.CloudSaveManager
 import kotlinx.coroutines.launch
@@ -555,7 +556,7 @@ fun SettingsScreen(
                                     fontSize = 16.sp
                                 )
                                 Text(
-                                    text = "Version 1.0 • Native Android",
+                                    text = "Version ${BuildConfig.VERSION_NAME} • Native Android",
                                     fontSize = 12.sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
