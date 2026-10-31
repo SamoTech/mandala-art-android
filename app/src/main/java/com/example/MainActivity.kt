@@ -1,7 +1,10 @@
 package com.example
 
 import android.app.Activity
+import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
+import android.os.LocaleList
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -77,6 +80,18 @@ sealed class Screen {
 }
 
 class MainActivity : ComponentActivity() {
+    override fun attachBaseContext(newBase: Context) {
+        val languageTag = newBase.getSharedPreferences("mandala_app_prefs", Context.MODE_PRIVATE)
+            .getString(AppSettings.KEY_LANGUAGE, "").orEmpty()
+        if (languageTag.isBlank()) {
+            super.attachBaseContext(newBase)
+        } else {
+            val configuration = Configuration(newBase.resources.configuration)
+            configuration.setLocales(LocaleList.forLanguageTags(languageTag))
+            super.attachBaseContext(newBase.createConfigurationContext(configuration))
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -133,9 +148,18 @@ fun MandalaApp(
 
     val screenStack = remember { mutableStateListOf<Screen>(Screen.Home) }
     var observedOwnerUid by remember { mutableStateOf(repository.currentOwnerUid) }
+    var initialAuthStateObserved by remember { mutableStateOf(false) }
+    var startupRestoreRequested by remember { mutableStateOf(false) }
+    var cloudRestoreLoading by remember { mutableStateOf(false) }
+    var cloudRestoreFailed by remember { mutableStateOf(false) }
+    var cloudRestoreRetryCount by remember { mutableStateOf(0) }
 
     DisposableEffect(repository, cloudSaveManager) {
         val stopObserving = cloudSaveManager.observeAuthState { uid ->
+            if (!initialAuthStateObserved) {
+                initialAuthStateObserved = true
+                startupRestoreRequested = uid.isNotBlank()
+            }
             repository.setOwnerUid(uid)
             if (uid != observedOwnerUid) {
                 observedOwnerUid = uid
@@ -148,6 +172,31 @@ fun MandalaApp(
     val currentScreen = screenStack.lastOrNull() ?: Screen.Home
 
     val scope = rememberCoroutineScope()
+
+    // Restore only the already-authenticated account on cold start. Sign-in and
+    // account creation retain their existing explicit sync path; anonymous and
+    // other-account partitions are never imported here.
+    LaunchedEffect(startupRestoreRequested, cloudRestoreRetryCount) {
+        if (startupRestoreRequested) {
+            val startupUid = observedOwnerUid
+            if (startupUid.isNotBlank() && cloudSaveManager.currentUser?.uid == startupUid) {
+                cloudRestoreLoading = true
+                cloudRestoreFailed = false
+                try {
+                    cloudSaveManager.syncProgress()
+                } catch (error: Exception) {
+                    android.util.Log.w("MainActivity", "Startup cloud restore failed; local progress remains available.", error)
+                    cloudRestoreFailed = true
+                } finally {
+                    cloudRestoreLoading = false
+                    startupRestoreRequested = false
+                }
+            } else {
+                startupRestoreRequested = false
+            }
+        }
+    }
+
     val allProgressList by repository.allProgress.collectAsState(initial = emptyList())
     val savedArtworksMap = remember(allProgressList) {
         allProgressList.associateBy { it.mandalaId }
@@ -276,6 +325,10 @@ fun MandalaApp(
                 SettingsScreen(
                     appSettings = appSettings,
                     cloudSaveManager = cloudSaveManager,
+                    onLanguageChange = { languageTag ->
+                        appSettings.setLanguage(languageTag)
+                        activity.recreate()
+                    },
                     onManageConsent = {
                         adMobManager.showPrivacyOptionsForm(activity)
                     },
@@ -283,6 +336,35 @@ fun MandalaApp(
                 )
             }
         }
+    }
+
+    if (cloudRestoreLoading) {
+        AlertDialog(
+            onDismissRequest = {},
+            title = { Text(stringResource(R.string.settings_cloud_restore_title)) },
+            text = { Text(stringResource(R.string.settings_cloud_restore_message)) },
+            confirmButton = {}
+        )
+    }
+
+    if (cloudRestoreFailed) {
+        AlertDialog(
+            onDismissRequest = { cloudRestoreFailed = false },
+            title = { Text(stringResource(R.string.settings_cloud_restore_failed_title)) },
+            text = { Text(stringResource(R.string.settings_cloud_restore_failed_message)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    cloudRestoreFailed = false
+                    startupRestoreRequested = true
+                    cloudRestoreRetryCount += 1
+                }) { Text(stringResource(R.string.dialog_retry)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { cloudRestoreFailed = false }) {
+                    Text(stringResource(R.string.dialog_close))
+                }
+            }
+        )
     }
 
     // Rewarded Ad Voluntary Unlock Dialog
