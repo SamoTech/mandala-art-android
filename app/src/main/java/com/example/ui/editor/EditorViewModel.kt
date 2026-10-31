@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
 class EditorViewModel(
@@ -193,6 +194,22 @@ class EditorViewModel(
      */
     suspend fun flushPendingSave() {
         autosaveWorker.flush()
+    }
+
+    /**
+     * Starts an ON_STOP flush in the ViewModel scope so composition disposal
+     * cannot cancel a save that was already triggered by the lifecycle event.
+     */
+    fun flushPendingSaveOnLifecycleStop(onError: (Exception) -> Unit) {
+        viewModelScope.launch {
+            try {
+                flushPendingSave()
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (error: Exception) {
+                onError(error)
+            }
+        }
     }
 
     private fun saveProgressInternal() {

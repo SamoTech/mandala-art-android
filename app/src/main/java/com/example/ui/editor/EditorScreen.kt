@@ -55,8 +55,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -108,21 +106,12 @@ fun EditorScreen(
     }
 
     DisposableEffect(lifecycleOwner, viewModel) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_STOP) {
-                navigationScope.launch {
-                    try {
-                        viewModel.flushPendingSave()
-                    } catch (cancelled: CancellationException) {
-                        throw cancelled
-                    } catch (error: Exception) {
-                        Log.e("EditorScreen", "Autosave flush failed when app stopped", error)
-                    }
-                }
+        val observer = EditorLifecycleSaveObserver(lifecycleOwner.lifecycle) {
+            viewModel.flushPendingSaveOnLifecycleStop { error ->
+                Log.e("EditorScreen", "Autosave flush failed when app stopped", error)
             }
         }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+        onDispose { observer.close() }
     }
 
     LaunchedEffect(viewModel.design.id) {
