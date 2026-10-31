@@ -89,6 +89,9 @@ fun SettingsScreen(
     val hapticEnabled by appSettings.hapticEnabled.collectAsState()
     val outlineColor by appSettings.outlineColor.collectAsState()
     val appLanguage by appSettings.language.collectAsState()
+    val effectiveLanguage = appLanguage.ifBlank {
+        context.resources.configuration.locales[0].language.takeIf { it == "ar" } ?: "en"
+    }
 
     var showPrivacyPolicyDialog by remember { mutableStateOf(false) }
     var showLicensesDialog by remember { mutableStateOf(false) }
@@ -184,12 +187,12 @@ fun SettingsScreen(
                     ) {
                         Text(stringResource(R.string.settings_language_description), color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            if (appLanguage == "en") {
+                            if (effectiveLanguage == "en") {
                                 Button(onClick = { onLanguageChange("en") }, modifier = Modifier.weight(1f).testTag("btn_language_english")) { Text(stringResource(R.string.settings_language_english)) }
                             } else {
                                 OutlinedButton(onClick = { onLanguageChange("en") }, modifier = Modifier.weight(1f).testTag("btn_language_english")) { Text(stringResource(R.string.settings_language_english)) }
                             }
-                            if (appLanguage == "ar") {
+                            if (effectiveLanguage == "ar") {
                                 Button(onClick = { onLanguageChange("ar") }, modifier = Modifier.weight(1f).testTag("btn_language_arabic")) { Text(stringResource(R.string.settings_language_arabic)) }
                             } else {
                                 OutlinedButton(onClick = { onLanguageChange("ar") }, modifier = Modifier.weight(1f).testTag("btn_language_arabic")) { Text(stringResource(R.string.settings_language_arabic)) }
