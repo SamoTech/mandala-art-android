@@ -24,7 +24,15 @@ class EditorViewModel(
     val mandalaId: String,
     private val repository: MandalaRepository,
     private val appSettings: AppSettings,
-    private val ownerUid: String = repository.currentOwnerUid
+    private val ownerUid: String = repository.currentOwnerUid,
+    private val persistProgress: suspend (String, Map<String, Long>) -> Unit = { uid, snapshot ->
+        repository.saveProgress(
+            mandalaId = mandalaId,
+            coloredRegions = snapshot,
+            totalRegions = MandalaLibrary.getDesignById(mandalaId).regionCount,
+            ownerUid = uid
+        )
+    }
 ) : ViewModel() {
 
     val design: MandalaDesign = MandalaLibrary.getDesignById(mandalaId)
@@ -48,14 +56,7 @@ class EditorViewModel(
 
     private val autosaveWorker = EditorAutosaveWorker(
         scope = viewModelScope,
-        save = { snapshot ->
-            repository.saveProgress(
-                mandalaId = mandalaId,
-                coloredRegions = snapshot,
-                totalRegions = design.regionCount,
-                ownerUid = ownerUid
-            )
-        },
+        save = { snapshot -> persistProgress(ownerUid, snapshot) },
         onSaveError = { error ->
             Log.e("EditorViewModel", "Autosave failed for $mandalaId", error)
         }
@@ -203,11 +204,19 @@ class EditorViewModel(
         private val mandalaId: String,
         private val repository: MandalaRepository,
         private val appSettings: AppSettings,
-        private val ownerUid: String = repository.currentOwnerUid
+        private val ownerUid: String = repository.currentOwnerUid,
+        private val persistProgress: suspend (String, Map<String, Long>) -> Unit = { uid, snapshot ->
+            repository.saveProgress(
+                mandalaId = mandalaId,
+                coloredRegions = snapshot,
+                totalRegions = MandalaLibrary.getDesignById(mandalaId).regionCount,
+                ownerUid = uid
+            )
+        }
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return EditorViewModel(mandalaId, repository, appSettings, ownerUid) as T
+            return EditorViewModel(mandalaId, repository, appSettings, ownerUid, persistProgress) as T
         }
     }
 }
