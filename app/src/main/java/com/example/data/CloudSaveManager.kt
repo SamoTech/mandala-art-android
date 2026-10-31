@@ -94,7 +94,9 @@ class CloudSaveManager(
             favoriteActor = getString("favoriteActor") ?: "legacy",
             isDeleted = getBoolean("isDeleted") ?: false,
             deletionRevision = (getLong("deletionRevision") ?: 0L).coerceAtLeast(0L),
-            deletionActor = getString("deletionActor") ?: "legacy"
+            deletionActor = getString("deletionActor") ?: "legacy",
+            restoredDeletionRevision = (getLong("restoredDeletionRevision") ?: 0L).coerceAtLeast(0L),
+            restoredDeletionActor = getString("restoredDeletionActor") ?: "legacy"
         )
     }
 
@@ -110,6 +112,8 @@ class CloudSaveManager(
         "favoriteActor" to favoriteActor,
         "isDeleted" to isDeleted,
         "deletionRevision" to deletionRevision,
-        "deletionActor" to deletionActor
+        "deletionActor" to deletionActor,
+        "restoredDeletionRevision" to restoredDeletionRevision,
+        "restoredDeletionActor" to restoredDeletionActor
     )
 }
