@@ -3,7 +3,7 @@
 > **Status:** Living execution plan  
 > **Baseline reviewed:** 2026-10-31  
 > **Repository:** [SamoTech/mandala-art-android](https://github.com/SamoTech/mandala-art-android)  
-> **Current planning baseline:** `main` at `3b4ac9c1c99915fcd2646640a8408957e6d10fa2`
+> **Current planning baseline:** `main` at `bb39ad1bd9c5d72238f3fdb470e279e7c1e62d74`
 
 This document is the canonical roadmap for product and engineering work on Mandala Art. New work should follow the sequence, dependencies, acceptance criteria, and delivery rules below. It is intentionally milestone-based rather than date-based: a milestone advances only when its exit criteria are demonstrated.
 
@@ -33,7 +33,7 @@ The following reflects a source review of `main` on 2026-10-31. “Implemented�
 | Account deletion | In-app reauthentication, server-side deletion lock, cloud/local cleanup | Merged in PR #29; pre-Play compliance review remains |
 | Favorites | Separate favorite revision/actor; update path also updates edit timestamp | Implemented; add/retain focused persistence and conflict tests |
 | Delete/reset semantics | Tombstones, deletion revisions, explicit restoration proof | Implemented; expand adversarial regression tests as needed |
-| Autosave | Conflated worker, debounce, explicit flush, background error callback | Implemented; account-switch/lifecycle race still requires investigation |
+| Autosave | Conflated worker, debounce, explicit flush, background error callback, owner-bound ViewModel persistence, ON_STOP flush in ViewModel scope | M0 regression coverage merged in PRs #32, #36, and #37; lifecycle test covers ON_STOP, not process death |
 | Daily Inspiration | Stable date-based design selection; Home screen keys it by local date | Implemented; verify timezone/day-boundary behavior |
 | Share image rendering | Bitmap rendering on IO dispatcher; age-based cache cleanup | Implemented; verify memory and cleanup behavior |
 | Arabic localization | Main `strings.xml` is currently English | Not implemented |
@@ -52,7 +52,7 @@ The following reflects a source review of `main` on 2026-10-31. “Implemented�
 
 ## 3. Milestones and execution order
 
-### M0 — Data integrity and editor lifecycle (P0, active)
+### M0 — Data integrity and editor lifecycle (P0, completed)
 
 **Goal:** Never lose a user's latest coloring edits, resurrect a deleted artwork incorrectly, or mix data between accounts.
 
@@ -78,7 +78,7 @@ Work items:
 - Firestore emulator security tests, Android unit tests, lint, and debug build pass.
 - Manual test on a physical device: edit, switch account from another screen/session, return/sign in, and verify each account sees only its own data.
 
-**Progress evidence:** PRs #29–#36 are merged. PR #36 adds deterministic in-flight save and failed-save retry coverage; its post-merge workflow on `47827afb2be1edd9e957e7019de1e7fe71327b5c` passed Android build/unit tests and Firestore security rules. The production release job was skipped as expected. Physical-device account-isolation verification was reported complete by the user on 2026-10-31. PR #37 adds an ON_STOP lifecycle integration test using the real editor ViewModel and its owner-bound persistence callback; this verifies the lifecycle-triggered flush path, not full Android process-death behavior. Automated sync tests exercise the deterministic reconciliation/merge layer, not live Firestore end-to-end tests. M0 remains active until PR #37 passes CI and is merged.
+**Completion evidence:** PRs #29–#37 are merged. PR #36 added deterministic in-flight save and failed-save retry coverage. PR #37 added an ON_STOP lifecycle integration test using the real editor ViewModel, in-memory Room, and owner-bound persistence callback; it verifies that a lifecycle-triggered flush remains attached to the original account when the active account changes. The post-merge workflow for commit `bb39ad1bd9c5d72238f3fdb470e279e7c1e62d74` passed Android debug build, unit tests, lint, and Firestore security rules. The production release job was skipped as expected. Physical-device account-isolation verification was reported complete by the user on 2026-10-31; the ON_STOP integration test is Robolectric-based and does not claim physical-device process-death coverage. Automated sync tests exercise the deterministic reconciliation/merge layer, not live Firestore end-to-end tests. All defined M0 exit criteria are met; process-death and live Firestore E2E remain outside the demonstrated coverage and must not be inferred.
 
 ### M1 — Arabic localization and accessibility foundation (P1)
 
@@ -236,10 +236,10 @@ The following is the working queue. Do not skip ahead because a later feature is
 
 | Order | Work item | Priority | Status |
 |---:|---|---|---|
-| 1 | Autosave/account-switch lifecycle audit and regression tests | P0 | In progress — debounce, in-flight, and failed-save retry tests covered; navigation/ON_STOP lifecycle integration remains |
+| 1 | Autosave/account-switch lifecycle audit and regression tests | P0 | Completed — PRs #32, #36, #37; post-merge CI passed |
 | 2 | Favorite timestamp persistence and tombstone edge-case coverage | P0 | Completed — PR #33; post-merge CI passed |
 | 3 | Offline sync and account-isolation regression coverage | P0 | Completed — PR #34; post-merge Android and Firestore CI passed; device verification user-reported |
-| 4 | Arabic resources and RTL pass | P1 | Planned |
+| 4 | Arabic resources and RTL pass | P1 | Next — inspect current resource coverage, then implement in focused PRs |
 | 5 | Release R8/minification experiment with measured comparison | P1 | Planned |
 | 6 | Profile gallery and share paths; optimize only measured bottlenecks | P1 | Planned |
 | 7 | User-configurable deterministic mandala generator | P2 | Discovery |
@@ -310,4 +310,4 @@ Every change to priority or scope must include a short reason. Do not silently r
 
 ---
 
-**Current next action:** Complete M0 item 1 — add a lifecycle integration test proving the navigation/ON_STOP flush path completes safely while preserving the editor's original UID. Keep M1 blocked until M0 exit criteria are demonstrated.
+**Current next action:** Begin M1 — inspect the existing Android resource inventory and user-visible hardcoded strings, define a localization acceptance checklist, then add Arabic resources and RTL coverage in small reviewable PRs. Preserve English as the default locale and verify Arabic/English behavior with automated tests.
