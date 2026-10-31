@@ -370,9 +370,22 @@ fun EditorScreen(
             confirmButton = {
                 Button(
                     onClick = {
-                        viewModel.reset()
-                        showResetDialog = false
-                        Toast.makeText(context, "Artwork reset", Toast.LENGTH_SHORT).show()
+                        navigationScope.launch {
+                            try {
+                                viewModel.reset()
+                                showResetDialog = false
+                                Toast.makeText(context, "Artwork reset", Toast.LENGTH_SHORT).show()
+                            } catch (cancelled: CancellationException) {
+                                throw cancelled
+                            } catch (error: Exception) {
+                                Log.e("EditorScreen", "Unable to reset artwork", error)
+                                Toast.makeText(
+                                    context,
+                                    "Could not reset artwork. Please try again.",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
                     modifier = Modifier.testTag("btn_confirm_reset")
