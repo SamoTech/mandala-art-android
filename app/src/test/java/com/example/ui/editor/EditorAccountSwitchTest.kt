@@ -7,13 +7,18 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.example.data.MandalaDatabase
 import com.example.data.MandalaRepository
+import com.example.generator.MandalaLibrary
 import com.example.util.AppSettings
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertNotSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.io.IOException
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
@@ -76,4 +81,114 @@ class EditorAccountSwitchTest {
             database.close()
         }
     }
+    @Test
+    fun accountSwitchDuringInFlightSaveKeepsWriteBoundToOriginalOwner() = runBlocking {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val database = Room.inMemoryDatabaseBuilder(context, MandalaDatabase::class.java)
+            .allowMainThreadQueries()
+            .build()
+        val repository = MandalaRepository(database.mandalaDao(), "in-flight-switch-test-device")
+        val settings = AppSettings(context)
+        val viewModelStore = ViewModelStore()
+        val saveStarted = CompletableDeferred<Unit>()
+        val releaseSave = CompletableDeferred<Unit>()
+        val observedOwnerUids = mutableListOf<String>()
+
+        try {
+            repository.setOwnerUid("account-a")
+            val factory = EditorViewModel.Factory(
+                mandalaId = "lotus_bloom",
+                repository = repository,
+                appSettings = settings,
+                ownerUid = "account-a",
+                persistProgress = { ownerUid, snapshot ->
+                    observedOwnerUids += ownerUid
+                    saveStarted.complete(Unit)
+                    releaseSave.await()
+                    repository.saveProgress(
+                        mandalaId = "lotus_bloom",
+                        coloredRegions = snapshot,
+                        totalRegions = MandalaLibrary.getDesignById("lotus_bloom").regionCount,
+                        ownerUid = ownerUid
+                    )
+                }
+            )
+            val editor = ViewModelProvider(viewModelStore, factory)
+                .get("account-a:lotus_bloom", EditorViewModel::class.java)
+
+            editor.onRegionTapped("petal_0", context)
+            val flush = async { editor.flushPendingSave() }
+            saveStarted.await()
+
+            repository.setOwnerUid("account-b")
+            releaseSave.complete(Unit)
+            flush.await()
+
+            assertTrue("Every in-flight write must retain the editor's original UID", observedOwnerUids.all { it == "account-a" })
+            assertNotNull(database.mandalaDao().getProgressOnce("lotus_bloom", "account-a"))
+            assertNull(database.mandalaDao().getProgressOnce("lotus_bloom", "account-b"))
+        } finally {
+            releaseSave.complete(Unit)
+            viewModelStore.clear()
+            database.close()
+        }
+    }
+
+    @Test
+    fun failedSaveRetryAfterAccountSwitchStillUsesOriginalOwnerUid() = runBlocking {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val database = Room.inMemoryDatabaseBuilder(context, MandalaDatabase::class.java)
+            .allowMainThreadQueries()
+            .build()
+        val repository = MandalaRepository(database.mandalaDao(), "failed-switch-test-device")
+        val settings = AppSettings(context)
+        val viewModelStore = ViewModelStore()
+        val observedOwnerUids = mutableListOf<String>()
+        var failFirstAttempt = true
+
+        try {
+            repository.setOwnerUid("account-a")
+            val factory = EditorViewModel.Factory(
+                mandalaId = "lotus_bloom",
+                repository = repository,
+                appSettings = settings,
+                ownerUid = "account-a",
+                persistProgress = { ownerUid, snapshot ->
+                    observedOwnerUids += ownerUid
+                    if (failFirstAttempt) {
+                        failFirstAttempt = false
+                        throw IOException("temporary persistence failure")
+                    }
+                    repository.saveProgress(
+                        mandalaId = "lotus_bloom",
+                        coloredRegions = snapshot,
+                        totalRegions = MandalaLibrary.getDesignById("lotus_bloom").regionCount,
+                        ownerUid = ownerUid
+                    )
+                }
+            )
+            val editor = ViewModelProvider(viewModelStore, factory)
+                .get("account-a:lotus_bloom", EditorViewModel::class.java)
+
+            editor.onRegionTapped("petal_0", context)
+            var failedAsExpected = false
+            try {
+                editor.flushPendingSave()
+            } catch (_: IOException) {
+                failedAsExpected = true
+            }
+            assertTrue("The first persistence attempt must fail in this regression test", failedAsExpected)
+
+            repository.setOwnerUid("account-b")
+            editor.flushPendingSave()
+
+            assertEquals(listOf("account-a", "account-a"), observedOwnerUids)
+            assertNotNull(database.mandalaDao().getProgressOnce("lotus_bloom", "account-a"))
+            assertNull(database.mandalaDao().getProgressOnce("lotus_bloom", "account-b"))
+        } finally {
+            viewModelStore.clear()
+            database.close()
+        }
+    }
+
 }
