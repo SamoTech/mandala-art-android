@@ -50,6 +50,12 @@ class EditorViewModel(
     private val _isZoomPanMode = MutableStateFlow(false)
     val isZoomPanMode: StateFlow<Boolean> = _isZoomPanMode.asStateFlow()
 
+    private val _hasAutosaveError = MutableStateFlow(false)
+    val hasAutosaveError: StateFlow<Boolean> = _hasAutosaveError.asStateFlow()
+
+    private val _autosaveErrorVersion = MutableStateFlow(0L)
+    val autosaveErrorVersion: StateFlow<Long> = _autosaveErrorVersion.asStateFlow()
+
     private val undoStack = mutableListOf<ColorStep>()
     // Prevent a late initial database read from replacing the user's first edit.
     private var hasUserEdited = false
@@ -57,8 +63,12 @@ class EditorViewModel(
 
     private val autosaveWorker = EditorAutosaveWorker(
         scope = viewModelScope,
-        save = { snapshot -> persistProgress(ownerUid, snapshot) },
+        save = { snapshot ->
+            persistProgress(ownerUid, snapshot)
+            _hasAutosaveError.value = false
+        },
         onSaveError = { error ->
+            publishAutosaveError()
             Log.e("EditorViewModel", "Autosave failed for $mandalaId", error)
         }
     )
@@ -193,7 +203,20 @@ class EditorViewModel(
      * leaves the foreground. Safe to call repeatedly.
      */
     suspend fun flushPendingSave() {
-        autosaveWorker.flush()
+        try {
+            autosaveWorker.flush()
+            _hasAutosaveError.value = false
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (error: Exception) {
+            publishAutosaveError()
+            throw error
+        }
+    }
+
+    private fun publishAutosaveError() {
+        _hasAutosaveError.value = true
+        _autosaveErrorVersion.value += 1L
     }
 
     /**

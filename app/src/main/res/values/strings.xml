@@ -25,6 +25,11 @@
     <string name="editor_reset_message">Are you sure you want to clear all colored areas? This action cannot be undone.</string>
     <string name="dialog_cancel">Cancel</string>
     <string name="dialog_confirm">Confirm</string>
+    <string name="autosave_error_title">Changes not saved</string>
+    <string name="autosave_error_message">Your latest changes have not been saved. Retry before leaving the editor.</string>
+    <string name="autosave_retry">Retry</string>
+    <string name="autosave_retrying">Retrying…</string>
+    <string name="autosave_keep_editing">Keep Editing</string>
     <string name="gallery_title">Mandala Gallery</string>
     <string name="my_art_title">My Art Collection</string>
     <string name="my_art_empty">No colored mandalas yet. Tap Color Now to begin your journey!</string>
