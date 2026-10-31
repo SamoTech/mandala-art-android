@@ -52,6 +52,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -97,6 +99,7 @@ fun MyArtScreen(
     onNavigateBack: () -> Unit
 ) {
     val context = LocalContext.current
+    val shareScope = rememberCoroutineScope()
     var selectedFilter by remember { mutableStateOf(MyArtFilter.ALL) }
     var artworkToDelete by remember { mutableStateOf<MandalaDesign?>(null) }
 
@@ -326,12 +329,22 @@ fun MyArtScreen(
                                     Row {
                                         IconButton(
                                             onClick = {
-                                                ImageSharer.exportAndShare(
-                                                    context = context,
-                                                    design = design,
-                                                    coloredRegions = saved?.coloredRegions ?: emptyMap(),
-                                                    outlineColor = outlineColor
-                                                )
+                                                shareScope.launch {
+                                                    try {
+                                                        ImageSharer.exportAndShare(
+                                                            context = context,
+                                                            design = design,
+                                                            coloredRegions = saved?.coloredRegions ?: emptyMap(),
+                                                            outlineColor = outlineColor
+                                                        )
+                                                    } catch (error: Exception) {
+                                                        Toast.makeText(
+                                                            context,
+                                                            "Unable to export artwork. Please try again.",
+                                                            Toast.LENGTH_LONG
+                                                        ).show()
+                                                    }
+                                                }
                                             },
                                             modifier = Modifier.size(36.dp).testTag("btn_share_${design.id}")
                                         ) {
