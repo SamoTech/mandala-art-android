@@ -229,4 +229,66 @@ class ProgressSyncMergeTest {
         assertNull(ProgressSyncMerge.merge(null, null))
         assertNotNull(ProgressSyncMerge.merge(existing, existing))
     }
+
+    @Test
+    fun concurrentLocalEditIsUploadedBeforeReconciliationCompletes() = kotlinx.coroutines.runBlocking {
+        var local = record(progress = "before-sync", progressRevision = 1)
+        var cloud: MandalaProgressEntity? = null
+        var attempts = 0
+
+        ProgressSyncReconciler.reconcile(
+            readLocal = { local },
+            syncRemote = { candidate ->
+                attempts++
+                val merged = ProgressSyncMerge.merge(candidate, cloud)
+                cloud = merged
+                if (attempts == 1) {
+                    // Simulate an editor save after the sync read but before
+                    // the first cloud transaction has completed.
+                    local = record(
+                        progress = "edited-during-sync",
+                        progressRevision = 2,
+                        timestamp = 2
+                    )
+                }
+                merged
+            },
+            applyRemote = { incoming ->
+                local = ProgressSyncMerge.merge(local, incoming)!!
+            }
+        )
+
+        assertEquals(2, attempts)
+        assertEquals("edited-during-sync", cloud!!.coloredRegionsJson)
+        assertEquals(2L, cloud!!.progressRevision)
+        assertEquals(cloud, local)
+    }
+
+    @Test
+    fun continuouslyChangingLocalRowFailsInsteadOfReportingSyncSuccess() = kotlinx.coroutines.runBlocking {
+        var local = record(progress = "edit-0", progressRevision = 1)
+        var attempts = 0
+
+        val error = runCatching {
+            ProgressSyncReconciler.reconcile(
+                readLocal = { local },
+                syncRemote = { candidate ->
+                    attempts++
+                    val merged = candidate
+                    local = record(
+                        progress = "edit-$attempts",
+                        progressRevision = (attempts + 1).toLong(),
+                        timestamp = (attempts + 1).toLong()
+                    )
+                    merged
+                },
+                applyRemote = {},
+                maxAttempts = 3
+            )
+        }.exceptionOrNull()
+
+        assertTrue(error is IllegalStateException)
+        assertEquals(3, attempts)
+    }
+
 }
