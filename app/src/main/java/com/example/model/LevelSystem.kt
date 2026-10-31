@@ -36,14 +36,6 @@ object LevelSystem {
         return if (level in 1..LEVEL_COUNT) level else null
     }
 
-    /** Display name used in the gallery section header. */
-    fun levelName(level: Int): String = when (level) {
-        1 -> "Blossom Path"
-        2 -> "Golden Flow"
-        3 -> "Master Circle"
-        else -> "Level $level"
-    }
-
     /** Number of completed designs in the given level. */
     fun completedCountInLevel(level: Int, savedArtworks: Map<String, SavedArtwork>): Int =
         LEVEL_DESIGN_IDS[level].orEmpty().count { id -> savedArtworks[id]?.isCompleted == true }
