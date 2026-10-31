@@ -127,6 +127,16 @@
     </plurals>
 
 
+
+    <string name="settings_language_section">App Language</string>
+    <string name="settings_language_description">Choose the language used by Mandala Art. This does not change your device language.</string>
+    <string name="settings_language_english">English</string>
+    <string name="settings_language_arabic">العربية</string>
+    <string name="settings_cloud_restore_title">Restoring your artwork</string>
+    <string name="settings_cloud_restore_message">Your signed-in account is being synchronized. Your locally saved artwork remains available.</string>
+    <string name="settings_cloud_restore_failed_title">Cloud restore unavailable</string>
+    <string name="settings_cloud_restore_failed_message">Your local artwork is still available. Check your connection and retry cloud restore from this message.</string>
+
     <string name="settings_feedback_section">Feedback &amp; Experience</string>
     <string name="settings_sound_description">Subtle click on region coloring</string>
     <string name="settings_haptics_description">Gentle tactile pulse on tap</string>
