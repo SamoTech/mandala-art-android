@@ -151,7 +151,7 @@ fun GalleryScreen(
                                 onClick = { selectedCategory = category },
                                 label = {
                                     Text(
-                                        text = category.title,
+                                        text = stringResource(category.labelResource),
                                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
                                     )
                                 },
@@ -292,7 +292,7 @@ private fun LevelPackHeader(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = stringResource(R.string.gallery_level_title, level, LevelSystem.levelName(level)),
+                    text = stringResource(R.string.gallery_level_title, level, stringResource(levelNameResource(level))),
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 14.sp
                 )
@@ -315,4 +315,23 @@ private fun LevelPackHeader(
             }
         }
     }
+}
+
+
+private val MandalaCategory.labelResource: Int
+    get() = when (this) {
+        MandalaCategory.ALL -> R.string.category_all
+        MandalaCategory.EASY -> R.string.category_easy
+        MandalaCategory.MEDIUM -> R.string.category_medium
+        MandalaCategory.HARD -> R.string.category_hard
+        MandalaCategory.FLORAL -> R.string.category_floral
+        MandalaCategory.GEOMETRIC -> R.string.category_geometric
+        MandalaCategory.INTRICATE -> R.string.category_intricate
+    }
+
+private fun levelNameResource(level: Int): Int = when (level) {
+    1 -> R.string.gallery_level_name_blossom_path
+    2 -> R.string.gallery_level_name_golden_flow
+    3 -> R.string.gallery_level_name_master_circle
+    else -> R.string.gallery_level_title
 }
