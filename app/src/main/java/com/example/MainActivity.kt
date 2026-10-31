@@ -40,6 +40,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -297,13 +299,13 @@ fun MandalaApp(
             },
             title = {
                 Text(
-                    text = "Unlock Bonus Artwork",
+                    text = stringResource(R.string.reward_unlock_bonus_title),
                     fontWeight = FontWeight.Bold
                 )
             },
             text = {
                 Text(
-                    text = "Would you like to watch a short sponsored video to unlock \"${targetDesign.title}\" permanently? You can also continue enjoying all 52 free designs anytime."
+                    text = stringResource(R.string.reward_unlock_bonus_message, targetDesign.title, 52)${targetDesign.title}\" permanently? You can also continue enjoying all 52 free designs anytime."
                 )
             },
             confirmButton = {
@@ -326,7 +328,7 @@ fun MandalaApp(
                                     AnalyticsTracker.logEvent("rewarded_ad_completed", "content_type", "design")
                                     appSettings.unlockDesign(idToUnlock)
                                     AnalyticsTracker.logEvent("premium_unlock_granted", "content_type", "design")
-                                    Toast.makeText(context, "Unlocked \"$designTitle\"! Enjoy coloring.", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, context.getString(R.string.reward_design_unlocked_toast, designTitle), Toast.LENGTH_SHORT).show()
                                     if (navigated.compareAndSet(false, true)) {
                                         navigateTo(Screen.Editor(idToUnlock))
                                     }
@@ -338,7 +340,7 @@ fun MandalaApp(
                                     // Ad was closed or dismissed without earning reward: NEVER unlock bonus design
                                     Toast.makeText(
                                         context,
-                                        "Video was not completed. Watch the full video to unlock \"$designTitle\", or enjoy all 52 free designs anytime.",
+                                        context.getString(R.string.reward_video_not_completed, designTitle, 52),
                                         Toast.LENGTH_LONG
                                     ).show()
                                 }
@@ -364,7 +366,7 @@ fun MandalaApp(
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text("Watch Video", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.reward_watch_video), fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {
@@ -376,7 +378,7 @@ fun MandalaApp(
                     },
                     modifier = Modifier.testTag("btn_dismiss_unlock_dialog")
                 ) {
-                    Text("Later")
+                    Text(stringResource(R.string.dialog_later))
                 }
             }
         )
@@ -390,15 +392,13 @@ fun MandalaApp(
             onDismissRequest = { lockedLevelTarget = null },
             title = {
                 Text(
-                    text = "Level $targetLevel Locked",
+                    text = stringResource(R.string.gallery_level_locked_title, targetLevel),
                     fontWeight = FontWeight.Bold
                 )
             },
             text = {
                 Text(
-                    text = "This mandala belongs to Level $targetLevel. Complete $remaining more " +
-                        (if (remaining == 1) "design" else "designs") +
-                        " in Level ${targetLevel - 1} to unlock it. Keep coloring to level up!"
+                    text = pluralStringResource(R.plurals.gallery_level_locked_message, remaining, targetLevel, remaining, targetLevel - 1)
                 )
             },
             confirmButton = {
@@ -406,7 +406,7 @@ fun MandalaApp(
                     onClick = { lockedLevelTarget = null },
                     modifier = Modifier.testTag("btn_dismiss_level_locked_dialog")
                 ) {
-                    Text("Keep Coloring")
+                    Text(stringResource(R.string.gallery_keep_coloring))
                 }
             }
         )
@@ -419,13 +419,13 @@ fun MandalaApp(
             onDismissRequest = { adUnavailableTarget = null },
             title = {
                 Text(
-                    text = "Video Ad Unavailable",
+                    text = stringResource(R.string.reward_video_unavailable_title),
                     fontWeight = FontWeight.Bold
                 )
             },
             text = {
                 Text(
-                    text = "The sponsored video for \"${targetDesign.title}\" is not ready yet. Please check your internet connection and try again in a few moments.\n\nAll 52 standard mandala designs remain free and open to color without ads!"
+                    text = stringResource(R.string.reward_video_unavailable_message, targetDesign.title, 52)
                 )
             },
             confirmButton = {
@@ -439,7 +439,7 @@ fun MandalaApp(
                         } else {
                             Toast.makeText(
                                 context,
-                                "Requesting video ad... Please try again in a moment.",
+                                stringResource(R.string.reward_requesting_video_ad),
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
@@ -448,7 +448,7 @@ fun MandalaApp(
                     shape = RoundedCornerShape(50.dp),
                     modifier = Modifier.testTag("btn_retry_ad")
                 ) {
-                    Text("Retry", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.dialog_retry), fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {
@@ -456,7 +456,7 @@ fun MandalaApp(
                     onClick = { adUnavailableTarget = null },
                     modifier = Modifier.testTag("btn_dismiss_unavailable_dialog")
                 ) {
-                    Text("Explore Free Designs")
+                    Text(stringResource(R.string.reward_explore_free_designs))
                 }
             }
         )
