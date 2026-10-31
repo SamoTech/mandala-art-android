@@ -104,8 +104,10 @@ fun SettingsScreen(
         Pair("Espresso", 0xFF3E2723L)
     )
 
+    // Consume Back while an account deletion is running. Leaving this screen
+    // would cancel its composition-scoped coroutine after the server lock exists.
     BackHandler {
-        onNavigateBack()
+        if (!cloudBusy) onNavigateBack()
     }
 
     Scaffold(
@@ -128,7 +130,8 @@ fun SettingsScreen(
                     },
                     navigationIcon = {
                         IconButton(
-                            onClick = onNavigateBack,
+                            onClick = { if (!cloudBusy) onNavigateBack() },
+                            enabled = !cloudBusy,
                             modifier = Modifier.testTag("btn_settings_back")
                         ) {
                             Icon(
@@ -689,9 +692,9 @@ fun SettingsScreen(
             confirmButton = {
                 TextButton(
                     onClick = {
+                        cloudBusy = true
                         showDeleteAccountDialog = false
                         cloudScope.launch {
-                            cloudBusy = true
                             cloudMessage = null
                             cloudMessage = try {
                                 cloudSaveManager?.deleteAccount(deleteAccountPassword)
