@@ -27,6 +27,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -127,6 +128,12 @@ fun MandalaApp(
     cloudSaveManager: CloudSaveManager
 ) {
     val context = LocalContext.current
+
+    DisposableEffect(repository, cloudSaveManager) {
+        val stopObserving = cloudSaveManager.observeAuthState(repository::setOwnerUid)
+        onDispose { stopObserving() }
+    }
+
     val screenStack = remember { mutableStateListOf<Screen>(Screen.Home) }
     val currentScreen = screenStack.lastOrNull() ?: Screen.Home
 
