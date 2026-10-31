@@ -449,6 +449,23 @@ fun SettingsScreen(
                                 ) { Text(if (cloudBusy) "Syncing..." else "Sync Progress") }
                                 OutlinedButton(
                                     onClick = {
+                                        cloudScope.launch {
+                                            cloudBusy = true
+                                            cloudMessage = null
+                                            cloudMessage = try {
+                                                cloudSaveManager.importAnonymousProgress()
+                                                "Local progress imported; the local copy remains available."
+                                            } catch (error: Exception) {
+                                                error.localizedMessage ?: "Import failed."
+                                            }
+                                            cloudBusy = false
+                                        }
+                                    },
+                                    enabled = !cloudBusy,
+                                    modifier = Modifier.fillMaxWidth().testTag("btn_cloud_import_local")
+                                ) { Text(if (cloudBusy) "Importing..." else "Import Local Progress") }
+                                OutlinedButton(
+                                    onClick = {
                                         cloudSaveManager.signOut()
                                         cloudMessage = "Signed out. Local progress remains on this device."
                                     },
