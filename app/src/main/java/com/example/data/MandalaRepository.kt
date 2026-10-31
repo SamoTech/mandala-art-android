@@ -15,6 +15,8 @@ class MandalaRepository(
     // "" is the anonymous local-only partition; Firebase UIDs are isolated.
     private val activeOwnerUid = MutableStateFlow("")
 
+    val currentOwnerUid: String get() = activeOwnerUid.value
+
     fun setOwnerUid(uid: String) {
         activeOwnerUid.value = uid
     }
@@ -29,8 +31,8 @@ class MandalaRepository(
             .map { it?.toSavedArtwork() }
     }
 
-    suspend fun getProgressOnce(mandalaId: String): SavedArtwork? {
-        return dao.getProgressOnce(mandalaId, activeOwnerUid.value)
+    suspend fun getProgressOnce(mandalaId: String, ownerUid: String = activeOwnerUid.value): SavedArtwork? {
+        return dao.getProgressOnce(mandalaId, ownerUid)
             ?.takeUnless { it.isDeleted }
             ?.toSavedArtwork()
     }
@@ -39,9 +41,9 @@ class MandalaRepository(
         mandalaId: String,
         coloredRegions: Map<String, Long>,
         totalRegions: Int,
-        isFavorite: Boolean? = null
+        isFavorite: Boolean? = null,
+        ownerUid: String = activeOwnerUid.value
     ) {
-        val ownerUid = activeOwnerUid.value
         val nonDefaultCount = coloredRegions.values.count { it != 0xFFFFFFFFL }
         val percent = if (totalRegions > 0) {
             (nonDefaultCount.toFloat() / totalRegions).coerceIn(0f, 1f)
@@ -88,7 +90,7 @@ class MandalaRepository(
         )
     }
 
-    suspend fun resetProgress(mandalaId: String) {
+    suspend fun resetProgress(mandalaId: String, ownerUid: String = activeOwnerUid.value) {
         dao.resetProgress(
             mandalaId = mandalaId,
             timestamp = System.currentTimeMillis(),
