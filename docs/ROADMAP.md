@@ -237,6 +237,7 @@ Work items:
 The following is the working queue. Do not skip ahead because a later feature is more visible.
 
 | Order | Work item | Priority | Status |
+| 0 | Cold-start cloud restore and in-app Arabic/English selection | P0 | In progress — `fix/startup-cloud-restore-and-app-language` |
 |---:|---|---|---|
 | 1 | Autosave/account-switch lifecycle audit and regression tests | P0 | Completed — PRs #32, #36, #37, #39; post-merge CI passed |
 | 2 | Favorite timestamp persistence and tombstone edge-case coverage | P0 | Completed — PR #33; post-merge CI passed |
@@ -312,4 +313,4 @@ Every change to priority or scope must include a short reason. Do not silently r
 
 ---
 
-**Current next action:** Complete physical-device RTL, typography, and TalkBack verification using `docs/RTL_DEVICE_TEST_MATRIX.md`; fix only reproducible issues, then close M1. PR #49 merged at `ab70db9c085410644baee1ba3362fe3d3100b327`; its PR CI passed, but no post-merge workflow run was returned. Preserve artwork IDs, persisted values, backend fields, and analytics names.
+**Current next action:** Complete and verify the P0 cold-start cloud restore and in-app language selector on `fix/startup-cloud-restore-and-app-language`. After merge, resume physical-device RTL, typography, and TalkBack verification using `docs/RTL_DEVICE_TEST_MATRIX.md`; fix only reproducible issues, then close M1. PR #49 merged at `ab70db9c085410644baee1ba3362fe3d3100b327`; its PR CI passed, but no post-merge workflow run was returned. Preserve artwork IDs, persisted values, backend fields, and analytics names.
