@@ -47,10 +47,11 @@ These are not ordinary Compose literals, but they are displayed to users and mus
 
 ## 4. Accessibility inventory
 
-- Several navigation and action descriptions are hardcoded English (Back, Favorite, Share, Delete, Locked, Locked color, Level locked).
-- Decorative artwork and visual-only icons currently use `contentDescription = null` in multiple places; verify that each is genuinely decorative and that its containing control has an accessible label.
-- Every icon-only actionable control must expose a localized semantic label.
-- Progress indicators and completion state need meaningful semantics, not only visible percentages or color.
+- The identified navigation/action descriptions (Back, Favorite, Share, Delete, Locked, Locked color, Level locked) were migrated to Android string resources in PRs #43–#47; Arabic translations are supplied by `values-ar` and are covered by resource-key/placeholder parity checks.
+- Static source review found `contentDescription = null` on decorative icons or icons paired with visible control text in the reviewed flows. This is not a substitute for TalkBack traversal testing.
+- Icon-only actionable controls must retain localized semantic labels as new UI is added.
+- Progress indicators and completion state still require runtime verification with TalkBack and non-color cues.
+- Touch target sizes, traversal order, focus behavior, and announcements have not been validated on a physical device.
 
 ## 5. RTL source review and automated locale smoke coverage
 
@@ -72,13 +73,13 @@ PR #49 merged Robolectric locale smoke tests that verify the manifest RTL flag, 
 - Touch target size and TalkBack traversal order in both locales.
 - Preserve `supportsRtl=true`; verify actual Compose behavior rather than assuming the manifest flag alone guarantees correct layout.
 
-## 7. Recommended implementation sequence
+## 7. Remaining implementation and verification sequence
 
-1. Extract remaining user-visible strings from screen and dialog code into default English resources.
-2. Localize data-driven labels through resource IDs or UI-layer mappings; add plural and formatted resources.
-3. Add `values-ar/strings.xml` with matching keys and valid placeholders.
-4. Add resource integrity tests that compare required keys and validate formatting/plural definitions.
-5. Add locale/RTL UI tests or screenshot coverage for critical screens, then perform manual device verification with Arabic and English system locales.
+1. Keep English/Arabic resource parity and placeholder/plural tests mandatory for every future string change.
+2. Run `connectedAndroidTest` on a representative physical Android device; current instrumented-test infrastructure is minimal and the existing PR #49 tests are Robolectric locale smoke tests, not full screen UI tests.
+3. Execute the manual matrix in `docs/RTL_DEVICE_TEST_MATRIX.md` in Arabic and English, including screen geometry, horizontal scrolling, shaping, mixed-direction text, font scaling, and TalkBack.
+4. Record device model, Android version, locale, font scale, screenshots, observed defects, and retest results. Fix reproducible issues in focused PRs.
+5. Re-scan future UI additions for hardcoded strings, missing semantics, and directional assumptions.
 6. Keep artwork IDs, database values, analytics event names, Firebase fields, and other persisted/backend identifiers language-neutral and unchanged.
 
 ## 8. Out of scope for M1
