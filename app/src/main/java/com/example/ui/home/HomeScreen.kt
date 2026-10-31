@@ -86,9 +86,11 @@ fun HomeScreen(
     modifier: Modifier = Modifier
 ) {
     val featuredDesign = remember { MandalaLibrary.designs.first() } // Lotus Bloom
-    val today = java.time.LocalDate.now()
-    val dailyInspiration = remember(today) {
-        MandalaLibrary.dailyInspiration(today)
+    val today = java.util.Calendar.getInstance()
+    val todayYear = today.get(java.util.Calendar.YEAR)
+    val todayDayOfYear = today.get(java.util.Calendar.DAY_OF_YEAR)
+    val dailyInspiration = remember(todayYear, todayDayOfYear) {
+        MandalaLibrary.dailyInspiration(todayYear, todayDayOfYear)
     }
 
     val categories = listOf(
