@@ -296,4 +296,116 @@ class RevisionedProgressDaoTest {
         assertTrue(first.isNotBlank())
         assertTrue(context.noBackupFilesDir.resolve("mandala_sync_actor_id").isFile)
     }
+
+    @Test
+    fun favoriteMutationPersistsTimestampAndPreservesIndependentProgressSnapshot() = runBlocking {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val database = Room.inMemoryDatabaseBuilder(context, MandalaDatabase::class.java).build()
+        try {
+            val dao = database.mandalaDao()
+            val original = MandalaProgressEntity(
+                mandalaId = "favorite-timestamp",
+                coloredRegionsJson = "petal:123;center:456",
+                percentCompleted = 0.65f,
+                isFavorite = false,
+                isCompleted = false,
+                lastEditedTimestamp = 100L,
+                progressRevision = 4L,
+                progressActor = "progress-device",
+                favoriteRevision = 2L,
+                favoriteActor = "old-favorite-device"
+            )
+            dao.upsertProgress(original)
+
+            dao.updateFavoriteField(
+                mandalaId = original.mandalaId,
+                isFavorite = true,
+                timestamp = 200L,
+                actor = "favorite-device"
+            )
+
+            val favorited = dao.getProgressOnce(original.mandalaId)!!
+            assertTrue(favorited.isFavorite)
+            assertEquals(200L, favorited.lastEditedTimestamp)
+            assertEquals(5L, favorited.favoriteRevision)
+            assertEquals("favorite-device", favorited.favoriteActor)
+            assertEquals(original.coloredRegionsJson, favorited.coloredRegionsJson)
+            assertEquals(original.percentCompleted, favorited.percentCompleted, 0.0001f)
+            assertEquals(original.isCompleted, favorited.isCompleted)
+            assertEquals(original.progressRevision, favorited.progressRevision)
+            assertEquals(original.progressActor, favorited.progressActor)
+
+            dao.updateFavoriteField(
+                mandalaId = original.mandalaId,
+                isFavorite = false,
+                timestamp = 300L,
+                actor = "favorite-device"
+            )
+
+            val unfavorited = dao.getProgressOnce(original.mandalaId)!!
+            assertFalse(unfavorited.isFavorite)
+            assertEquals(300L, unfavorited.lastEditedTimestamp)
+            assertEquals(6L, unfavorited.favoriteRevision)
+            assertEquals(original.progressRevision, unfavorited.progressRevision)
+            assertEquals(original.coloredRegionsJson, unfavorited.coloredRegionsJson)
+        } finally {
+            database.close()
+        }
+    }
+
+    @Test
+    fun persistedRestoreProofCannotOverrideANewerTombstone() = runBlocking {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val database = Room.inMemoryDatabaseBuilder(context, MandalaDatabase::class.java).build()
+        try {
+            val dao = database.mandalaDao()
+            val tombstone = MandalaProgressEntity(
+                mandalaId = "restore-race",
+                coloredRegionsJson = "before-delete",
+                percentCompleted = 0.4f,
+                isFavorite = false,
+                isCompleted = false,
+                isDeleted = true,
+                deletionRevision = 8L,
+                deletionActor = "device-b"
+            )
+            val restore = tombstone.copy(
+                coloredRegionsJson = "restored",
+                percentCompleted = 0.8f,
+                progressRevision = 9L,
+                progressActor = "device-a",
+                isDeleted = false,
+                restoredDeletionRevision = 8L,
+                restoredDeletionActor = "device-b",
+                restorationEventRevision = 9L,
+                restorationEventActor = "device-a"
+            )
+            dao.upsertProgress(tombstone)
+            dao.mergeProgress(restore)
+
+            val restored = dao.getProgressOnce("restore-race")!!
+            assertFalse(restored.isDeleted)
+            assertEquals("restored", restored.coloredRegionsJson)
+            assertEquals(8L, restored.restoredDeletionRevision)
+            assertEquals("device-b", restored.restoredDeletionActor)
+            assertEquals(9L, restored.restorationEventRevision)
+
+            val newerTombstone = restored.copy(
+                isDeleted = true,
+                deletionRevision = 10L,
+                deletionActor = "device-c"
+            )
+            dao.mergeProgress(newerTombstone)
+            // A delayed copy of the old restore must not resurrect the newer deletion.
+            dao.mergeProgress(restore)
+
+            val finalRow = dao.getProgressOnce("restore-race")!!
+            assertTrue(finalRow.isDeleted)
+            assertEquals(10L, finalRow.deletionRevision)
+            assertEquals("device-c", finalRow.deletionActor)
+        } finally {
+            database.close()
+        }
+    }
+
 }
