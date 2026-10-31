@@ -155,7 +155,7 @@ class EditorViewModel(
         saveProgressInternal()
     }
 
-    fun reset() {
+    suspend fun reset() {
         val current = _coloredRegions.value
         if (current.isEmpty()) return
 
@@ -167,10 +167,8 @@ class EditorViewModel(
         _coloredRegions.value = emptyMap()
         hasUserEdited = true
 
-        viewModelScope.launch {
-            autosaveWorker.flush()
-            repository.resetProgress(mandalaId)
-        }
+        autosaveWorker.flush()
+        repository.resetProgress(mandalaId)
     }
 
     fun setSelectedColor(color: Long) {
