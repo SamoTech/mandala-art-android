@@ -305,7 +305,7 @@ fun MandalaApp(
             },
             text = {
                 Text(
-                    text = stringResource(R.string.reward_unlock_bonus_message, targetDesign.title, 52)${targetDesign.title}\" permanently? You can also continue enjoying all 52 free designs anytime."
+                    text = stringResource(R.string.reward_unlock_bonus_message, targetDesign.title, 52)
                 )
             },
             confirmButton = {
@@ -439,7 +439,7 @@ fun MandalaApp(
                         } else {
                             Toast.makeText(
                                 context,
-                                stringResource(R.string.reward_requesting_video_ad),
+                                context.getString(R.string.reward_requesting_video_ad),
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
