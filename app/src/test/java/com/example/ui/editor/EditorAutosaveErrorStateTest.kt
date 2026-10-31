@@ -109,7 +109,7 @@ class EditorAutosaveErrorStateTest {
             override val lifecycle = LifecycleRegistry(this)
         }
         val editor: EditorViewModel
-        val observer: EditorLifecycleSaveObserver
+        var observer: EditorLifecycleSaveObserver? = null
 
         try {
             repository.setOwnerUid("account-a")
@@ -162,7 +162,7 @@ class EditorAutosaveErrorStateTest {
             assertFalse("The error clears only after the pending snapshot is saved", editor.hasAutosaveError.value)
             assertNotNull(database.mandalaDao().getProgressOnce("lotus_bloom", "account-a"))
         } finally {
-            if (::observer.isInitialized) observer.close()
+            observer?.close()
             viewModelStore.clear()
             database.close()
             Dispatchers.resetMain()
