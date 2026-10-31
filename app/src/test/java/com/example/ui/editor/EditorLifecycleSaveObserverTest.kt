@@ -112,7 +112,6 @@ class EditorLifecycleSaveObserverTest {
 
     @Test
     fun closingObserverDetachesItFromFurtherLifecycleEvents() = runTest {
-        val dispatcher = StandardTestDispatcher(testScheduler)
         val lifecycleOwner = object : LifecycleOwner {
             override val lifecycle = LifecycleRegistry(this, false)
         }
@@ -122,15 +121,12 @@ class EditorLifecycleSaveObserverTest {
             onStop = { flushCount++ }
         )
 
-        try {
-            observer.close()
-            lifecycleOwner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
-            lifecycleOwner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_START)
-            lifecycleOwner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
-            runCurrent()
+        observer.close()
+        lifecycleOwner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
+        lifecycleOwner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_START)
+        lifecycleOwner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
+        runCurrent()
 
-            assertEquals(0, flushCount)
-        } finally {
-        }
+        assertEquals(0, flushCount)
     }
 }
