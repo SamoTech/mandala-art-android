@@ -23,6 +23,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -92,7 +93,7 @@ class EditorLifecycleSaveObserverTest {
             lifecycleOwner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
             runCurrent()
 
-            assertEquals("ON_STOP must start flushing the pending snapshot", true, saveStarted.isCompleted)
+            assertTrue("ON_STOP must start flushing the pending snapshot", saveStarted.isCompleted)
             repository.setOwnerUid("account-b")
             releaseSave.complete(Unit)
             advanceUntilIdle()
@@ -115,11 +116,9 @@ class EditorLifecycleSaveObserverTest {
         val lifecycleOwner = object : LifecycleOwner {
             override val lifecycle = LifecycleRegistry(this, false)
         }
-        val scope = CoroutineScope(SupervisorJob() + dispatcher)
         var flushCount = 0
         val observer = EditorLifecycleSaveObserver(
             lifecycle = lifecycleOwner.lifecycle,
-            scope = scope,
             onStop = { flushCount++ }
         )
 
@@ -132,7 +131,6 @@ class EditorLifecycleSaveObserverTest {
 
             assertEquals(0, flushCount)
         } finally {
-            scope.cancel()
         }
     }
 }
