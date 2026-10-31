@@ -201,9 +201,21 @@ object MandalaLibrary {
         }
     }
 
-    fun getDesignById(id: String): MandalaDesign {
-        return designs.find { it.id == id } ?: designs.first()
-    }
+    /**
+     * Returns the matching design, or null when the ID is unknown.
+     * Unknown IDs must never silently open a different artwork.
+     */
+    fun findDesignById(id: String): MandalaDesign? =
+        designs.firstOrNull { it.id == id }
+
+    /**
+     * Strict lookup for callers that require a valid, persisted design ID.
+     */
+    fun getDesignById(id: String): MandalaDesign =
+        findDesignById(id) ?: throw NoSuchElementException("Unknown mandala design ID: $id")
+
+    fun dailyInspiration(date: java.time.LocalDate): MandalaDesign =
+        dailyInspirationForDate(date, designs)
 
     // 1. Lotus Bloom (Easy / Floral - 25 regions)
     private fun createLotusBloom(): MandalaDesign {
