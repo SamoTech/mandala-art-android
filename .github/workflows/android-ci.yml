@@ -140,7 +140,7 @@ jobs:
 
   build-sign-and-publish-production:
     name: Build, sign, and publish production release
-    needs: build-and-test
+    needs: [build-and-test, firestore-rules-test]
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && inputs.release == true
     runs-on: ubuntu-latest
     timeout-minutes: 45
