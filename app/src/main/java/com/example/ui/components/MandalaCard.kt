@@ -39,9 +39,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.R
 import com.example.model.LevelSystem
 import com.example.model.MandalaDesign
 import com.example.model.SavedArtwork
@@ -79,7 +82,6 @@ fun MandalaCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
-            // Mandala Visual Preview
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -110,14 +112,12 @@ fun MandalaCard(
                             color = outlineColor.toInt()
                         }
 
-                        // Fill regions
                         for (region in design.regions) {
                             val color = coloredRegions[region.id] ?: 0xFFFFFFFFL
                             fillPaint.color = color.toInt()
                             nativeCanvas.drawPath(region.androidPath, fillPaint)
                         }
 
-                        // Draw outlines
                         for (region in design.regions) {
                             nativeCanvas.drawPath(region.androidPath, strokePaint)
                         }
@@ -126,7 +126,6 @@ fun MandalaCard(
                     }
                 }
 
-                // Favorite heart button overlay in top right
                 Surface(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
@@ -142,18 +141,16 @@ fun MandalaCard(
                     ) {
                         Icon(
                             imageVector = if (isFav) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                            contentDescription = "Favorite",
+                            contentDescription = stringResource(R.string.mandala_favorite),
                             tint = if (isFav) PinkAccent else MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(20.dp)
                         )
                     }
                 }
 
-                // Lock badge or Completion badge in bottom left
                 if (isLocked) {
                     Surface(
-                        modifier = Modifier
-                            .align(Alignment.BottomStart),
+                        modifier = Modifier.align(Alignment.BottomStart),
                         shape = RoundedCornerShape(50.dp),
                         color = GoldAccent
                     ) {
@@ -163,13 +160,17 @@ fun MandalaCard(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Lock,
-                                contentDescription = "Locked",
+                                contentDescription = stringResource(R.string.mandala_locked),
                                 tint = Color(0xFF3F2A00),
                                 modifier = Modifier.size(12.dp)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = if (LevelSystem.levelOf(design.id) != null) "Level" else "Bonus",
+                                text = if (LevelSystem.levelOf(design.id) != null) {
+                                    stringResource(R.string.mandala_level)
+                                } else {
+                                    stringResource(R.string.mandala_bonus)
+                                },
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.ExtraBold,
                                 color = Color(0xFF3F2A00)
@@ -178,13 +179,16 @@ fun MandalaCard(
                     }
                 } else if (percent > 0f) {
                     Surface(
-                        modifier = Modifier
-                            .align(Alignment.BottomStart),
+                        modifier = Modifier.align(Alignment.BottomStart),
                         shape = RoundedCornerShape(50.dp),
                         color = if (isCompleted) Color(0xFF16C779) else PinkAccent
                     ) {
                         Text(
-                            text = if (isCompleted) "Completed ✓" else "${(percent * 100).toInt()}%",
+                            text = if (isCompleted) {
+                                stringResource(R.string.mandala_completed)
+                            } else {
+                                stringResource(R.string.mandala_progress_percent, (percent * 100).toInt())
+                            },
                             fontSize = 10.sp,
                             fontWeight = FontWeight.ExtraBold,
                             color = Color.White,
@@ -194,7 +198,6 @@ fun MandalaCard(
                 }
             }
 
-            // Info details below preview
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -214,7 +217,6 @@ fun MandalaCard(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    // Category & difficulty
                     Text(
                         text = "${design.difficulty.label} • ${design.category.title}",
                         fontSize = 12.sp,
@@ -223,7 +225,11 @@ fun MandalaCard(
                     )
 
                     Text(
-                        text = "${design.regionCount} areas",
+                        text = pluralStringResource(
+                            R.plurals.mandala_region_count,
+                            design.regionCount,
+                            design.regionCount
+                        ),
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
