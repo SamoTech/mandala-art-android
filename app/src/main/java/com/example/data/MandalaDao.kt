@@ -71,7 +71,9 @@ interface MandalaDao {
                 progressActor = actor,
                 isDeleted = false,
                 restoredDeletionRevision = if (existing.isDeleted) existing.deletionRevision else existing.restoredDeletionRevision,
-                restoredDeletionActor = if (existing.isDeleted) existing.deletionActor else existing.restoredDeletionActor
+                restoredDeletionActor = if (existing.deletionRevision > 0L) existing.deletionActor else existing.restoredDeletionActor,
+                restorationEventRevision = if (existing.deletionRevision > 0L) revision else existing.restorationEventRevision,
+                restorationEventActor = if (existing.deletionRevision > 0L) actor else existing.restorationEventActor
             )
         }
         upsertProgress(updated)
@@ -156,7 +158,9 @@ interface MandalaDao {
                     lastEditedTimestamp = timestamp,
                     isDeleted = false,
                     restoredDeletionRevision = if (existing.isDeleted) existing.deletionRevision else existing.restoredDeletionRevision,
-                    restoredDeletionActor = if (existing.isDeleted) existing.deletionActor else existing.restoredDeletionActor
+                    restoredDeletionActor = if (existing.deletionRevision > 0L) existing.deletionActor else existing.restoredDeletionActor,
+                    restorationEventRevision = if (existing.deletionRevision > 0L) revision else existing.restorationEventRevision,
+                    restorationEventActor = if (existing.deletionRevision > 0L) actor else existing.restorationEventActor
                 )
             )
         } else {
