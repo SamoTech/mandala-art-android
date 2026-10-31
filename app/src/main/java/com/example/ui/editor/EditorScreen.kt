@@ -40,6 +40,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,6 +54,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -76,6 +80,27 @@ fun EditorScreen(
 ) {
     val context = LocalContext.current
     val shareScope = rememberCoroutineScope()
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val navigationScope = rememberCoroutineScope()
+    val navigateBackAfterFlush: () -> Unit = {
+        navigationScope.launch {
+            viewModel.flushPendingSave()
+            onNavigateBack()
+        }
+    }
+
+    DisposableEffect(lifecycleOwner, viewModel) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_STOP) {
+                navigationScope.launch {
+                    viewModel.flushPendingSave()
+                }
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+
     LaunchedEffect(viewModel.design.id) {
         AnalyticsTracker.logEvent("design_opened", "content_type", "mandala")
         AnalyticsTracker.logEvent("coloring_started", "content_type", "mandala")
@@ -116,7 +141,7 @@ fun EditorScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         IconButton(
-                            onClick = onNavigateBack,
+                            onClick = navigateBackAfterFlush,
                             modifier = Modifier.testTag("btn_editor_back")
                         ) {
                             Icon(
