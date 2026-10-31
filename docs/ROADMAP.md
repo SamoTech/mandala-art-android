@@ -3,7 +3,7 @@
 > **Status:** Living execution plan  
 > **Baseline reviewed:** 2026-10-31  
 > **Repository:** [SamoTech/mandala-art-android](https://github.com/SamoTech/mandala-art-android)  
-> **Current planning baseline:** `main` at `bb39ad1bd9c5d72238f3fdb470e279e7c1e62d74`
+> **Current planning baseline:** `main` at `f09fecfc0655feb273beac937a8737ae6ee7a305`
 
 This document is the canonical roadmap for product and engineering work on Mandala Art. New work should follow the sequence, dependencies, acceptance criteria, and delivery rules below. It is intentionally milestone-based rather than date-based: a milestone advances only when its exit criteria are demonstrated.
 
@@ -52,7 +52,7 @@ The following reflects a source review of `main` on 2026-10-31. “Implemented�
 
 ## 3. Milestones and execution order
 
-### M0 — Data integrity and editor lifecycle (P0, active)
+### M0 — Data integrity and editor lifecycle (P0, completed)
 
 **Goal:** Never lose a user's latest coloring edits, resurrect a deleted artwork incorrectly, or mix data between accounts.
 
@@ -64,7 +64,7 @@ Work items:
 - [x] Cover a pending editor save across an account switch before debounce.
 - [x] Add deterministic UID-ownership tests for account switches during an in-flight save and after a failed save/retry.
 - [x] Add a lifecycle integration test proving ON_STOP flush completes without crossing account ownership.
-- [ ] Surface background autosave and ON_STOP failures as an actionable in-app error state with an explicit retry path; retain the pending snapshot until persistence succeeds.
+- [x] Surface background autosave and ON_STOP failures as an actionable in-app error state with an explicit retry path; retain the pending snapshot until persistence succeeds (PR #39).
 - [x] Add focused DAO/repository tests proving favorite changes persist the timestamp and independent favorite revision without overwriting newer progress.
 - [x] Expand sync/tombstone tests for offline edits, delete-vs-edit races, restore proof, repeated sync, and account isolation.
 - [x] Verify sync failure is surfaced to the UI and never reported as success when server access or reconciliation fails.
@@ -78,7 +78,7 @@ Work items:
 - Firestore emulator security tests, Android unit tests, lint, and debug build pass.
 - Manual test on a physical device: edit, switch account from another screen/session, return/sign in, and verify each account sees only its own data.
 
-**Progress evidence:** PRs #29–#37 are merged. PR #36 added deterministic in-flight save and failed-save retry coverage. PR #37 added an ON_STOP lifecycle integration test using the real editor ViewModel, in-memory Room, and owner-bound persistence callback; it verifies that a lifecycle-triggered flush remains attached to the original account when the active account changes. The post-merge workflow for commit `bb39ad1bd9c5d72238f3fdb470e279e7c1e62d74` passed Android debug build, unit tests, lint, and Firestore security rules. The production release job was skipped as expected. Physical-device account-isolation verification was reported complete by the user on 2026-10-31; the ON_STOP integration test is Robolectric-based and does not claim physical-device process-death coverage. Automated sync tests exercise the deterministic reconciliation/merge layer, not live Firestore end-to-end tests. **M0 remains active:** failed background autosaves and ON_STOP flushes are logged but are not yet exposed as an actionable in-app error state; PR #38 review identified this gap. Do not begin M1 implementation until this P0 gap is fixed and verified.
+**Completion evidence:** PRs #29–#39 are merged. PR #36 added deterministic in-flight save and failed-save retry coverage. PR #37 added an ON_STOP lifecycle integration test using the real editor ViewModel, in-memory Room, and owner-bound persistence callback; it verifies that a lifecycle-triggered flush remains attached to the original account when the active account changes. PR #39 added retained autosave error state, an in-editor Retry/Keep Editing dialog, and deterministic tests for debounce failure, ON_STOP failure, failed retry retention, and successful retry. The post-merge workflow for commit `f09fecfc0655feb273beac937a8737ae6ee7a305` passed Android debug build, unit tests, lint, and Firestore security rules. The production release job was skipped as expected. Physical-device account-isolation verification was reported complete by the user on 2026-10-31; the ON_STOP integration test is Robolectric-based and does not claim physical-device process-death coverage. Automated sync tests exercise the deterministic reconciliation/merge layer, not live Firestore end-to-end tests. All defined M0 exit criteria are now met; process-death and live Firestore E2E remain outside the demonstrated coverage.
 
 ### M1 — Arabic localization and accessibility foundation (P1)
 
@@ -236,10 +236,10 @@ The following is the working queue. Do not skip ahead because a later feature is
 
 | Order | Work item | Priority | Status |
 |---:|---|---|---|
-| 1 | Autosave/account-switch lifecycle audit and regression tests | P0 | In progress — account ownership and ON_STOP coverage merged; actionable background-save error UI remains |
+| 1 | Autosave/account-switch lifecycle audit and regression tests | P0 | Completed — PRs #32, #36, #37, #39; post-merge CI passed |
 | 2 | Favorite timestamp persistence and tombstone edge-case coverage | P0 | Completed — PR #33; post-merge CI passed |
 | 3 | Offline sync and account-isolation regression coverage | P0 | Completed — PR #34; post-merge Android and Firestore CI passed; device verification user-reported |
-| 4 | Arabic resources and RTL pass | P1 | Blocked by M0 closure |
+| 4 | Arabic resources and RTL pass | P1 | Next — M1 begins with a full string/resource inventory and hardcoded-text audit |
 | 5 | Release R8/minification experiment with measured comparison | P1 | Planned |
 | 6 | Profile gallery and share paths; optimize only measured bottlenecks | P1 | Planned |
 | 7 | User-configurable deterministic mandala generator | P2 | Discovery |
@@ -310,4 +310,4 @@ Every change to priority or scope must include a short reason. Do not silently r
 
 ---
 
-**Current next action:** Complete M0 autosave error visibility: persist a failed-save state in `EditorViewModel`, expose a localized actionable error UI when the editor is visible (including after returning from background), and provide a retry action that clears the error only after the pending snapshot is durably saved. Add deterministic tests for background debounce failure, ON_STOP failure, successful retry, and retained error state after retry failure. Keep M1 blocked until this P0 gap is merged and post-merge CI passes.
+**Current next action:** Begin M1 with a complete localization inventory: identify all user-visible hardcoded strings, existing `stringResource` coverage, accessibility descriptions, plural/formatting needs, and RTL-sensitive layouts. Then replace hardcoded UI text with default English resources and add `values-ar/strings.xml` in focused PRs. Preserve English behavior, verify Arabic shaping and layout direction, and add locale/resource regression tests.
