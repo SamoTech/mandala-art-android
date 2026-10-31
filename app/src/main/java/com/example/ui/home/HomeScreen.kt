@@ -446,7 +446,7 @@ fun HomeScreen(
                         onClick = { selectedCategoryFilter = cat },
                         label = {
                             Text(
-                                text = cat.title,
+                                text = stringResource(homeCategoryLabelResource(cat)),
                                 fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.Medium
                             )
                         },
@@ -498,4 +498,15 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
+}
+
+
+private fun homeCategoryLabelResource(category: com.example.model.MandalaCategory): Int = when (category) {
+    com.example.model.MandalaCategory.ALL -> R.string.category_all
+    com.example.model.MandalaCategory.EASY -> R.string.category_easy
+    com.example.model.MandalaCategory.MEDIUM -> R.string.category_medium
+    com.example.model.MandalaCategory.HARD -> R.string.category_hard
+    com.example.model.MandalaCategory.FLORAL -> R.string.category_floral
+    com.example.model.MandalaCategory.GEOMETRIC -> R.string.category_geometric
+    com.example.model.MandalaCategory.INTRICATE -> R.string.category_intricate
 }
