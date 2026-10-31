@@ -27,7 +27,7 @@ class RoomMigrationTest {
         val databaseFile: File = context.getDatabasePath(databaseName)
         databaseFile.parentFile?.mkdirs()
 
-        // Build the exact v1 schema exported by Room before opening the current DB.
+        // Build the exact v1 schema exported by Room before opening the v3 DB.
         val legacyDb = SQLiteDatabase.openOrCreateDatabase(databaseFile.absolutePath, null)
         try {
             legacyDb.execSQL(
@@ -63,7 +63,7 @@ class RoomMigrationTest {
         }
 
         val migratedDb = Room.databaseBuilder(context, MandalaDatabase::class.java, databaseName)
-            .addMigrations(MandalaDatabase.MIGRATION_1_2, MandalaDatabase.MIGRATION_2_3, MandalaDatabase.MIGRATION_3_4)
+            .addMigrations(MandalaDatabase.MIGRATION_1_2, MandalaDatabase.MIGRATION_2_3)
             .allowMainThreadQueries()
             .build()
 
