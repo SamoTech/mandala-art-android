@@ -53,7 +53,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.R
 import com.example.model.MandalaPalettes
-import com.example.model.Palette
 import com.example.ui.theme.PinkAccent
 import com.example.ui.theme.PurplePrimary
 import com.example.ui.theme.glassStroke
@@ -109,7 +108,7 @@ fun ColorPaletteBar(
                             onClick = { selectedPaletteIndex = index },
                             label = {
                                 Text(
-                                    text = palette.name,
+                                    text = stringResource(paletteLabelResource(palette.name)),
                                     fontSize = 12.sp,
                                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
                                 )
@@ -231,4 +230,14 @@ fun ColorPaletteBar(
             }
         }
     }
+}
+
+
+private fun paletteLabelResource(name: String): Int = when (name) {
+    "Chakra" -> R.string.palette_chakra
+    "Pastel" -> R.string.palette_pastel
+    "Jewel" -> R.string.palette_jewel
+    "Sunset" -> R.string.palette_sunset
+    "Nature" -> R.string.palette_nature
+    else -> error("Missing localized palette label for: $name")
 }
