@@ -36,7 +36,7 @@ The following reflects a source review of `main` on 2026-10-31. “Implemented�
 | Autosave | Conflated worker, debounce, explicit flush, background error callback, owner-bound ViewModel persistence, ON_STOP flush in ViewModel scope | M0 regression coverage merged in PRs #32, #36, and #37; lifecycle test covers ON_STOP, not process death |
 | Daily Inspiration | Stable date-based design selection; Home screen keys it by local date | Implemented; verify timezone/day-boundary behavior |
 | Share image rendering | Bitmap rendering on IO dispatcher; age-based cache cleanup | Implemented; verify memory and cleanup behavior |
-| Arabic localization | Main `strings.xml` is currently English | Not implemented |
+| Arabic localization | English default resources plus Arabic `values-ar/strings.xml` (164 matching keys); RTL/device verification pending | In progress — current PR adds resource parity tests |
 | Release minification | Release `isMinifyEnabled = false` | Not implemented |
 | Gallery caching | No dedicated image/card cache established in reviewed source | Profile first; do not add speculative cache |
 | Random design controls | Existing algorithmic design library/generator | User-facing parameter controls not yet established |
@@ -87,9 +87,9 @@ Work items:
 Work items:
 
 - [x] Audit existing string resources, hardcoded UI text, dynamic labels, accessibility descriptions, and RTL-sensitive screens (see `docs/LOCALIZATION_AUDIT.md`).
-- [ ] Add `app/src/main/res/values-ar/strings.xml`; keep the default `values/strings.xml` as English.
-- [ ] Replace user-visible hardcoded strings with Android string resources; include dialogs, errors, empty states, ads/reward messaging, account flows, and accessibility descriptions.
-- [ ] Review pluralization, formatting placeholders, and text concatenation. Use formatted resources rather than manually joining translated fragments.
+- [x] Add `app/src/main/res/values-ar/strings.xml`; keep the default `values/strings.xml` as English (164 matching keys; current PR).
+- [x] Replace user-visible strings in the audited screens with Android string resources, including dialogs, errors, empty states, ads/reward messaging, account flows, and identified accessibility descriptions (PRs #43–#47).
+- [x] Review pluralization and formatting placeholders; Arabic plural forms and parity checks are included in the current PR. Continue to review new strings as they are added.
 - [ ] Validate RTL mirroring for navigation, gallery, editor controls, progress indicators, dialogs, and settings.
 - [ ] Review font fallback, Arabic shaping, truncation, line wrapping, and large-font scaling.
 - [ ] Add resource/locale tests and screenshot or manual verification for Arabic and English.
@@ -240,7 +240,7 @@ The following is the working queue. Do not skip ahead because a later feature is
 | 1 | Autosave/account-switch lifecycle audit and regression tests | P0 | Completed — PRs #32, #36, #37, #39; post-merge CI passed |
 | 2 | Favorite timestamp persistence and tombstone edge-case coverage | P0 | Completed — PR #33; post-merge CI passed |
 | 3 | Offline sync and account-isolation regression coverage | P0 | Completed — PR #34; post-merge Android and Firestore CI passed; device verification user-reported |
-| 4 | Arabic resources and RTL pass | P1 | Next — M1 begins with a full string/resource inventory and hardcoded-text audit |
+| 4 | Arabic resources and RTL pass | P1 | In progress — Arabic resources and parity tests in PR; RTL/device verification remains |
 | 5 | Release R8/minification experiment with measured comparison | P1 | Planned |
 | 6 | Profile gallery and share paths; optimize only measured bottlenecks | P1 | Planned |
 | 7 | User-configurable deterministic mandala generator | P2 | Discovery |
@@ -311,4 +311,4 @@ Every change to priority or scope must include a short reason. Do not silently r
 
 ---
 
-**Current next action:** Implement M1 in focused PRs: first extract remaining hardcoded screen/dialog/accessibility text into default English resources, then localize data-driven labels and plural resources, then add matching `values-ar/strings.xml` translations and locale/RTL regression tests. Use `docs/LOCALIZATION_AUDIT.md` as the source inventory. Preserve persisted IDs, backend fields, and analytics names.
+**Current next action:** Complete the Arabic resource/parity-test PR, then validate RTL layout, typography, TalkBack semantics, and critical screens on Arabic and English locales. Preserve artwork IDs, persisted values, backend fields, and analytics names.
