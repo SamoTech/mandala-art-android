@@ -40,6 +40,10 @@ class EditorLifecycleSaveObserverTest {
 
         val context = ApplicationProvider.getApplicationContext<Context>()
         val database = Room.inMemoryDatabaseBuilder(context, MandalaDatabase::class.java)
+            // Run Room work inline so the lifecycle flush assertion cannot race
+            // a background query executor after the test scheduler becomes idle.
+            .setQueryExecutor { command -> command.run() }
+            .setTransactionExecutor { command -> command.run() }
             .allowMainThreadQueries()
             .build()
         val repository = MandalaRepository(database.mandalaDao(), "on-stop-switch-test-device")

@@ -40,13 +40,14 @@ class CloudSaveManager(
     }
 
     suspend fun createAccount(email: String, password: String) {
+        // The app-level auth-state observer owns account synchronization so it
+        // also covers persisted sessions restored after process startup.
         auth.createUserWithEmailAndPassword(email.trim(), password).await()
-        syncProgress()
     }
 
     suspend fun signIn(email: String, password: String) {
+        // The app-level auth-state observer owns account synchronization.
         auth.signInWithEmailAndPassword(email.trim(), password).await()
-        syncProgress()
     }
 
     fun signOut() = auth.signOut()

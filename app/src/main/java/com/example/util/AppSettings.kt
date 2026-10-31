@@ -10,6 +10,9 @@ class AppSettings(context: Context) {
     private val prefs: SharedPreferences =
         context.getSharedPreferences("mandala_app_prefs", Context.MODE_PRIVATE)
 
+    private val _language = MutableStateFlow(prefs.getString(KEY_LANGUAGE, "").orEmpty())
+    val language: StateFlow<String> = _language.asStateFlow()
+
     private val _soundEnabled = MutableStateFlow(prefs.getBoolean(KEY_SOUND, true))
     val soundEnabled: StateFlow<Boolean> = _soundEnabled.asStateFlow()
 
@@ -26,6 +29,14 @@ class AppSettings(context: Context) {
         prefs.getStringSet(KEY_UNLOCKED_DESIGNS, emptySet()) ?: emptySet()
     )
     val unlockedDesigns: StateFlow<Set<String>> = _unlockedDesigns.asStateFlow()
+
+    fun setLanguage(languageTag: String) {
+        require(languageTag.isEmpty() || languageTag == "en" || languageTag == "ar") {
+            "Unsupported app language: $languageTag"
+        }
+        prefs.edit().putString(KEY_LANGUAGE, languageTag).apply()
+        _language.value = languageTag
+    }
 
     fun setSoundEnabled(enabled: Boolean) {
         prefs.edit().putBoolean(KEY_SOUND, enabled).apply()
@@ -63,6 +74,7 @@ class AppSettings(context: Context) {
     }
 
     companion object {
+        const val KEY_LANGUAGE = "key_language"
         private const val KEY_SOUND = "key_sound"
         private const val KEY_HAPTIC = "key_haptic"
         private const val KEY_OUTLINE = "key_outline"
