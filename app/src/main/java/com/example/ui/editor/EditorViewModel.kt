@@ -1,6 +1,7 @@
 package com.example.ui.editor
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -40,7 +41,23 @@ class EditorViewModel(
     val isZoomPanMode: StateFlow<Boolean> = _isZoomPanMode.asStateFlow()
 
     private val undoStack = mutableListOf<ColorStep>()
+    // Prevent a late initial database read from replacing the user's first edit.
+    private var hasUserEdited = false
     private val redoStack = mutableListOf<ColorStep>()
+
+    private val autosaveWorker = EditorAutosaveWorker(
+        scope = viewModelScope,
+        save = { snapshot ->
+            repository.saveProgress(
+                mandalaId = mandalaId,
+                coloredRegions = snapshot,
+                totalRegions = design.regionCount
+            )
+        },
+        onSaveError = { error ->
+            Log.e("EditorViewModel", "Autosave failed for $mandalaId", error)
+        }
+    )
 
     private val _canUndo = MutableStateFlow(false)
     val canUndo: StateFlow<Boolean> = _canUndo.asStateFlow()
@@ -62,7 +79,7 @@ class EditorViewModel(
     private fun loadSavedProgress() {
         viewModelScope.launch {
             val saved = repository.getProgressOnce(mandalaId)
-            if (saved != null && saved.coloredRegions.isNotEmpty()) {
+            if (!hasUserEdited && saved != null && saved.coloredRegions.isNotEmpty()) {
                 _coloredRegions.value = saved.coloredRegions
             }
         }
@@ -138,7 +155,7 @@ class EditorViewModel(
         saveProgressInternal()
     }
 
-    fun reset() {
+    suspend fun reset() {
         val current = _coloredRegions.value
         if (current.isEmpty()) return
 
@@ -148,10 +165,10 @@ class EditorViewModel(
         _canUndo.value = false
         _canRedo.value = false
         _coloredRegions.value = emptyMap()
+        hasUserEdited = true
 
-        viewModelScope.launch {
-            repository.resetProgress(mandalaId)
-        }
+        autosaveWorker.flush()
+        repository.resetProgress(mandalaId)
     }
 
     fun setSelectedColor(color: Long) {
@@ -167,14 +184,17 @@ class EditorViewModel(
         _isZoomPanMode.value = !_isZoomPanMode.value
     }
 
+    /**
+     * Persist the latest editor snapshot before navigation or when the app
+     * leaves the foreground. Safe to call repeatedly.
+     */
+    suspend fun flushPendingSave() {
+        autosaveWorker.flush()
+    }
+
     private fun saveProgressInternal() {
-        viewModelScope.launch {
-            repository.saveProgress(
-                mandalaId = mandalaId,
-                coloredRegions = _coloredRegions.value,
-                totalRegions = design.regionCount
-            )
-        }
+        hasUserEdited = true
+        autosaveWorker.submit(_coloredRegions.value)
     }
 
     class Factory(

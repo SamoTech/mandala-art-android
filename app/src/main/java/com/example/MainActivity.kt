@@ -46,6 +46,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ads.AdMobManager
 import com.example.analytics.AnalyticsTracker
 import com.example.data.CloudSaveManager
+import com.example.data.DeviceIdentity
 import com.example.data.MandalaDatabase
 import com.example.data.MandalaRepository
 import com.example.generator.MandalaLibrary
@@ -78,7 +79,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         val database = MandalaDatabase.getInstance(applicationContext)
-        val repository = MandalaRepository(database.mandalaDao())
+        val deviceActorId = DeviceIdentity.getOrCreate(applicationContext)
+        val repository = MandalaRepository(database.mandalaDao(), deviceActorId)
         val cloudSaveManager = CloudSaveManager(database.mandalaDao())
         val appSettings = AppSettings(applicationContext)
         AnalyticsTracker.initialize(applicationContext)

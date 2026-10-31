@@ -1,5 +1,6 @@
 package com.example.ui.editor
 
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -40,16 +41,23 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -72,6 +80,51 @@ fun EditorScreen(
     onNavigateBack: () -> Unit
 ) {
     val context = LocalContext.current
+    val shareScope = rememberCoroutineScope()
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val navigationScope = rememberCoroutineScope()
+    var isNavigatingBack by remember { mutableStateOf(false) }
+    val navigateBackAfterFlush: () -> Unit = {
+        if (!isNavigatingBack) {
+            isNavigatingBack = true
+            navigationScope.launch {
+                try {
+                    viewModel.flushPendingSave()
+                    onNavigateBack()
+                } catch (cancelled: CancellationException) {
+                    isNavigatingBack = false
+                    throw cancelled
+                } catch (error: Exception) {
+                    isNavigatingBack = false
+                    Log.e("EditorScreen", "Unable to flush artwork before navigation", error)
+                    Toast.makeText(
+                        context,
+                        "Could not save your latest changes. Please try again.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
+    }
+
+    DisposableEffect(lifecycleOwner, viewModel) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_STOP) {
+                navigationScope.launch {
+                    try {
+                        viewModel.flushPendingSave()
+                    } catch (cancelled: CancellationException) {
+                        throw cancelled
+                    } catch (error: Exception) {
+                        Log.e("EditorScreen", "Autosave flush failed when app stopped", error)
+                    }
+                }
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+
     LaunchedEffect(viewModel.design.id) {
         AnalyticsTracker.logEvent("design_opened", "content_type", "mandala")
         AnalyticsTracker.logEvent("coloring_started", "content_type", "mandala")
@@ -90,8 +143,8 @@ fun EditorScreen(
     var lockedColorToUnlock by remember { mutableStateOf<Long?>(null) }
     var colorAdInProgress by remember { mutableStateOf(false) }
 
-    BackHandler {
-        onNavigateBack()
+    BackHandler(enabled = !isNavigatingBack) {
+        navigateBackAfterFlush()
     }
 
     Scaffold(
@@ -112,7 +165,7 @@ fun EditorScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         IconButton(
-                            onClick = onNavigateBack,
+                            onClick = navigateBackAfterFlush,
                             modifier = Modifier.testTag("btn_editor_back")
                         ) {
                             Icon(
@@ -174,12 +227,24 @@ fun EditorScreen(
 
                             IconButton(
                                 onClick = {
-                                    ImageSharer.exportAndShare(
-                                        context = context,
-                                        design = viewModel.design,
-                                        coloredRegions = coloredRegions,
-                                        outlineColor = outlineColor
-                                    )
+                                    shareScope.launch {
+                                        try {
+                                            ImageSharer.exportAndShare(
+                                                context = context,
+                                                design = viewModel.design,
+                                                coloredRegions = coloredRegions,
+                                                outlineColor = outlineColor
+                                            )
+                                        } catch (cancelled: CancellationException) {
+                                            throw cancelled
+                                        } catch (error: Exception) {
+                                            Toast.makeText(
+                                                context,
+                                                "Unable to export artwork. Please try again.",
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                        }
+                                    }
                                 },
                                 modifier = Modifier.testTag("btn_editor_share")
                             ) {
@@ -305,9 +370,22 @@ fun EditorScreen(
             confirmButton = {
                 Button(
                     onClick = {
-                        viewModel.reset()
-                        showResetDialog = false
-                        Toast.makeText(context, "Artwork reset", Toast.LENGTH_SHORT).show()
+                        navigationScope.launch {
+                            try {
+                                viewModel.reset()
+                                showResetDialog = false
+                                Toast.makeText(context, "Artwork reset", Toast.LENGTH_SHORT).show()
+                            } catch (cancelled: CancellationException) {
+                                throw cancelled
+                            } catch (error: Exception) {
+                                Log.e("EditorScreen", "Unable to reset artwork", error)
+                                Toast.makeText(
+                                    context,
+                                    "Could not reset artwork. Please try again.",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
                     modifier = Modifier.testTag("btn_confirm_reset")

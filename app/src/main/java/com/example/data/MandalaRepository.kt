@@ -4,8 +4,10 @@ import com.example.model.SavedArtwork
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class MandalaRepository(private val dao: MandalaDao) {
-
+class MandalaRepository(
+    private val dao: MandalaDao,
+    private val deviceActorId: String
+) {
     val allProgress: Flow<List<SavedArtwork>> = dao.getAllProgress().map { entities ->
         entities.map { it.toSavedArtwork() }
     }
@@ -15,7 +17,9 @@ class MandalaRepository(private val dao: MandalaDao) {
     }
 
     suspend fun getProgressOnce(mandalaId: String): SavedArtwork? {
-        return dao.getProgressOnce(mandalaId)?.toSavedArtwork()
+        return dao.getProgressOnce(mandalaId)
+            ?.takeUnless { it.isDeleted }
+            ?.toSavedArtwork()
     }
 
     suspend fun saveProgress(
@@ -25,61 +29,53 @@ class MandalaRepository(private val dao: MandalaDao) {
         isFavorite: Boolean? = null
     ) {
         val nonDefaultCount = coloredRegions.values.count { it != 0xFFFFFFFFL }
-        val percent = if (totalRegions > 0) (nonDefaultCount.toFloat() / totalRegions).coerceIn(0f, 1f) else 0f
-        val isCompleted = percent >= 0.999f
-
-        val serialized = serializeColors(coloredRegions)
-        val timestamp = System.currentTimeMillis()
-        if (isFavorite == null) {
-            // Update progress fields atomically without overwriting a concurrent favorite toggle.
-            val updatedRows = dao.updateProgressPreservingFavorite(
-                mandalaId = mandalaId,
-                coloredRegionsJson = serialized,
-                percentCompleted = percent,
-                isCompleted = isCompleted,
-                lastEditedTimestamp = timestamp
-            )
-            if (updatedRows > 0) return
+        val percent = if (totalRegions > 0) {
+            (nonDefaultCount.toFloat() / totalRegions).coerceIn(0f, 1f)
+        } else {
+            0f
         }
-
-        // New artwork starts as not favorite unless the caller explicitly sets the state.
-        dao.saveProgress(
-            MandalaProgressEntity(
-                mandalaId = mandalaId,
-                coloredRegionsJson = serialized,
-                percentCompleted = percent,
-                isFavorite = isFavorite ?: false,
-                isCompleted = isCompleted,
-                lastEditedTimestamp = timestamp
-            )
+        val serialized = serializeColors(coloredRegions)
+        dao.updateProgressFields(
+            mandalaId = mandalaId,
+            coloredRegionsJson = serialized,
+            percentCompleted = percent,
+            isCompleted = percent >= 0.999f,
+            timestamp = System.currentTimeMillis(),
+            actor = deviceActorId
         )
+        if (isFavorite != null) {
+            dao.updateFavoriteField(
+                mandalaId = mandalaId,
+                isFavorite = isFavorite,
+                timestamp = System.currentTimeMillis(),
+                actor = deviceActorId
+            )
+        }
     }
 
     suspend fun toggleFavorite(mandalaId: String, currentFav: Boolean) {
-        val existing = dao.getProgressOnce(mandalaId)
-        if (existing != null) {
-            dao.updateFavorite(mandalaId, !currentFav, System.currentTimeMillis())
-        } else {
-            // Create initial entry with favorite flagged
-            dao.saveProgress(
-                MandalaProgressEntity(
-                    mandalaId = mandalaId,
-                    coloredRegionsJson = "",
-                    percentCompleted = 0f,
-                    isFavorite = !currentFav,
-                    isCompleted = false,
-                    lastEditedTimestamp = System.currentTimeMillis()
-                )
-            )
-        }
+        dao.updateFavoriteField(
+            mandalaId = mandalaId,
+            isFavorite = !currentFav,
+            timestamp = System.currentTimeMillis(),
+            actor = deviceActorId
+        )
     }
 
     suspend fun deleteProgress(mandalaId: String) {
-        dao.deleteProgress(mandalaId)
+        dao.markDeleted(
+            mandalaId = mandalaId,
+            timestamp = System.currentTimeMillis(),
+            actor = deviceActorId
+        )
     }
 
     suspend fun resetProgress(mandalaId: String) {
-        dao.resetProgress(mandalaId)
+        dao.resetProgress(
+            mandalaId = mandalaId,
+            timestamp = System.currentTimeMillis(),
+            actor = deviceActorId
+        )
     }
 
     companion object {
@@ -96,9 +92,7 @@ class MandalaRepository(private val dao: MandalaDao) {
                 if (parts.size == 2) {
                     val id = parts[0]
                     val color = parts[1].toLongOrNull()
-                    if (color != null) {
-                        result[id] = color
-                    }
+                    if (color != null) result[id] = color
                 }
             }
             return result
@@ -108,11 +102,11 @@ class MandalaRepository(private val dao: MandalaDao) {
 
 private fun MandalaProgressEntity.toSavedArtwork(): SavedArtwork {
     return SavedArtwork(
-        mandalaId = this.mandalaId,
-        coloredRegions = MandalaRepository.deserializeColors(this.coloredRegionsJson),
-        percentCompleted = this.percentCompleted,
-        isFavorite = this.isFavorite,
-        isCompleted = this.isCompleted,
-        lastEditedTimestamp = this.lastEditedTimestamp
+        mandalaId = mandalaId,
+        coloredRegions = MandalaRepository.deserializeColors(coloredRegionsJson),
+        percentCompleted = percentCompleted,
+        isFavorite = isFavorite,
+        isCompleted = isCompleted,
+        lastEditedTimestamp = lastEditedTimestamp
     )
 }

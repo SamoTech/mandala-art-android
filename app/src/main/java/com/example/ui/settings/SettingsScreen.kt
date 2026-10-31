@@ -66,6 +66,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.BuildConfig
 import com.example.R
 import com.example.data.CloudSaveManager
 import kotlinx.coroutines.launch
@@ -425,7 +426,7 @@ fun SettingsScreen(
                             if (signedInUser != null) {
                                 Text("Signed in as ${signedInUser.email ?: "Firebase user"}")
                                 Text(
-                                    "Your local progress stays available offline. Sync uploads or restores the newest saved record per mandala.",
+                                    "Your local progress stays available offline. Sync merges coloring, favorites, and deletions independently across devices.",
                                     fontSize = 12.sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -555,7 +556,7 @@ fun SettingsScreen(
                                     fontSize = 16.sp
                                 )
                                 Text(
-                                    text = "Version 1.0 • Native Android",
+                                    text = "Version ${BuildConfig.VERSION_NAME} • Native Android",
                                     fontSize = 12.sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -600,7 +601,7 @@ fun SettingsScreen(
                 ) {
                     Text(
                         text = "1. Optional Cloud Save:\n" +
-                                "Account creation is optional. If you create an account, Firebase Authentication processes your email address. When you manually sync, your coloring progress, colors, favorites, completion status, and timestamps are stored in Cloud Firestore under your account. Without signing in, progress remains local.\n\n" +
+                                "Account creation is optional. If you create an account, Firebase Authentication processes your email address. When you manually sync, your coloring progress, colors, favorites, completion status, timestamps, per-field sync revisions, and deletion markers are stored in Cloud Firestore under your account. A random installation identifier is used only to resolve concurrent offline edits; it is stored outside Android backup data. Without signing in, progress remains local.\n\n" +
                                 "2. Advertising & Third-Party SDKs:\n" +
                                 "The app uses Google AdMob (Google Mobile Ads SDK) to show non-intrusive ads and voluntary rewarded video unlocks. Google AdMob may process device identifiers (such as Android Advertising ID), coarse IP address, and interaction diagnostics for ad serving and fraud detection.\n\n" +
                                 "The app also uses Firebase Analytics with a small, fixed set of app events: when a design is opened, when coloring is started, when a rewarded ad is offered, started, or completed, and when premium content is unlocked. These events include only a coarse content category, never artwork images, colors, or coloring progress. Firebase also collects an app instance identifier and standard app lifecycle and technical information.\n\n" +

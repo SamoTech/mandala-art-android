@@ -147,12 +147,12 @@ class ExampleRobolectricTest {
     }
 
     @Test
-    fun verifyEditorViewModelUndoRedoOperations() {
+    fun verifyEditorViewModelUndoRedoOperations() = runBlocking {
         val context = ApplicationProvider.getApplicationContext<Context>()
         val inMemoryDb = Room.inMemoryDatabaseBuilder(context, MandalaDatabase::class.java)
             .allowMainThreadQueries()
             .build()
-        val repository = MandalaRepository(inMemoryDb.mandalaDao())
+        val repository = MandalaRepository(inMemoryDb.mandalaDao(), "test-device")
         val settings = AppSettings(context)
 
         val viewModel = EditorViewModel(
@@ -280,7 +280,7 @@ class ExampleRobolectricTest {
             .allowMainThreadQueries()
             .build()
         try {
-            val repository = MandalaRepository(inMemoryDb.mandalaDao())
+            val repository = MandalaRepository(inMemoryDb.mandalaDao(), "test-device")
             repository.toggleFavorite("lotus_bloom", currentFav = false)
 
             repository.saveProgress(
@@ -370,7 +370,7 @@ class ExampleRobolectricTest {
                     lastEditedTimestamp = 100L
                 )
             )
-            dao.resetProgress("reset_favorite_mandala")
+            dao.resetProgress("reset_favorite_mandala", 200L, "test-device")
 
             val favoriteAfterReset = dao.getProgressOnce("reset_favorite_mandala")
             assertNotNull("Favorite record must survive reset", favoriteAfterReset)
@@ -390,8 +390,8 @@ class ExampleRobolectricTest {
                     lastEditedTimestamp = 100L
                 )
             )
-            dao.resetProgress("reset_plain_mandala")
-            assertNull("Non-favorite record must be removed by reset", dao.getProgressOnce("reset_plain_mandala"))
+            dao.resetProgress("reset_plain_mandala", 200L, "test-device")
+            assertTrue("Non-favorite reset must retain a sync tombstone", dao.getProgressOnce("reset_plain_mandala")!!.isDeleted)
         } finally {
             inMemoryDb.close()
         }
