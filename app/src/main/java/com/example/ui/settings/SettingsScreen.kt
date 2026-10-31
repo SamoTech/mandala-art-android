@@ -641,7 +641,7 @@ fun SettingsScreen(
                                 "4. Children's Privacy:\n" +
                                 "We treat ads as General Audience (Content Rating G) and do not knowingly collect personal information from children under 13.\n\n" +
                                 "5. Account & Data Deletion:\n" +
-                                "In Settings > Cloud Save > Delete Account & Cloud Data, you can permanently delete your Firebase account, its Firestore mandala progress, and that account's local Room data. The app asks for your password again before deletion. Guest/local-only progress and other accounts on the same device are retained. Signing out alone does not delete cloud data.",
+                                "In Settings > Cloud Save > Delete Account & Cloud Data, you can permanently delete your Firebase account, its Firestore mandala progress, and that account's local Room data. The app asks for your password again before deletion. Guest/local-only progress and other accounts on the same device are retained. A minimal UID-based deletion lock remains to stop other devices from recreating saves. Signing out alone does not delete cloud data.",
                         fontSize = 12.sp,
                         lineHeight = 18.sp
                     )
@@ -673,7 +673,7 @@ fun SettingsScreen(
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Text(
-                        "This permanently deletes your Firebase account, its cloud saves, and this account's local progress. Guest progress and other accounts on this device are kept. Enter your password to reauthenticate."
+                        "This permanently deletes your Firebase account, its cloud saves, and this account's local progress. Guest progress and other accounts on this device are kept. A minimal UID-based lock remains to prevent stale devices from recreating saves. Enter your password to reauthenticate."
                     )
                     OutlinedTextField(
                         value = deleteAccountPassword,
