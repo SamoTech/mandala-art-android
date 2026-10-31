@@ -1,5 +1,6 @@
 package com.example.ui.editor
 
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -82,10 +83,27 @@ fun EditorScreen(
     val shareScope = rememberCoroutineScope()
     val lifecycleOwner = LocalLifecycleOwner.current
     val navigationScope = rememberCoroutineScope()
+    var isNavigatingBack by remember { mutableStateOf(false) }
     val navigateBackAfterFlush: () -> Unit = {
-        navigationScope.launch {
-            viewModel.flushPendingSave()
-            onNavigateBack()
+        if (!isNavigatingBack) {
+            isNavigatingBack = true
+            navigationScope.launch {
+                try {
+                    viewModel.flushPendingSave()
+                    onNavigateBack()
+                } catch (cancelled: CancellationException) {
+                    isNavigatingBack = false
+                    throw cancelled
+                } catch (error: Exception) {
+                    isNavigatingBack = false
+                    Log.e("EditorScreen", "Unable to flush artwork before navigation", error)
+                    Toast.makeText(
+                        context,
+                        "Could not save your latest changes. Please try again.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
         }
     }
 
@@ -93,7 +111,13 @@ fun EditorScreen(
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_STOP) {
                 navigationScope.launch {
-                    viewModel.flushPendingSave()
+                    try {
+                        viewModel.flushPendingSave()
+                    } catch (cancelled: CancellationException) {
+                        throw cancelled
+                    } catch (error: Exception) {
+                        Log.e("EditorScreen", "Autosave flush failed when app stopped", error)
+                    }
                 }
             }
         }
@@ -119,8 +143,8 @@ fun EditorScreen(
     var lockedColorToUnlock by remember { mutableStateOf<Long?>(null) }
     var colorAdInProgress by remember { mutableStateOf(false) }
 
-    BackHandler {
-        onNavigateBack()
+    BackHandler(enabled = !isNavigatingBack) {
+        navigateBackAfterFlush()
     }
 
     Scaffold(
