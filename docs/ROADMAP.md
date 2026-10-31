@@ -3,7 +3,7 @@
 > **Status:** Living execution plan  
 > **Baseline reviewed:** 2026-10-31  
 > **Repository:** [SamoTech/mandala-art-android](https://github.com/SamoTech/mandala-art-android)  
-> **Current planning baseline:** `main` at `3b4ac9c1c99915fcd2646640a8408957e6d10fa2`
+> **Current planning baseline:** `main` at `bb39ad1bd9c5d72238f3fdb470e279e7c1e62d74`
 
 This document is the canonical roadmap for product and engineering work on Mandala Art. New work should follow the sequence, dependencies, acceptance criteria, and delivery rules below. It is intentionally milestone-based rather than date-based: a milestone advances only when its exit criteria are demonstrated.
 
@@ -33,7 +33,7 @@ The following reflects a source review of `main` on 2026-10-31. “Implemented�
 | Account deletion | In-app reauthentication, server-side deletion lock, cloud/local cleanup | Merged in PR #29; pre-Play compliance review remains |
 | Favorites | Separate favorite revision/actor; update path also updates edit timestamp | Implemented; add/retain focused persistence and conflict tests |
 | Delete/reset semantics | Tombstones, deletion revisions, explicit restoration proof | Implemented; expand adversarial regression tests as needed |
-| Autosave | Conflated worker, debounce, explicit flush, background error callback | Implemented; account-switch/lifecycle race still requires investigation |
+| Autosave | Conflated worker, debounce, explicit flush, background error callback, owner-bound ViewModel persistence, ON_STOP flush in ViewModel scope | M0 regression coverage merged in PRs #32, #36, and #37; lifecycle test covers ON_STOP, not process death |
 | Daily Inspiration | Stable date-based design selection; Home screen keys it by local date | Implemented; verify timezone/day-boundary behavior |
 | Share image rendering | Bitmap rendering on IO dispatcher; age-based cache cleanup | Implemented; verify memory and cleanup behavior |
 | Arabic localization | Main `strings.xml` is currently English | Not implemented |
@@ -52,7 +52,7 @@ The following reflects a source review of `main` on 2026-10-31. “Implemented�
 
 ## 3. Milestones and execution order
 
-### M0 — Data integrity and editor lifecycle (P0, active)
+### M0 — Data integrity and editor lifecycle (P0, completed)
 
 **Goal:** Never lose a user's latest coloring edits, resurrect a deleted artwork incorrectly, or mix data between accounts.
 
@@ -238,7 +238,7 @@ The following is the working queue. Do not skip ahead because a later feature is
 | 1 | Autosave/account-switch lifecycle audit and regression tests | P0 | In progress — PR #32 covers pending save before debounce; in-flight/failure/ON_STOP UID timing tests remain |
 | 2 | Favorite timestamp persistence and tombstone edge-case coverage | P0 | Completed — PR #33; post-merge CI passed |
 | 3 | Offline sync and account-isolation regression coverage | P0 | Completed — PR #34; post-merge Android and Firestore CI passed; device verification user-reported |
-| 4 | Arabic resources and RTL pass | P1 | Planned |
+| 4 | Arabic resources and RTL pass | P1 | Next — inspect current resource coverage, then implement in focused PRs |
 | 5 | Release R8/minification experiment with measured comparison | P1 | Planned |
 | 6 | Profile gallery and share paths; optimize only measured bottlenecks | P1 | Planned |
 | 7 | User-configurable deterministic mandala generator | P2 | Discovery |
