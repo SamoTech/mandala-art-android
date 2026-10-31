@@ -86,6 +86,7 @@ Work items:
 
 Work items:
 
+- [x] Audit existing string resources, hardcoded UI text, dynamic labels, accessibility descriptions, and RTL-sensitive screens (see `docs/LOCALIZATION_AUDIT.md`).
 - [ ] Add `app/src/main/res/values-ar/strings.xml`; keep the default `values/strings.xml` as English.
 - [ ] Replace user-visible hardcoded strings with Android string resources; include dialogs, errors, empty states, ads/reward messaging, account flows, and accessibility descriptions.
 - [ ] Review pluralization, formatting placeholders, and text concatenation. Use formatted resources rather than manually joining translated fragments.
@@ -310,4 +311,4 @@ Every change to priority or scope must include a short reason. Do not silently r
 
 ---
 
-**Current next action:** Begin M1 with a complete localization inventory: identify all user-visible hardcoded strings, existing `stringResource` coverage, accessibility descriptions, plural/formatting needs, and RTL-sensitive layouts. Then replace hardcoded UI text with default English resources and add `values-ar/strings.xml` in focused PRs. Preserve English behavior, verify Arabic shaping and layout direction, and add locale/resource regression tests.
+**Current next action:** Implement M1 in focused PRs: first extract remaining hardcoded screen/dialog/accessibility text into default English resources, then localize data-driven labels and plural resources, then add matching `values-ar/strings.xml` translations and locale/RTL regression tests. Use `docs/LOCALIZATION_AUDIT.md` as the source inventory. Preserve persisted IDs, backend fields, and analytics names.
