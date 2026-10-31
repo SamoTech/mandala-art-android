@@ -7,20 +7,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.asComposePath
 
-enum class MandalaCategory(val title: String) {
-    ALL("All"),
-    EASY("Easy"),
-    MEDIUM("Medium"),
-    HARD("Hard"),
-    FLORAL("Floral"),
-    GEOMETRIC("Geometric"),
-    INTRICATE("Intricate")
+enum class MandalaCategory {
+    ALL,
+    EASY,
+    MEDIUM,
+    HARD,
+    FLORAL,
+    GEOMETRIC,
+    INTRICATE
 }
 
-enum class Difficulty(val label: String, val color: Long) {
-    EASY("Easy", 0xFF4CAF50),
-    MEDIUM("Medium", 0xFFFF9800),
-    HARD("Hard", 0xFFE91E63)
+enum class Difficulty(val color: Long) {
+    EASY(0xFF4CAF50),
+    MEDIUM(0xFFFF9800),
+    HARD(0xFFE91E63)
 }
 
 /**

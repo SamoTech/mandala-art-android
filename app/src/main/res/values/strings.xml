@@ -178,4 +178,14 @@
     <string name="settings_delete_account_confirmation">This permanently deletes your Firebase account, its cloud saves, and this account\'s local progress. Guest progress and other accounts on this device are kept. A minimal UID-based lock remains to prevent stale devices from recreating saves. Enter your password to reauthenticate.</string>
     <string name="settings_account_delete_completed">Account deletion completed.</string>
 
+    <string name="palette_chakra">Chakra</string>
+    <string name="palette_pastel">Pastel</string>
+    <string name="palette_jewel">Jewel</string>
+    <string name="palette_sunset">Sunset</string>
+    <string name="palette_nature">Nature</string>
+    <string name="gallery_level_name_blossom_path">Blossom Path</string>
+    <string name="gallery_level_name_golden_flow">Golden Flow</string>
+    <string name="gallery_level_name_master_circle">Master Circle</string>
+    <string name="gallery_level_name_fallback">Level %1$d</string>
+
 </resources>
