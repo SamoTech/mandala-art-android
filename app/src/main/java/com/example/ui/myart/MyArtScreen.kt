@@ -388,7 +388,7 @@ fun MyArtScreen(
                 Text(text = stringResource(R.string.my_art_delete_title), fontWeight = FontWeight.Bold)
             },
             text = {
-                Text(text = "Are you sure you want to remove your colored progress for \"${target.title}\"?")
+                Text(text = stringResource(R.string.my_art_delete_message, target.title))
             },
             confirmButton = {
                 Button(
