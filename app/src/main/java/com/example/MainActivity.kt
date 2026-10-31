@@ -81,7 +81,7 @@ class MainActivity : ComponentActivity() {
         val database = MandalaDatabase.getInstance(applicationContext)
         val deviceActorId = DeviceIdentity.getOrCreate(applicationContext)
         val repository = MandalaRepository(database.mandalaDao(), deviceActorId)
-        val cloudSaveManager = CloudSaveManager(database.mandalaDao(), deviceActorId)
+        val cloudSaveManager = CloudSaveManager(database.mandalaDao())
         val appSettings = AppSettings(applicationContext)
         AnalyticsTracker.initialize(applicationContext)
         val adMobManager = AdMobManager.getInstance(applicationContext)
