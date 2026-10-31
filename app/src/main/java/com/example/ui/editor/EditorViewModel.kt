@@ -195,6 +195,22 @@ class EditorViewModel(
         autosaveWorker.flush()
     }
 
+    /**
+     * Starts an ON_STOP flush in the ViewModel scope so composition disposal
+     * cannot cancel a save that was already triggered by the lifecycle event.
+     */
+    fun flushPendingSaveOnLifecycleStop(onError: (Exception) -> Unit) {
+        viewModelScope.launch {
+            try {
+                flushPendingSave()
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (error: Exception) {
+                onError(error)
+            }
+        }
+    }
+
     private fun saveProgressInternal() {
         hasUserEdited = true
         autosaveWorker.submit(_coloredRegions.value)
