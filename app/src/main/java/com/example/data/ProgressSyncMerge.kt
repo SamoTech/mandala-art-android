@@ -23,6 +23,13 @@ object ProgressSyncMerge {
         val isCompleted: Boolean
     )
 
+    private data class RestorationProof(
+        val deletedRevision: Long,
+        val deletedActor: String,
+        val eventRevision: Long,
+        val eventActor: String
+    )
+
     fun merge(
         local: MandalaProgressEntity?,
         remote: MandalaProgressEntity?
@@ -48,12 +55,22 @@ object ProgressSyncMerge {
             local.isFavorite to localFavoriteRevision,
             remote.isFavorite to remoteFavoriteRevision
         )
-        val localRestoreRevision = local.restoredDeletionRevision.toRevision(local.restoredDeletionActor)
-        val remoteRestoreRevision = remote.restoredDeletionRevision.toRevision(remote.restoredDeletionActor)
+        val localRestoreProof = RestorationProof(
+            local.restoredDeletionRevision,
+            local.restoredDeletionActor,
+            local.restorationEventRevision,
+            local.restorationEventActor
+        )
+        val remoteRestoreProof = RestorationProof(
+            remote.restoredDeletionRevision,
+            remote.restoredDeletionActor,
+            remote.restorationEventRevision,
+            remote.restorationEventActor
+        )
         val restore = choose(
-            local.restoredDeletionRevision to localRestoreRevision,
-            remote.restoredDeletionRevision to remoteRestoreRevision
-        ).let { it.first to it.second }
+            localRestoreProof to local.restorationEventRevision.toRevision(local.restorationEventActor),
+            remoteRestoreProof to remote.restorationEventRevision.toRevision(remote.restorationEventActor)
+        ).first
 
         val deletionOrder = localDeletionRevision.compareTo(remoteDeletionRevision)
         val deletion = when {
@@ -64,12 +81,16 @@ object ProgressSyncMerge {
 
         // A higher Lamport counter alone does not prove causality: an offline
         // device may have advanced its clock without ever seeing this deletion.
-        // Revival therefore requires an explicit acknowledgement of this exact
-        // tombstone plus a field mutation newer than it.
-        val newestFieldRevision = maxOf(progress.second, favorite.second)
-        val observedDeletion = restore.second == deletion.second
-        val hasPostDeletionMutation = newestFieldRevision.compareTo(deletion.second) > 0
-        val deleted = deletion.first && !(observedDeletion && hasPostDeletionMutation)
+        // Revival requires an explicit acknowledgement of this exact tombstone
+        // and the exact field mutation that carried that acknowledgement. A
+        // larger revision from a different offline device cannot borrow proof
+        // from a concurrent restore event.
+        val restoreEventRevision = restore.eventRevision.toRevision(restore.eventActor)
+        val observedDeletion = restore.deletedRevision == deletion.second.counter &&
+            restore.deletedActor == deletion.second.actor
+        val restorationMutationPresent = progress.second == restoreEventRevision ||
+            favorite.second == restoreEventRevision
+        val deleted = deletion.first && !(observedDeletion && restorationMutationPresent)
 
         return MandalaProgressEntity(
             mandalaId = local.mandalaId,
@@ -85,8 +106,10 @@ object ProgressSyncMerge {
             isDeleted = deleted,
             deletionRevision = deletion.second.counter,
             deletionActor = deletion.second.actor,
-            restoredDeletionRevision = restore.first,
-            restoredDeletionActor = restore.second.actor
+            restoredDeletionRevision = restore.deletedRevision,
+            restoredDeletionActor = restore.deletedActor,
+            restorationEventRevision = restore.eventRevision,
+            restorationEventActor = restore.eventActor
         )
     }
 
