@@ -18,7 +18,9 @@ class ProgressSyncMergeTest {
         deleted: Boolean = false,
         deletionRevision: Long = 0,
         deletionActor: String = "legacy",
-        timestamp: Long = 1
+        timestamp: Long = 1,
+        restoredDeletionRevision: Long = 0,
+        restoredDeletionActor: String = "legacy"
     ) = MandalaProgressEntity(
         mandalaId = "mandala-1",
         coloredRegionsJson = progress,
@@ -32,7 +34,9 @@ class ProgressSyncMergeTest {
         favoriteActor = favoriteActor,
         isDeleted = deleted,
         deletionRevision = deletionRevision,
-        deletionActor = deletionActor
+        deletionActor = deletionActor,
+        restoredDeletionRevision = restoredDeletionRevision,
+        restoredDeletionActor = restoredDeletionActor
     )
 
     @Test fun favoriteChangeDoesNotOverwriteNewerProgress() {
@@ -70,13 +74,49 @@ class ProgressSyncMergeTest {
 
     @Test fun laterEditCanReviveObservedTombstone() {
         val tombstone = record(deleted = true, deletionRevision = 8, deletionActor = "device-b")
-        val edited = record(progress = "after-delete", progressRevision = 9, progressActor = "device-a")
+        val edited = record(progress = "after-delete", progressRevision = 9, progressActor = "device-a", restoredDeletionRevision = 8, restoredDeletionActor = "device-b")
 
         val merged = ProgressSyncMerge.merge(tombstone, edited)!!
 
         assertFalse(merged.isDeleted)
         assertEquals("after-delete", merged.coloredRegionsJson)
         assertEquals(8L, merged.deletionRevision)
+    }
+
+    @Test fun unobservedConcurrentEditCannotResurrectTombstoneEvenWithHigherCounter() {
+        val tombstone = record(deleted = true, deletionRevision = 8, deletionActor = "device-b")
+        val offlineEdit = record(progress = "offline-edit", progressRevision = 20, progressActor = "device-a")
+
+        val merged = ProgressSyncMerge.merge(tombstone, offlineEdit)!!
+
+        assertTrue("A larger counter is not proof that the device observed deletion", merged.isDeleted)
+        assertEquals("offline-edit", merged.coloredRegionsJson)
+    }
+
+    @Test fun newerTombstoneOverridesRestorationOfAnOlderDeletion() {
+        val restored = record(
+            progress = "restored-old",
+            progressRevision = 9,
+            progressActor = "device-a",
+            deleted = true,
+            deletionRevision = 8,
+            deletionActor = "device-b",
+            restoredDeletionRevision = 8,
+            restoredDeletionActor = "device-b"
+        )
+        val newerDelete = record(
+            progress = "restored-old",
+            progressRevision = 9,
+            progressActor = "device-a",
+            deleted = true,
+            deletionRevision = 10,
+            deletionActor = "device-c"
+        )
+
+        val merged = ProgressSyncMerge.merge(restored, newerDelete)!!
+        assertTrue(merged.isDeleted)
+        assertEquals(10L, merged.deletionRevision)
+        assertEquals("device-c", merged.deletionActor)
     }
 
     @Test fun concurrentCountersUseActorIdAsDeterministicTieBreaker() {
