@@ -237,8 +237,8 @@ Work items:
 The following is the working queue. Do not skip ahead because a later feature is more visible.
 
 | Order | Work item | Priority | Status |
-| 0 | Cold-start cloud restore and in-app Arabic/English selection | P0 | In progress — `fix/startup-cloud-restore-and-app-language` |
 |---:|---|---|---|
+| 0 | Cold-start cloud restore and in-app Arabic/English selection | P0 | In progress — `fix/startup-cloud-restore-and-app-language` |
 | 1 | Autosave/account-switch lifecycle audit and regression tests | P0 | Completed — PRs #32, #36, #37, #39; post-merge CI passed |
 | 2 | Favorite timestamp persistence and tombstone edge-case coverage | P0 | Completed — PR #33; post-merge CI passed |
 | 3 | Offline sync and account-isolation regression coverage | P0 | Completed — PR #34; post-merge Android and Firestore CI passed; device verification user-reported |
