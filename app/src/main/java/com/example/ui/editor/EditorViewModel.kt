@@ -29,7 +29,7 @@ class EditorViewModel(
         repository.saveProgress(
             mandalaId = mandalaId,
             coloredRegions = snapshot,
-            totalRegions = design.regionCount,
+            totalRegions = MandalaLibrary.getDesignById(mandalaId).regionCount,
             ownerUid = uid
         )
     }
