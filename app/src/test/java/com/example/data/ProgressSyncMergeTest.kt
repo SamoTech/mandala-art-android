@@ -20,7 +20,9 @@ class ProgressSyncMergeTest {
         deletionActor: String = "legacy",
         timestamp: Long = 1,
         restoredDeletionRevision: Long = 0,
-        restoredDeletionActor: String = "legacy"
+        restoredDeletionActor: String = "legacy",
+        restorationEventRevision: Long = 0,
+        restorationEventActor: String = "legacy"
     ) = MandalaProgressEntity(
         mandalaId = "mandala-1",
         coloredRegionsJson = progress,
@@ -36,7 +38,9 @@ class ProgressSyncMergeTest {
         deletionRevision = deletionRevision,
         deletionActor = deletionActor,
         restoredDeletionRevision = restoredDeletionRevision,
-        restoredDeletionActor = restoredDeletionActor
+        restoredDeletionActor = restoredDeletionActor,
+        restorationEventRevision = restorationEventRevision,
+        restorationEventActor = restorationEventActor
     )
 
     @Test fun favoriteChangeDoesNotOverwriteNewerProgress() {
@@ -93,7 +97,7 @@ class ProgressSyncMergeTest {
 
     @Test fun laterEditCanReviveObservedTombstone() {
         val tombstone = record(deleted = true, deletionRevision = 8, deletionActor = "device-b")
-        val edited = record(progress = "after-delete", progressRevision = 9, progressActor = "device-a", restoredDeletionRevision = 8, restoredDeletionActor = "device-b")
+        val edited = record(progress = "after-delete", progressRevision = 9, progressActor = "device-a", restoredDeletionRevision = 8, restoredDeletionActor = "device-b", restorationEventRevision = 9, restorationEventActor = "device-a")
 
         val merged = ProgressSyncMerge.merge(tombstone, edited)!!
 
@@ -112,6 +116,32 @@ class ProgressSyncMergeTest {
         assertEquals("offline-edit", merged.coloredRegionsJson)
     }
 
+    @Test fun concurrentForeignEditCannotBorrowAnotherDevicesRestoreProof() {
+        val observedTombstone = record(deleted = true, deletionRevision = 8, deletionActor = "device-b")
+        val restoreEvent = record(
+            progress = "restored",
+            progressRevision = 9,
+            progressActor = "device-a",
+            restoredDeletionRevision = 8,
+            restoredDeletionActor = "device-b",
+            restorationEventRevision = 9,
+            restorationEventActor = "device-a"
+        )
+        val unobservedForeignEdit = record(
+            progress = "offline-newer",
+            progressRevision = 20,
+            progressActor = "device-c"
+        )
+
+        val merged = ProgressSyncMerge.merge(
+            ProgressSyncMerge.merge(observedTombstone, restoreEvent),
+            unobservedForeignEdit
+        )!!
+
+        assertTrue("A foreign edit must not borrow another device's restore acknowledgement", merged.isDeleted)
+        assertEquals("offline-newer", merged.coloredRegionsJson)
+    }
+
     @Test fun newerTombstoneOverridesRestorationOfAnOlderDeletion() {
         val restored = record(
             progress = "restored-old",
@@ -121,7 +151,9 @@ class ProgressSyncMergeTest {
             deletionRevision = 8,
             deletionActor = "device-b",
             restoredDeletionRevision = 8,
-            restoredDeletionActor = "device-b"
+            restoredDeletionActor = "device-b",
+            restorationEventRevision = 9,
+            restorationEventActor = "device-a"
         )
         val newerDelete = record(
             progress = "restored-old",
