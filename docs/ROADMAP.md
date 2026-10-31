@@ -62,7 +62,8 @@ Work items:
 - [x] Trace the complete lifecycle: editor ViewModel ownership, navigation stack reset, `viewModelScope` cancellation, pending worker signal, `flushPendingSave()`, and repository owner UID.
 - [x] Define an explicit policy for pending edits on account switch: persist to the original owner partition before disposal, or block/suspend the switch until a bounded flush completes. Never silently save to the newly active account.
 - [x] Cover a pending editor save across an account switch before debounce.
-- [ ] Add deterministic UID-ownership tests for account switches during an in-flight save, after a failed save, and during navigation/ON_STOP.
+- [x] Add deterministic UID-ownership tests for account switches during an in-flight save and after a failed save/retry.
+- [ ] Add a lifecycle integration test proving navigation/ON_STOP flush completes without crossing account ownership.
 - [x] Review autosave error recovery. A failed background write must remain retryable and observable; avoid unbounded retry loops.
 - [x] Add focused DAO/repository tests proving favorite changes persist the timestamp and independent favorite revision without overwriting newer progress.
 - [x] Expand sync/tombstone tests for offline edits, delete-vs-edit races, restore proof, repeated sync, and account isolation.
@@ -70,8 +71,8 @@ Work items:
 
 **Acceptance / exit criteria:**
 
-- A deterministic regression test proves the newest submitted snapshot is persisted to the correct UID partition when account switching occurs at each tested timing boundary.
-- No pending editor snapshot can be written under a different account UID.
+- A deterministic regression test proves the newest submitted snapshot is persisted to the correct UID partition before debounce, during an in-flight save, and after a failed save/retry.
+- No pending editor snapshot can be written under a different account UID at the tested debounce, in-flight, and retry boundaries.
 - Failed saves remain recoverable through an explicit retry/flush path and expose an actionable error state.
 - Favorite and tombstone tests cover both local persistence and merge behavior.
 - Firestore emulator security tests, Android unit tests, lint, and debug build pass.
@@ -235,7 +236,7 @@ The following is the working queue. Do not skip ahead because a later feature is
 
 | Order | Work item | Priority | Status |
 |---:|---|---|---|
-| 1 | Autosave/account-switch lifecycle audit and regression tests | P0 | In progress — PR #32 covers pending save before debounce; in-flight/failure/ON_STOP UID timing tests remain |
+| 1 | Autosave/account-switch lifecycle audit and regression tests | P0 | In progress — debounce, in-flight, and failed-save retry tests covered; navigation/ON_STOP lifecycle integration remains |
 | 2 | Favorite timestamp persistence and tombstone edge-case coverage | P0 | Completed — PR #33; post-merge CI passed |
 | 3 | Offline sync and account-isolation regression coverage | P0 | Completed — PR #34; post-merge Android and Firestore CI passed; device verification user-reported |
 | 4 | Arabic resources and RTL pass | P1 | Planned |
@@ -309,4 +310,4 @@ Every change to priority or scope must include a short reason. Do not silently r
 
 ---
 
-**Current next action:** Complete M0 item 1 — add deterministic UID-ownership tests for account switches during an in-flight save, after a failed save, and during navigation/ON_STOP. Keep M1 blocked until M0 exit criteria are demonstrated.
+**Current next action:** Complete M0 item 1 — add a lifecycle integration test proving the navigation/ON_STOP flush path completes safely while preserving the editor's original UID. Keep M1 blocked until M0 exit criteria are demonstrated.
