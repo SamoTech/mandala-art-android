@@ -201,6 +201,35 @@ class RevisionedProgressDaoTest {
         }
     }
 
+
+    @Test
+    fun pendingEditorWriteStaysInTheAccountThatOpenedTheEditor() = runBlocking {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val database = Room.inMemoryDatabaseBuilder(context, MandalaDatabase::class.java).build()
+        try {
+            val repository = MandalaRepository(database.mandalaDao(), "device-local")
+            repository.setOwnerUid("firebase-user-a")
+            val editorOwnerUid = repository.currentOwnerUid
+
+            repository.setOwnerUid("firebase-user-b")
+            repository.saveProgress(
+                "lotus",
+                mapOf("petal" to 777L),
+                totalRegions = 10,
+                ownerUid = editorOwnerUid
+            )
+
+            assertNull(repository.getProgressOnce("lotus"))
+            assertEquals(
+                "firebase-user-a",
+                database.mandalaDao().getProgressOnce("lotus", "firebase-user-a")!!.ownerUid
+            )
+            assertNull(database.mandalaDao().getProgressOnce("lotus", "firebase-user-b"))
+        } finally {
+            database.close()
+        }
+    }
+
     @Test
     fun installationActorIdIsStableAndStoredOutsideBackupData() {
         val context = ApplicationProvider.getApplicationContext<Context>()
