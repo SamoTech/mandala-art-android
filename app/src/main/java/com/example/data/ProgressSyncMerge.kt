@@ -50,10 +50,11 @@ object ProgressSyncMerge {
             local.isFavorite to localFavoriteRevision,
             remote.isFavorite to remoteFavoriteRevision
         )
-        val deletion = if (localDeletionRevision >= remoteDeletionRevision) {
-            local.isDeleted to localDeletionRevision
-        } else {
-            remote.isDeleted to remoteDeletionRevision
+        val deletionOrder = localDeletionRevision.compareTo(remoteDeletionRevision)
+        val deletion = when {
+            deletionOrder > 0 -> local.isDeleted to localDeletionRevision
+            deletionOrder < 0 -> remote.isDeleted to remoteDeletionRevision
+            else -> (local.isDeleted || remote.isDeleted) to localDeletionRevision
         }
 
         // A tombstone wins over fields at the same or older revision. A later
