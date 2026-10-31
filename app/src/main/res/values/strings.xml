@@ -135,7 +135,7 @@
     <string name="settings_cloud_restore_title">Restoring your artwork</string>
     <string name="settings_cloud_restore_message">Your signed-in account is being synchronized. Your locally saved artwork remains available.</string>
     <string name="settings_cloud_restore_failed_title">Cloud restore unavailable</string>
-    <string name="settings_cloud_restore_failed_message">Your local artwork is still available. Check your connection and retry cloud restore from this message.</string>
+    <string name="settings_cloud_restore_failed_message">Your local data has not been changed. Cloud restore did not complete. Check your connection and retry.</string>
 
     <string name="settings_feedback_section">Feedback &amp; Experience</string>
     <string name="settings_sound_description">Subtle click on region coloring</string>
