@@ -17,7 +17,6 @@ import kotlinx.coroutines.tasks.await
  */
 class CloudSaveManager(
     private val dao: MandalaDao,
-    private val deviceActorId: String,
     private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 ) {
