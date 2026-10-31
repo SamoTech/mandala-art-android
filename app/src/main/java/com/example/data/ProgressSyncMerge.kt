@@ -55,6 +55,13 @@ object ProgressSyncMerge {
             local.isFavorite to localFavoriteRevision,
             remote.isFavorite to remoteFavoriteRevision
         )
+        val deletionOrder = localDeletionRevision.compareTo(remoteDeletionRevision)
+        val deletion = when {
+            deletionOrder > 0 -> local.isDeleted to localDeletionRevision
+            deletionOrder < 0 -> remote.isDeleted to remoteDeletionRevision
+            else -> (local.isDeleted || remote.isDeleted) to localDeletionRevision
+        }
+
         val localRestoreProof = RestorationProof(
             local.restoredDeletionRevision,
             local.restoredDeletionActor,
@@ -67,30 +74,30 @@ object ProgressSyncMerge {
             remote.restorationEventRevision,
             remote.restorationEventActor
         )
-        val restore = choose(
+        val restoreCandidates = listOf(
             localRestoreProof to local.restorationEventRevision.toRevision(local.restorationEventActor),
             remoteRestoreProof to remote.restorationEventRevision.toRevision(remote.restorationEventActor)
+        )
+        // Prefer a proof for the currently selected tombstone. A very high
+        // Lamport counter acknowledging an older deletion must not mask a
+        // lower-counter proof for a newer deletion.
+        val matchingRestoreCandidates = restoreCandidates.filter { (proof, _) ->
+            proof.deletedRevision == deletion.second.counter &&
+                proof.deletedActor == deletion.second.actor
+        }
+        val restore = choose(
+            matchingRestoreCandidates.ifEmpty { restoreCandidates }
+                .reduce { best, candidate -> choose(best, candidate) }
         ).first
 
-        val deletionOrder = localDeletionRevision.compareTo(remoteDeletionRevision)
-        val deletion = when {
-            deletionOrder > 0 -> local.isDeleted to localDeletionRevision
-            deletionOrder < 0 -> remote.isDeleted to remoteDeletionRevision
-            else -> (local.isDeleted || remote.isDeleted) to localDeletionRevision
-        }
-
-        // A higher Lamport counter alone does not prove causality: an offline
-        // device may have advanced its clock without ever seeing this deletion.
-        // Revival requires an explicit acknowledgement of this exact tombstone
-        // and the exact field mutation that carried that acknowledgement. A
-        // larger revision from a different offline device cannot borrow proof
-        // from a concurrent restore event.
+        // A Lamport counter alone is not causal evidence. The proof explicitly
+        // names the exact tombstone observed by the restoring device, and its
+        // event revision must be later than that tombstone.
         val restoreEventRevision = restore.eventRevision.toRevision(restore.eventActor)
         val observedDeletion = restore.deletedRevision == deletion.second.counter &&
             restore.deletedActor == deletion.second.actor
-        val restorationMutationPresent = progress.second == restoreEventRevision ||
-            favorite.second == restoreEventRevision
-        val deleted = deletion.first && !(observedDeletion && restorationMutationPresent)
+        val postDeletionRestoreEvent = restoreEventRevision.compareTo(deletion.second) > 0
+        val deleted = deletion.first && !(observedDeletion && postDeletionRestoreEvent)
 
         return MandalaProgressEntity(
             mandalaId = local.mandalaId,
