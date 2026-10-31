@@ -156,7 +156,7 @@
     <string name="settings_cloud_restore_title">جارٍ استعادة أعمالك الفنية</string>
     <string name="settings_cloud_restore_message">تتم الآن مزامنة الحساب المسجل دخوله. تظل أعمالك المحفوظة محليًا متاحة.</string>
     <string name="settings_cloud_restore_failed_title">تعذرت الاستعادة السحابية</string>
-    <string name="settings_cloud_restore_failed_message">لا تزال أعمالك المحلية متاحة. تحقق من اتصالك ثم أعد محاولة الاستعادة السحابية من هذه الرسالة.</string>
+    <string name="settings_cloud_restore_failed_message">لم يتم تغيير بياناتك المحلية. لم تكتمل الاستعادة السحابية. تحقق من اتصالك ثم أعد المحاولة.</string>
 
     <string name="settings_feedback_section">التفاعل وتجربة الاستخدام</string>
     <string name="settings_sound_description">نقرة صوتية خفيفة عند تلوين منطقة</string>
