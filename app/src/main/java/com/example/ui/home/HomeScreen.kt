@@ -54,6 +54,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -224,7 +225,7 @@ fun HomeScreen(
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
-                                    text = "Featured Artwork",
+                                    text = stringResource(R.string.home_featured_artwork),
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.ExtraBold,
                                     color = Color.White
@@ -242,7 +243,7 @@ fun HomeScreen(
                         )
 
                         Text(
-                            text = "A calming sacred flower pattern with ${featuredDesign.regionCount} harmonious petals.",
+                            text = stringResource(R.string.home_featured_artwork_description, featuredDesign.regionCount),
                             fontSize = 13.sp,
                             color = Color.White.copy(alpha = 0.85f),
                             modifier = Modifier.padding(vertical = 4.dp)
@@ -322,12 +323,12 @@ fun HomeScreen(
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {
                             Text(
-                                text = "All Mandalas",
+                                text = stringResource(R.string.home_all_mandalas),
                                 fontWeight = FontWeight.ExtraBold,
                                 fontSize = 14.sp
                             )
                             Text(
-                                text = "${MandalaLibrary.designs.size} Designs",
+                                text = pluralStringResource(R.plurals.home_design_count, MandalaLibrary.designs.size, MandalaLibrary.designs.size),
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -378,7 +379,7 @@ fun HomeScreen(
                             )
                             val count = savedArtworks.size
                             Text(
-                                text = if (count == 1) "1 Artwork" else "$count Artworks",
+                                text = pluralStringResource(R.plurals.home_artwork_count, count, count),
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -402,7 +403,7 @@ fun HomeScreen(
                     fontWeight = FontWeight.ExtraBold
                 )
                 Text(
-                    text = "Tap to color",
+                    text = stringResource(R.string.home_tap_to_color),
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold

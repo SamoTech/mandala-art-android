@@ -43,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -113,7 +114,7 @@ fun GalleryScreen(
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
-                                    text = "${allDesigns.size} Original Mandalas",
+                                    text = pluralStringResource(R.plurals.gallery_original_mandala_count, allDesigns.size, allDesigns.size),
                                     fontSize = 12.sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -126,7 +127,7 @@ fun GalleryScreen(
                             ) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                    contentDescription = "Back"
+                                    contentDescription = stringResource(R.string.navigation_back)
                                 )
                             }
                         },
@@ -291,15 +292,15 @@ private fun LevelPackHeader(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Level $level · ${LevelSystem.levelName(level)}",
+                    text = stringResource(R.string.gallery_level_title, level, LevelSystem.levelName(level)),
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 14.sp
                 )
                 Text(
                     text = if (isUnlocked) {
-                        "$completedCount / $totalDesigns completed"
+                        stringResource(R.string.gallery_completed_progress, completedCount, totalDesigns)
                     } else {
-                        "Locked — complete ${LevelSystem.REQUIRED_COMPLETIONS_TO_UNLOCK} designs in Level ${level - 1}"
+                        stringResource(R.string.gallery_locked_hint, LevelSystem.REQUIRED_COMPLETIONS_TO_UNLOCK, level - 1)
                     },
                     fontSize = 11.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -308,7 +309,7 @@ private fun LevelPackHeader(
             if (!isUnlocked) {
                 Icon(
                     imageVector = Icons.Filled.Lock,
-                    contentDescription = "Level locked",
+                    contentDescription = stringResource(R.string.gallery_level_locked),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
