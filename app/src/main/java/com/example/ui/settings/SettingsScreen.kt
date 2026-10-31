@@ -81,12 +81,14 @@ fun SettingsScreen(
     appSettings: AppSettings,
     onManageConsent: (() -> Unit)? = null,
     cloudSaveManager: CloudSaveManager? = null,
+    onLanguageChange: (String) -> Unit,
     onNavigateBack: () -> Unit
 ) {
     val context = LocalContext.current
     val soundEnabled by appSettings.soundEnabled.collectAsState()
     val hapticEnabled by appSettings.hapticEnabled.collectAsState()
     val outlineColor by appSettings.outlineColor.collectAsState()
+    val appLanguage by appSettings.language.collectAsState()
 
     var showPrivacyPolicyDialog by remember { mutableStateOf(false) }
     var showLicensesDialog by remember { mutableStateOf(false) }
@@ -164,6 +166,38 @@ fun SettingsScreen(
                     .padding(20.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                // App language is independent from the device-wide language.
+                Text(
+                    text = stringResource(R.string.settings_language_section),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Card(
+                    shape = RoundedCornerShape(18.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(stringResource(R.string.settings_language_description), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            if (appLanguage == "en") {
+                                Button(onClick = { onLanguageChange("en") }, modifier = Modifier.weight(1f).testTag("btn_language_english")) { Text(stringResource(R.string.settings_language_english)) }
+                            } else {
+                                OutlinedButton(onClick = { onLanguageChange("en") }, modifier = Modifier.weight(1f).testTag("btn_language_english")) { Text(stringResource(R.string.settings_language_english)) }
+                            }
+                            if (appLanguage == "ar") {
+                                Button(onClick = { onLanguageChange("ar") }, modifier = Modifier.weight(1f).testTag("btn_language_arabic")) { Text(stringResource(R.string.settings_language_arabic)) }
+                            } else {
+                                OutlinedButton(onClick = { onLanguageChange("ar") }, modifier = Modifier.weight(1f).testTag("btn_language_arabic")) { Text(stringResource(R.string.settings_language_arabic)) }
+                            }
+                        }
+                    }
+                }
+
                 // Audio & Haptics Section
                 Text(
                     text = stringResource(R.string.settings_feedback_section),
