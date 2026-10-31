@@ -291,4 +291,83 @@ class ProgressSyncMergeTest {
         assertEquals(3, attempts)
     }
 
+
+
+    @Test
+    fun offlineFailurePreservesLocalDataAndRetrySynchronizesIt() = kotlinx.coroutines.runBlocking {
+        val local = record(progress = "offline-edit", progressRevision = 7)
+        var storedLocal: MandalaProgressEntity? = local
+        var cloud: MandalaProgressEntity? = null
+
+        val offlineFailure = runCatching {
+            ProgressSyncReconciler.reconcile(
+                readLocal = { storedLocal },
+                syncRemote = { throw IllegalStateException("server unavailable") },
+                applyRemote = { storedLocal = it }
+            )
+        }.exceptionOrNull()
+
+        assertTrue(offlineFailure is IllegalStateException)
+        assertEquals(local, storedLocal)
+        assertNull(cloud)
+
+        ProgressSyncReconciler.reconcile(
+            readLocal = { storedLocal },
+            syncRemote = { candidate ->
+                ProgressSyncMerge.merge(candidate, cloud).also { cloud = it }
+            },
+            applyRemote = { storedLocal = it }
+        )
+
+        assertEquals(local, cloud)
+        assertEquals(local, storedLocal)
+    }
+
+    @Test
+    fun remoteOnlyRecordIsDownloadedIntoLocalPartition() = kotlinx.coroutines.runBlocking {
+        val remote = record(progress = "cloud-only", progressRevision = 6).copy(ownerUid = "user-a")
+        var local: MandalaProgressEntity? = null
+
+        ProgressSyncReconciler.reconcile(
+            readLocal = { local },
+            syncRemote = { candidate -> ProgressSyncMerge.merge(candidate, remote) },
+            applyRemote = { local = it }
+        )
+
+        assertEquals(remote, local)
+        assertEquals("user-a", local?.ownerUid)
+    }
+
+    @Test
+    fun repeatedReconciliationIsIdempotent() = kotlinx.coroutines.runBlocking {
+        val initial = record(progress = "same-artwork", progressRevision = 4).copy(ownerUid = "user-a")
+        var local: MandalaProgressEntity? = initial
+        var cloud: MandalaProgressEntity? = initial
+
+        repeat(3) {
+            ProgressSyncReconciler.reconcile(
+                readLocal = { local },
+                syncRemote = { candidate ->
+                    ProgressSyncMerge.merge(candidate, cloud).also { cloud = it }
+                },
+                applyRemote = { local = it }
+            )
+        }
+
+        assertEquals(initial, local)
+        assertEquals(initial, cloud)
+    }
+
+    @Test
+    fun crossAccountRecordsAreRejectedBeforeTheyCanBeMerged() {
+        val userA = record(progress = "private-a").copy(ownerUid = "user-a")
+        val userB = record(progress = "private-b").copy(ownerUid = "user-b")
+
+        val error = runCatching { ProgressSyncMerge.merge(userA, userB) }.exceptionOrNull()
+
+        assertTrue(error is IllegalArgumentException)
+        assertEquals("private-a", userA.coloredRegionsJson)
+        assertEquals("private-b", userB.coloredRegionsJson)
+    }
+
 }
