@@ -76,4 +76,36 @@
     <string name="my_art_delete_title">Delete Saved Artwork?</string>
     <string name="my_art_delete_message">Are you sure you want to remove your colored progress for “%1$s”?</string>
     <string name="my_art_deleted_toast">Artwork removed</string>
+
+    <string name="reward_unlock_bonus_title">Unlock Bonus Artwork</string>
+    <string name="reward_unlock_bonus_message">Would you like to watch a short sponsored video to unlock “%1$s” permanently? You can also continue enjoying all %2$d free designs anytime.</string>
+    <string name="reward_design_unlocked_toast">Unlocked “%1$s”! Enjoy coloring.</string>
+    <string name="reward_video_not_completed">Video was not completed. Watch the full video to unlock “%1$s”, or enjoy all %2$d free designs anytime.</string>
+    <string name="reward_watch_video">Watch Video</string>
+    <string name="dialog_later">Later</string>
+    <string name="gallery_level_locked_title">Level %1$d Locked</string>
+    <plurals name="gallery_level_locked_message">
+        <item quantity="one">This mandala belongs to Level %1$d. Complete %2$d more design in Level %3$d to unlock it. Keep coloring to level up!</item>
+        <item quantity="other">This mandala belongs to Level %1$d. Complete %2$d more designs in Level %3$d to unlock it. Keep coloring to level up!</item>
+    </plurals>
+    <string name="gallery_keep_coloring">Keep Coloring</string>
+    <string name="reward_video_unavailable_title">Video Ad Unavailable</string>
+    <string name="reward_video_unavailable_message">The sponsored video for “%1$s” is not ready yet. Please check your internet connection and try again in a few moments.\n\nAll %2$d standard mandala designs remain free and open to color without ads!</string>
+    <string name="reward_requesting_video_ad">Requesting video ad... Please try again in a moment.</string>
+    <string name="dialog_retry">Retry</string>
+    <string name="reward_explore_free_designs">Explore Free Designs</string>
+    <plurals name="editor_colored_progress">
+        <item quantity="one">%1$d%% Colored • %2$d Region</item>
+        <item quantity="other">%1$d%% Colored • %2$d Regions</item>
+    </plurals>
+    <string name="editor_zoom_pan_hint">Zoom &amp; Pan Mode: Drag to move • Pinch to zoom</string>
+    <string name="editor_eraser_hint">Eraser Active: Tap any region to clear color</string>
+    <string name="editor_reset_success">Artwork reset</string>
+    <string name="editor_reset_error">Could not reset artwork. Please try again.</string>
+    <string name="editor_unlock_premium_color">Unlock Premium Color</string>
+    <string name="editor_unlock_color_message">Watch a rewarded video to unlock this color permanently on this device.</string>
+    <string name="reward_unable_to_show_ad">Unable to show ad right now.</string>
+    <string name="editor_complete_video_to_unlock_color">Complete the video to unlock this color.</string>
+    <string name="reward_video_not_ready">Video ad is not ready. Try again shortly.</string>
+    <string name="reward_unable_to_show_ad_retry">Unable to show the ad. Please try again.</string>
 </resources>
