@@ -231,6 +231,33 @@ class RevisionedProgressDaoTest {
     }
 
     @Test
+    fun cloudMergeKeepsAuthenticatedOwnerPartition() = runBlocking {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val database = Room.inMemoryDatabaseBuilder(context, MandalaDatabase::class.java).build()
+        try {
+            val dao = database.mandalaDao()
+            val owner = "firebase-user-a"
+            val row = MandalaProgressEntity(
+                mandalaId = "lotus",
+                ownerUid = owner,
+                coloredRegionsJson = "petal:111",
+                percentCompleted = 0.1f,
+                isFavorite = false,
+                isCompleted = false,
+                progressRevision = 1L,
+                progressActor = "device-a"
+            )
+            dao.upsertProgress(row)
+            dao.mergeProgress(row.copy(coloredRegionsJson = "petal:222", progressRevision = 2L))
+
+            assertEquals(owner, dao.getProgressOnce("lotus", owner)!!.ownerUid)
+            assertNull(dao.getProgressOnce("lotus", ""))
+        } finally {
+            database.close()
+        }
+    }
+
+    @Test
     fun installationActorIdIsStableAndStoredOutsideBackupData() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         val first = DeviceIdentity.getOrCreate(context)
