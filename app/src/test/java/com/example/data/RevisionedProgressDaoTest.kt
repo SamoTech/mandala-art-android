@@ -258,6 +258,35 @@ class RevisionedProgressDaoTest {
     }
 
     @Test
+    fun deletingOneAccountLocalPartitionPreservesAnonymousAndOtherAccounts() = runBlocking {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val database = Room.inMemoryDatabaseBuilder(context, MandalaDatabase::class.java).build()
+        try {
+            val dao = database.mandalaDao()
+            listOf("", "firebase-user-a", "firebase-user-b").forEachIndexed { index, owner ->
+                dao.upsertProgress(
+                    MandalaProgressEntity(
+                        mandalaId = "lotus",
+                        ownerUid = owner,
+                        coloredRegionsJson = "petal:$index",
+                        percentCompleted = 0.1f,
+                        isFavorite = false,
+                        isCompleted = false
+                    )
+                )
+            }
+
+            dao.deleteAllProgress("firebase-user-a")
+
+            assertNull(dao.getProgressOnce("lotus", "firebase-user-a"))
+            assertEquals("petal:0", dao.getProgressOnce("lotus", "")!!.coloredRegionsJson)
+            assertEquals("petal:2", dao.getProgressOnce("lotus", "firebase-user-b")!!.coloredRegionsJson)
+        } finally {
+            database.close()
+        }
+    }
+
+    @Test
     fun installationActorIdIsStableAndStoredOutsideBackupData() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         val first = DeviceIdentity.getOrCreate(context)
