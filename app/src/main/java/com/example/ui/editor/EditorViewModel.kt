@@ -42,6 +42,17 @@ class EditorViewModel(
     private val undoStack = mutableListOf<ColorStep>()
     private val redoStack = mutableListOf<ColorStep>()
 
+    private val autosaveWorker = EditorAutosaveWorker(
+        scope = viewModelScope,
+        save = { snapshot ->
+            repository.saveProgress(
+                mandalaId = mandalaId,
+                coloredRegions = snapshot,
+                totalRegions = design.regionCount
+            )
+        }
+    )
+
     private val _canUndo = MutableStateFlow(false)
     val canUndo: StateFlow<Boolean> = _canUndo.asStateFlow()
 
@@ -150,6 +161,7 @@ class EditorViewModel(
         _coloredRegions.value = emptyMap()
 
         viewModelScope.launch {
+            autosaveWorker.flush()
             repository.resetProgress(mandalaId)
         }
     }
@@ -167,14 +179,16 @@ class EditorViewModel(
         _isZoomPanMode.value = !_isZoomPanMode.value
     }
 
+    /**
+     * Persist the latest editor snapshot before navigation or when the app
+     * leaves the foreground. Safe to call repeatedly.
+     */
+    suspend fun flushPendingSave() {
+        autosaveWorker.flush()
+    }
+
     private fun saveProgressInternal() {
-        viewModelScope.launch {
-            repository.saveProgress(
-                mandalaId = mandalaId,
-                coloredRegions = _coloredRegions.value,
-                totalRegions = design.regionCount
-            )
-        }
+        autosaveWorker.submit(_coloredRegions.value)
     }
 
     class Factory(
