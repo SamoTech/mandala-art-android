@@ -109,8 +109,10 @@ interface MandalaDao {
                 favoriteRevision = revision,
                 favoriteActor = actor,
                 isDeleted = false,
-                restoredDeletionRevision = if (existing.isDeleted) existing.deletionRevision else existing.restoredDeletionRevision,
-                restoredDeletionActor = if (existing.isDeleted) existing.deletionActor else existing.restoredDeletionActor
+                restoredDeletionRevision = if (existing.deletionRevision > 0L) existing.deletionRevision else existing.restoredDeletionRevision,
+                restoredDeletionActor = if (existing.deletionRevision > 0L) existing.deletionActor else existing.restoredDeletionActor,
+                restorationEventRevision = if (existing.deletionRevision > 0L) revision else existing.restorationEventRevision,
+                restorationEventActor = if (existing.deletionRevision > 0L) actor else existing.restorationEventActor
             )
         }
         upsertProgress(updated)
