@@ -5,6 +5,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Source
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.tasks.await
@@ -69,7 +70,10 @@ class CloudSaveManager(
         val collection = firestore.collection("users").document(uid).collection("mandalaProgress")
         while (true) {
             ensureSameAccount(uid)
-            val page = collection.limit(400).get().await()
+            // Never trust the local Firestore cache for account deletion. A
+            // cached empty/partial page must not cause Auth deletion while
+            // server-side documents remain.
+            val page = collection.limit(400).get(Source.SERVER).await()
             ensureSameAccount(uid)
             if (page.isEmpty) break
 
