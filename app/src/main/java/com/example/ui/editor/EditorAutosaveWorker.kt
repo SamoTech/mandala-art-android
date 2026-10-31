@@ -67,7 +67,7 @@ internal class EditorAutosaveWorker(
     private suspend fun persistPendingLocked() {
         val pending = synchronized(stateLock) {
             if (requestedVersion <= persistedVersion) null
-            else Triple(latestSnapshot.orEmpty(), requestedVersion, true)
+            else latestSnapshot.orEmpty() to requestedVersion
         } ?: return
 
         save(pending.first)
