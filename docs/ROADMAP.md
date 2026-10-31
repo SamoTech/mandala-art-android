@@ -78,7 +78,7 @@ Work items:
 - Firestore emulator security tests, Android unit tests, lint, and debug build pass.
 - Manual test on a physical device: edit, switch account from another screen/session, return/sign in, and verify each account sees only its own data.
 
-**Progress evidence:** PRs #29–#34 are merged; the post-merge workflow for `3b4ac9c1c99915fcd2646640a8408957e6d10fa2` passed Android build/unit tests and Firestore security rules. The production release job was skipped as expected. Physical-device verification was reported complete by the user on 2026-10-31. Automated sync tests exercise the deterministic reconciliation/merge layer, not live Firestore end-to-end tests. M0 remains open because the editor account-switch test does not yet cover in-flight save, failed save, and navigation/ON_STOP UID-ownership timing boundaries.
+**Progress evidence:** PRs #29–#34 are merged; the post-merge workflow for `3b4ac9c1c99915fcd2646640a8408957e6d10fa2` passed Android build/unit tests and Firestore security rules. The production release job was skipped as expected. Physical-device verification was reported complete by the user on 2026-10-31. Automated sync tests exercise the deterministic reconciliation/merge layer, not live Firestore end-to-end tests. M0 remains open because navigation/ON_STOP lifecycle integration has not yet been tested. PR #36 adds deterministic in-flight save and failed-save retry coverage; these tests are not a substitute for navigation/ON_STOP integration or physical-device lifecycle verification.
 
 ### M1 — Arabic localization and accessibility foundation (P1)
 
