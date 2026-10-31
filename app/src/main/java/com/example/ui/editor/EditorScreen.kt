@@ -95,11 +95,7 @@ fun EditorScreen(
                 } catch (error: Exception) {
                     isNavigatingBack = false
                     Log.e("EditorScreen", "Unable to flush artwork before navigation", error)
-                    Toast.makeText(
-                        context,
-                        "Could not save your latest changes. Please try again.",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    // The retained autosave error state is rendered as an actionable dialog.
                 }
             }
         }
