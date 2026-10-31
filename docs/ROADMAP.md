@@ -3,7 +3,7 @@
 > **Status:** Living execution plan  
 > **Baseline reviewed:** 2026-10-31  
 > **Repository:** [SamoTech/mandala-art-android](https://github.com/SamoTech/mandala-art-android)  
-> **Current planning baseline:** `main` at `f09fecfc0655feb273beac937a8737ae6ee7a305`
+> **Current planning baseline:** `main` at `ab70db9c085410644baee1ba3362fe3d3100b327`
 
 This document is the canonical roadmap for product and engineering work on Mandala Art. New work should follow the sequence, dependencies, acceptance criteria, and delivery rules below. It is intentionally milestone-based rather than date-based: a milestone advances only when its exit criteria are demonstrated.
 
@@ -36,7 +36,7 @@ The following reflects a source review of `main` on 2026-10-31. “Implemented�
 | Autosave | Conflated worker, debounce, explicit flush, background error callback, owner-bound ViewModel persistence, ON_STOP flush in ViewModel scope | M0 regression coverage merged in PRs #32, #36, and #37; lifecycle test covers ON_STOP, not process death |
 | Daily Inspiration | Stable date-based design selection; Home screen keys it by local date | Implemented; verify timezone/day-boundary behavior |
 | Share image rendering | Bitmap rendering on IO dispatcher; age-based cache cleanup | Implemented; verify memory and cleanup behavior |
-| Arabic localization | English default resources plus Arabic `values-ar/strings.xml` (164 matching keys); RTL/device verification pending | In progress — current PR adds resource parity tests |
+| Arabic localization | English default resources plus Arabic `values-ar/strings.xml` (164 matching keys); resource integrity and locale smoke tests merged in PRs #48–#49; rendered RTL/device verification pending | In progress — physical UI/accessibility validation remains |
 | Release minification | Release `isMinifyEnabled = false` | Not implemented |
 | Gallery caching | No dedicated image/card cache established in reviewed source | Profile first; do not add speculative cache |
 | Random design controls | Existing algorithmic design library/generator | User-facing parameter controls not yet established |
@@ -92,7 +92,7 @@ Work items:
 - [x] Review pluralization and formatting placeholders; Arabic plural forms and parity checks are included in the current PR. Continue to review new strings as they are added.
 - [ ] Validate RTL mirroring for navigation, gallery, editor controls, progress indicators, dialogs, and settings.
 - [ ] Review font fallback, Arabic shaping, truncation, line wrapping, and large-font scaling.
-- [ ] Add resource/locale tests and screenshot or manual verification for Arabic and English.
+- [x] Add resource integrity and Arabic/English locale smoke tests (PRs #48–#49).\n- [ ] Verify rendered Compose layout, typography, TalkBack semantics, and critical screens on physical devices in Arabic and English (see `docs/RTL_DEVICE_TEST_MATRIX.md`).
 
 **Acceptance / exit criteria:**
 
