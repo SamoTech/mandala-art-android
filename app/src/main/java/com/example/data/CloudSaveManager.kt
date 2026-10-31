@@ -88,6 +88,41 @@ class CloudSaveManager(
         ensureSameAccount(uid)
     }
 
+    /**
+     * Explicitly imports anonymous/local-only saves into the signed-in account.
+     * The anonymous partition is retained unchanged, so users can review or
+     * keep using their local data after signing out. Nothing is imported
+     * automatically because a shared device may contain another person's work.
+     */
+    suspend fun importAnonymousProgress() = syncMutex.withLock {
+        val uid = auth.currentUser?.uid ?: error("Sign in before importing local progress.")
+        val collection = firestore.collection("users").document(uid).collection("mandalaProgress")
+        val anonymousRows = dao.getAllProgressOnce(ownerUid = "")
+
+        for (anonymousRow in anonymousRows) {
+            ensureSameAccount(uid)
+            val localCandidate = anonymousRow.copy(ownerUid = uid)
+            val document = collection.document(anonymousRow.mandalaId)
+
+            val serverMerged = firestore.runTransaction { transaction ->
+                check(auth.currentUser?.uid == uid) {
+                    "Account changed during local import; retry with the active account."
+                }
+                val snapshot = transaction.get(document)
+                val remote = if (snapshot.exists()) snapshot.toProgressEntity(uid) else null
+                val merged = ProgressSyncMerge.merge(localCandidate, remote)
+                if (merged != null) transaction.set(document, merged.toCloudMap())
+                merged
+            }.await()
+
+            ensureSameAccount(uid)
+            if (serverMerged != null) {
+                dao.mergeProgress(serverMerged.copy(ownerUid = uid))
+            }
+        }
+        ensureSameAccount(uid)
+    }
+
     private fun ensureSameAccount(expectedUid: String) {
         check(auth.currentUser?.uid == expectedUid) {
             "Account changed during cloud sync; retry with the active account."
