@@ -23,7 +23,8 @@ import kotlinx.coroutines.launch
 class EditorViewModel(
     val mandalaId: String,
     private val repository: MandalaRepository,
-    private val appSettings: AppSettings
+    private val appSettings: AppSettings,
+    private val ownerUid: String
 ) : ViewModel() {
 
     val design: MandalaDesign = MandalaLibrary.getDesignById(mandalaId)
@@ -51,7 +52,8 @@ class EditorViewModel(
             repository.saveProgress(
                 mandalaId = mandalaId,
                 coloredRegions = snapshot,
-                totalRegions = design.regionCount
+                totalRegions = design.regionCount,
+                ownerUid = ownerUid
             )
         },
         onSaveError = { error ->
@@ -78,7 +80,7 @@ class EditorViewModel(
 
     private fun loadSavedProgress() {
         viewModelScope.launch {
-            val saved = repository.getProgressOnce(mandalaId)
+            val saved = repository.getProgressOnce(mandalaId, ownerUid)
             if (!hasUserEdited && saved != null && saved.coloredRegions.isNotEmpty()) {
                 _coloredRegions.value = saved.coloredRegions
             }
@@ -168,7 +170,7 @@ class EditorViewModel(
         hasUserEdited = true
 
         autosaveWorker.flush()
-        repository.resetProgress(mandalaId)
+        repository.resetProgress(mandalaId, ownerUid)
     }
 
     fun setSelectedColor(color: Long) {
@@ -200,11 +202,12 @@ class EditorViewModel(
     class Factory(
         private val mandalaId: String,
         private val repository: MandalaRepository,
-        private val appSettings: AppSettings
+        private val appSettings: AppSettings,
+        private val ownerUid: String
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return EditorViewModel(mandalaId, repository, appSettings) as T
+            return EditorViewModel(mandalaId, repository, appSettings, ownerUid) as T
         }
     }
 }
