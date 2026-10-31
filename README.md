@@ -197,7 +197,8 @@ Read the project's [Privacy Policy](PRIVACY_POLICY.md) for more information. Adv
 [Release history](https://github.com/SamoTech/mandala-art-android/releases) &nbsp; · &nbsp;
 [Privacy policy](PRIVACY_POLICY.md) &nbsp; · &nbsp;
 [Report a problem](https://github.com/SamoTech/mandala-art-android/issues) &nbsp; · &nbsp;
-[Build workflow](https://github.com/SamoTech/mandala-art-android/actions/workflows/android-ci.yml)
+[Build workflow](https://github.com/SamoTech/mandala-art-android/actions/workflows/android-ci.yml) &nbsp; · &nbsp;
+[**Product & Engineering Roadmap**](docs/ROADMAP.md)
 
 </div>
 
