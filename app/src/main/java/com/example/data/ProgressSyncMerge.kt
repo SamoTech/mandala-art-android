@@ -85,10 +85,9 @@ object ProgressSyncMerge {
             proof.deletedRevision == deletion.second.counter &&
                 proof.deletedActor == deletion.second.actor
         }
-        val restore = choose(
-            matchingRestoreCandidates.ifEmpty { restoreCandidates }
-                .reduce { best, candidate -> choose(best, candidate) }
-        ).first
+        val restore = matchingRestoreCandidates.ifEmpty { restoreCandidates }
+            .reduce { best, candidate -> choose(best, candidate) }
+            .first
 
         // A Lamport counter alone is not causal evidence. The proof explicitly
         // names the exact tombstone observed by the restoring device, and its
