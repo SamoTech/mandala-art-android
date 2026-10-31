@@ -1,23 +1,36 @@
 package com.example.data
 
 import com.example.model.SavedArtwork
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class MandalaRepository(
     private val dao: MandalaDao,
     private val deviceActorId: String
 ) {
-    val allProgress: Flow<List<SavedArtwork>> = dao.getAllProgress().map { entities ->
-        entities.map { it.toSavedArtwork() }
+    // "" is the anonymous local-only partition; Firebase UIDs are isolated.
+    private val activeOwnerUid = MutableStateFlow("")
+
+    fun setOwnerUid(uid: String) {
+        activeOwnerUid.value = uid
     }
 
+    val allProgress: Flow<List<SavedArtwork>> = activeOwnerUid
+        .flatMapLatest { ownerUid -> dao.getAllProgress(ownerUid) }
+        .map { entities -> entities.map { it.toSavedArtwork() } }
+
     fun getProgress(mandalaId: String): Flow<SavedArtwork?> {
-        return dao.getProgress(mandalaId).map { it?.toSavedArtwork() }
+        return activeOwnerUid
+            .flatMapLatest { ownerUid -> dao.getProgress(mandalaId, ownerUid) }
+            .map { it?.toSavedArtwork() }
     }
 
     suspend fun getProgressOnce(mandalaId: String): SavedArtwork? {
-        return dao.getProgressOnce(mandalaId)
+        return dao.getProgressOnce(mandalaId, activeOwnerUid.value)
             ?.takeUnless { it.isDeleted }
             ?.toSavedArtwork()
     }
@@ -28,6 +41,7 @@ class MandalaRepository(
         totalRegions: Int,
         isFavorite: Boolean? = null
     ) {
+        val ownerUid = activeOwnerUid.value
         val nonDefaultCount = coloredRegions.values.count { it != 0xFFFFFFFFL }
         val percent = if (totalRegions > 0) {
             (nonDefaultCount.toFloat() / totalRegions).coerceIn(0f, 1f)
@@ -41,14 +55,16 @@ class MandalaRepository(
             percentCompleted = percent,
             isCompleted = percent >= 0.999f,
             timestamp = System.currentTimeMillis(),
-            actor = deviceActorId
+            actor = deviceActorId,
+            ownerUid = ownerUid
         )
         if (isFavorite != null) {
             dao.updateFavoriteField(
                 mandalaId = mandalaId,
                 isFavorite = isFavorite,
                 timestamp = System.currentTimeMillis(),
-                actor = deviceActorId
+                actor = deviceActorId,
+                ownerUid = ownerUid
             )
         }
     }
@@ -58,7 +74,8 @@ class MandalaRepository(
             mandalaId = mandalaId,
             isFavorite = !currentFav,
             timestamp = System.currentTimeMillis(),
-            actor = deviceActorId
+            actor = deviceActorId,
+            ownerUid = activeOwnerUid.value
         )
     }
 
@@ -66,7 +83,8 @@ class MandalaRepository(
         dao.markDeleted(
             mandalaId = mandalaId,
             timestamp = System.currentTimeMillis(),
-            actor = deviceActorId
+            actor = deviceActorId,
+            ownerUid = activeOwnerUid.value
         )
     }
 
@@ -74,7 +92,8 @@ class MandalaRepository(
         dao.resetProgress(
             mandalaId = mandalaId,
             timestamp = System.currentTimeMillis(),
-            actor = deviceActorId
+            actor = deviceActorId,
+            ownerUid = activeOwnerUid.value
         )
     }
 
