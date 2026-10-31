@@ -59,7 +59,7 @@ object ProgressSyncMerge {
         // A tombstone wins over fields at the same or older revision. A later
         // field edit can revive the record after observing the tombstone.
         val newestFieldRevision = maxOf(progress.second, favorite.second)
-        val deleted = deletion.first && deletion.second >= newestFieldRevision
+        val deleted = deletion.first && deletion.second.counter >= newestFieldRevision.counter
 
         return MandalaProgressEntity(
             mandalaId = local.mandalaId,
