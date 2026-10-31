@@ -103,6 +103,8 @@ class RevisionedProgressDaoTest {
             assertTrue(revived.progressRevision > revived.deletionRevision)
             assertEquals(tombstone.deletionRevision, revived.restoredDeletionRevision)
             assertEquals(tombstone.deletionActor, revived.restoredDeletionActor)
+            assertEquals(revived.progressRevision, revived.restorationEventRevision)
+            assertEquals("device-local", revived.restorationEventActor)
         } finally {
             database.close()
         }
