@@ -38,11 +38,12 @@ class ImageSharerTest {
 
             val bitmap = BitmapFactory.decodeFile(file.absolutePath)
             assertTrue("Exported PNG must decode", bitmap != null)
+            val decoded = requireNotNull(bitmap)
             try {
-                assertEquals(1200, bitmap!!.width)
-                assertEquals(1200, bitmap.height)
+                assertEquals(1200, decoded.width)
+                assertEquals(1200, decoded.height)
             } finally {
-                bitmap?.recycle()
+                decoded.recycle()
             }
         } finally {
             file.delete()
