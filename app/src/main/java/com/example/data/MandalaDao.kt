@@ -116,16 +116,29 @@ interface MandalaDao {
 
     @Transaction
     suspend fun markDeleted(mandalaId: String, timestamp: Long, actor: String) {
-        val existing = getProgressOnce(mandalaId) ?: return
+        val existing = getProgressOnce(mandalaId)
         val revision = existing.nextLocalRevision()
-        upsertProgress(
+        val tombstone = if (existing == null) {
+            MandalaProgressEntity(
+                mandalaId = mandalaId,
+                coloredRegionsJson = "",
+                percentCompleted = 0f,
+                isFavorite = false,
+                isCompleted = false,
+                lastEditedTimestamp = timestamp,
+                isDeleted = true,
+                deletionRevision = revision,
+                deletionActor = actor
+            )
+        } else {
             existing.copy(
                 isDeleted = true,
                 deletionRevision = revision,
                 deletionActor = actor,
                 lastEditedTimestamp = timestamp
             )
-        )
+        }
+        upsertProgress(tombstone)
     }
 
     @Transaction
