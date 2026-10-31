@@ -129,6 +129,78 @@ class RevisionedProgressDaoTest {
         }
     }
 
+
+    @Test
+    fun identicalMandalaIdsRemainIsolatedAcrossAnonymousAndFirebaseAccounts() = runBlocking {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val database = Room.inMemoryDatabaseBuilder(context, MandalaDatabase::class.java).build()
+        try {
+            val dao = database.mandalaDao()
+            val repository = MandalaRepository(dao, "device-local")
+
+            repository.saveProgress("lotus", mapOf("petal" to 111L), totalRegions = 10)
+            repository.setOwnerUid("firebase-user-a")
+            repository.saveProgress("lotus", mapOf("petal" to 222L), totalRegions = 10)
+
+            repository.setOwnerUid("firebase-user-b")
+            assertNull("A different account must not read user A's progress", repository.getProgressOnce("lotus"))
+            repository.saveProgress("lotus", mapOf("petal" to 333L), totalRegions = 10)
+
+            repository.setOwnerUid("firebase-user-a")
+            assertEquals(222L, repository.getProgressOnce("lotus")!!.coloredRegions["petal"])
+            repository.setOwnerUid("firebase-user-b")
+            assertEquals(333L, repository.getProgressOnce("lotus")!!.coloredRegions["petal"])
+
+            assertEquals(111L, dao.getProgressOnce("lotus", "")!!.let {
+                MandalaRepository.deserializeColors(it.coloredRegionsJson)["petal"]
+            })
+            assertEquals(222L, dao.getProgressOnce("lotus", "firebase-user-a")!!.let {
+                MandalaRepository.deserializeColors(it.coloredRegionsJson)["petal"]
+            })
+            assertEquals(333L, dao.getProgressOnce("lotus", "firebase-user-b")!!.let {
+                MandalaRepository.deserializeColors(it.coloredRegionsJson)["petal"]
+            })
+        } finally {
+            database.close()
+        }
+    }
+
+    @Test
+    fun deletingOneAccountPartitionDoesNotDeleteAnotherAccountsProgress() = runBlocking {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val database = Room.inMemoryDatabaseBuilder(context, MandalaDatabase::class.java).build()
+        try {
+            val dao = database.mandalaDao()
+            dao.upsertProgress(
+                MandalaProgressEntity(
+                    mandalaId = "lotus",
+                    ownerUid = "firebase-user-a",
+                    coloredRegionsJson = "petal:123",
+                    percentCompleted = 0.1f,
+                    isFavorite = false,
+                    isCompleted = false
+                )
+            )
+            dao.upsertProgress(
+                MandalaProgressEntity(
+                    mandalaId = "lotus",
+                    ownerUid = "firebase-user-b",
+                    coloredRegionsJson = "petal:456",
+                    percentCompleted = 0.2f,
+                    isFavorite = false,
+                    isCompleted = false
+                )
+            )
+
+            dao.markDeleted("lotus", 10L, "device-a", "firebase-user-a")
+
+            assertTrue(dao.getProgressOnce("lotus", "firebase-user-a")!!.isDeleted)
+            assertEquals("petal:456", dao.getProgressOnce("lotus", "firebase-user-b")!!.coloredRegionsJson)
+        } finally {
+            database.close()
+        }
+    }
+
     @Test
     fun installationActorIdIsStableAndStoredOutsideBackupData() {
         val context = ApplicationProvider.getApplicationContext<Context>()
