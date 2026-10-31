@@ -8,7 +8,7 @@ data class MandalaProgressEntity(
     val mandalaId: String,
     // Empty string is the anonymous/local-only partition. Authenticated saves
     // are always stored under the Firebase UID that owns them.
-    @ColumnInfo(defaultValue = "") val ownerUid: String = "",
+    @ColumnInfo(defaultValue = "''") val ownerUid: String = "",
     val coloredRegionsJson: String, // format: "regionId:colorLongValue;regionId2:colorLongValue2" (see MandalaRepository.serializeColors)
     val percentCompleted: Float,
     val isFavorite: Boolean,
