@@ -73,8 +73,7 @@ jobs:
       - name: Run unit tests
         run: ./gradlew --no-daemon testDebugUnitTest
 
-      - name: Run Android Lint (non-blocking)
-        continue-on-error: true
+      - name: Run Android Lint
         run: ./gradlew --no-daemon lintDebug
 
       - name: Upload lint report
