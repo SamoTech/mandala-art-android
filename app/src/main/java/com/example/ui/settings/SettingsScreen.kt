@@ -640,8 +640,8 @@ fun SettingsScreen(
                                 "In regions requiring consent (such as the European Economic Area and UK), Google User Messaging Platform (UMP) requests your consent for personalized ads before ads are requested. You can update your consent at any time in Settings.\n\n" +
                                 "4. Children's Privacy:\n" +
                                 "We treat ads as General Audience (Content Rating G) and do not knowingly collect personal information from children under 13.\n\n" +
-                                "5. Data Deletion:\n" +
-                                "Local progress can be deleted using the app controls or Android App Settings. Signing out does not delete cloud saves. Contact the project maintainers to request deletion of cloud account data.",
+                                "5. Account & Data Deletion:\n" +
+                                "In Settings > Cloud Save > Delete Account & Cloud Data, you can permanently delete your Firebase account, its Firestore mandala progress, and that account's local Room data. The app asks for your password again before deletion. Guest/local-only progress and other accounts on the same device are retained. Signing out alone does not delete cloud data.",
                         fontSize = 12.sp,
                         lineHeight = 18.sp
                     )
