@@ -3,7 +3,7 @@
 > **Status:** Living execution plan  
 > **Baseline reviewed:** 2026-10-31  
 > **Repository:** [SamoTech/mandala-art-android](https://github.com/SamoTech/mandala-art-android)  
-> **Current planning baseline:** `main` at `2b2bbdafc462efd407c719c428c2f8b97f759c57`
+> **Current planning baseline:** `main` at `51e96fef1bef38f28c7cf4b7b1cb9b18961c6d80`
 
 This document is the canonical roadmap for product and engineering work on Mandala Art. New work should follow the sequence, dependencies, acceptance criteria, and delivery rules below. It is intentionally milestone-based rather than date-based: a milestone advances only when its exit criteria are demonstrated.
 
@@ -234,9 +234,9 @@ The following is the working queue. Do not skip ahead because a later feature is
 
 | Order | Work item | Priority | Status |
 |---:|---|---|---|
-| 1 | Autosave/account-switch lifecycle audit and regression tests | P0 | Next |
-| 2 | Favorite timestamp persistence and tombstone edge-case coverage | P0 | Verify/extend tests |
-| 3 | End-to-end account isolation and offline sync regression pass | P0 | Harden |
+| 1 | Autosave/account-switch lifecycle audit and regression tests | P0 | Regression test merged; physical-device lifecycle verification remains |
+| 2 | Favorite timestamp persistence and tombstone edge-case coverage | P0 | Tests merged and post-merge CI passed |
+| 3 | End-to-end account isolation and offline sync regression pass | P0 | In progress — deterministic reconciler coverage |
 | 4 | Arabic resources and RTL pass | P1 | Planned |
 | 5 | Release R8/minification experiment with measured comparison | P1 | Planned |
 | 6 | Profile gallery and share paths; optimize only measured bottlenecks | P1 | Planned |
@@ -308,4 +308,4 @@ Every change to priority or scope must include a short reason. Do not silently r
 
 ---
 
-**Current next action:** Execute M0 item 1 — reproduce and audit autosave behavior during account changes. Do not implement a speculative fix until the lifecycle and failure mode are demonstrated.
+**Current next action:** Complete M0 item 3 — verify offline failure/retry, remote-only pull, idempotent reconciliation, and cross-account rejection. Then record physical-device verification still required before M0 can exit.
