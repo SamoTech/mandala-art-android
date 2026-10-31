@@ -133,7 +133,7 @@ jobs:
           java-version: '21'
 
       - name: Install pinned Firebase emulator test dependencies
-        run: npm install --no-save --no-package-lock --no-audit --no-fund firebase-tools@14.0.0 @firebase/rules-unit-testing@5.0.0 firebase@11.10.0
+        run: npm install --no-save --no-package-lock --no-audit --no-fund firebase-tools@14.0.0 @firebase/rules-unit-testing@5.0.0 firebase@12.0.0
 
       - name: Test Firestore account isolation and deletion lock
         run: ./node_modules/.bin/firebase emulators:exec --only firestore --project demo-mandala-art "node scripts/firestore-rules.test.cjs"
