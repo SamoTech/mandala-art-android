@@ -101,6 +101,8 @@ class RevisionedProgressDaoTest {
             val revived = dao.getProgressOnce("lotus")!!
             assertFalse(revived.isDeleted)
             assertTrue(revived.progressRevision > revived.deletionRevision)
+            assertEquals(tombstone.deletionRevision, revived.restoredDeletionRevision)
+            assertEquals(tombstone.deletionActor, revived.restoredDeletionActor)
         } finally {
             database.close()
         }
