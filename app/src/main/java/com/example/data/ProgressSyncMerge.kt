@@ -129,3 +129,37 @@ object ProgressSyncMerge {
         return if (local.first.toString() >= remote.first.toString()) local else remote
     }
 }
+
+
+/**
+ * Reconcile one account-scoped progress row until the cloud write includes
+ * every local edit observed during the sync. The bound prevents a continuously
+ * edited row from starving the overall sync; callers receive a failure and can
+ * retry on the next explicit/background sync.
+ */
+internal object ProgressSyncReconciler {
+    const val MAX_ATTEMPTS = 5
+
+    suspend fun reconcile(
+        readLocal: suspend () -> MandalaProgressEntity?,
+        syncRemote: suspend (MandalaProgressEntity?) -> MandalaProgressEntity?,
+        applyRemote: suspend (MandalaProgressEntity) -> Unit,
+        maxAttempts: Int = MAX_ATTEMPTS
+    ) {
+        require(maxAttempts > 0) { "maxAttempts must be positive." }
+        var candidate = readLocal()
+
+        repeat(maxAttempts) {
+            val serverMerged = syncRemote(candidate)
+            if (serverMerged != null) applyRemote(serverMerged)
+
+            val latestLocal = readLocal()
+            val reconciled = ProgressSyncMerge.merge(latestLocal, serverMerged)
+            if (reconciled == serverMerged) return
+
+            candidate = reconciled
+        }
+
+        error("Progress changed repeatedly during cloud sync. Retry synchronization.")
+    }
+}
