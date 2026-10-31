@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-@Database(entities = [MandalaProgressEntity::class], version = 2, exportSchema = true)
+@Database(entities = [MandalaProgressEntity::class], version = 3, exportSchema = true)
 abstract class MandalaDatabase : RoomDatabase() {
     abstract fun mandalaDao(): MandalaDao
 
@@ -39,6 +39,13 @@ abstract class MandalaDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE mandala_progress ADD COLUMN restoredDeletionRevision INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE mandala_progress ADD COLUMN restoredDeletionActor TEXT NOT NULL DEFAULT 'legacy'")
+            }
+        }
+
         @Volatile
         private var INSTANCE: MandalaDatabase? = null
 
@@ -49,7 +56,7 @@ abstract class MandalaDatabase : RoomDatabase() {
                     MandalaDatabase::class.java,
                     "mandala_art_db"
                 )
-                    .addMigrations(MIGRATION_1_2)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                     .build()
                 INSTANCE = instance
                 instance
