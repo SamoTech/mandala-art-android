@@ -96,7 +96,9 @@ class CloudSaveManager(
             deletionRevision = (getLong("deletionRevision") ?: 0L).coerceAtLeast(0L),
             deletionActor = getString("deletionActor") ?: "legacy",
             restoredDeletionRevision = (getLong("restoredDeletionRevision") ?: 0L).coerceAtLeast(0L),
-            restoredDeletionActor = getString("restoredDeletionActor") ?: "legacy"
+            restoredDeletionActor = getString("restoredDeletionActor") ?: "legacy",
+            restorationEventRevision = (getLong("restorationEventRevision") ?: 0L).coerceAtLeast(0L),
+            restorationEventActor = getString("restorationEventActor") ?: "legacy"
         )
     }
 
@@ -114,6 +116,8 @@ class CloudSaveManager(
         "deletionRevision" to deletionRevision,
         "deletionActor" to deletionActor,
         "restoredDeletionRevision" to restoredDeletionRevision,
-        "restoredDeletionActor" to restoredDeletionActor
+        "restoredDeletionActor" to restoredDeletionActor,
+        "restorationEventRevision" to restorationEventRevision,
+        "restorationEventActor" to restorationEventActor
     )
 }
