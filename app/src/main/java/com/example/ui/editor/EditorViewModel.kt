@@ -1,6 +1,7 @@
 package com.example.ui.editor
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -40,6 +41,8 @@ class EditorViewModel(
     val isZoomPanMode: StateFlow<Boolean> = _isZoomPanMode.asStateFlow()
 
     private val undoStack = mutableListOf<ColorStep>()
+    // Prevent a late initial database read from replacing the user's first edit.
+    private var hasUserEdited = false
     private val redoStack = mutableListOf<ColorStep>()
 
     private val autosaveWorker = EditorAutosaveWorker(
@@ -50,6 +53,9 @@ class EditorViewModel(
                 coloredRegions = snapshot,
                 totalRegions = design.regionCount
             )
+        },
+        onSaveError = { error ->
+            Log.e("EditorViewModel", "Autosave failed for $mandalaId", error)
         }
     )
 
@@ -73,7 +79,7 @@ class EditorViewModel(
     private fun loadSavedProgress() {
         viewModelScope.launch {
             val saved = repository.getProgressOnce(mandalaId)
-            if (saved != null && saved.coloredRegions.isNotEmpty()) {
+            if (!hasUserEdited && saved != null && saved.coloredRegions.isNotEmpty()) {
                 _coloredRegions.value = saved.coloredRegions
             }
         }
@@ -159,6 +165,7 @@ class EditorViewModel(
         _canUndo.value = false
         _canRedo.value = false
         _coloredRegions.value = emptyMap()
+        hasUserEdited = true
 
         viewModelScope.launch {
             autosaveWorker.flush()
@@ -188,6 +195,7 @@ class EditorViewModel(
     }
 
     private fun saveProgressInternal() {
+        hasUserEdited = true
         autosaveWorker.submit(_coloredRegions.value)
     }
 
