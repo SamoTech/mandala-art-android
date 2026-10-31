@@ -204,11 +204,19 @@ class EditorViewModel(
         private val mandalaId: String,
         private val repository: MandalaRepository,
         private val appSettings: AppSettings,
-        private val ownerUid: String = repository.currentOwnerUid
+        private val ownerUid: String = repository.currentOwnerUid,
+        private val persistProgress: suspend (String, Map<String, Long>) -> Unit = { uid, snapshot ->
+            repository.saveProgress(
+                mandalaId = mandalaId,
+                coloredRegions = snapshot,
+                totalRegions = MandalaLibrary.getDesignById(mandalaId).regionCount,
+                ownerUid = uid
+            )
+        }
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return EditorViewModel(mandalaId, repository, appSettings, ownerUid) as T
+            return EditorViewModel(mandalaId, repository, appSettings, ownerUid, persistProgress) as T
         }
     }
 }
