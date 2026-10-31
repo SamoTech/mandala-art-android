@@ -76,4 +76,33 @@
     <string name="my_art_delete_title">Delete Saved Artwork?</string>
     <string name="my_art_delete_message">Are you sure you want to remove your colored progress for “%1$s”?</string>
     <string name="my_art_deleted_toast">Artwork removed</string>
+    <string name="editor_progress_summary">%1$d%% Colored • %2$s</string>
+    <plurals name="editor_region_count">
+        <item quantity="one">%d Region</item>
+        <item quantity="other">%d Regions</item>
+    </plurals>
+    <string name="editor_zoom_pan_hint">Zoom &amp; Pan Mode: Drag to move • Pinch to zoom</string>
+    <string name="editor_eraser_hint">Eraser Active: Tap any region to clear color</string>
+    <string name="editor_export_error">Unable to export artwork. Please try again.</string>
+    <string name="editor_reset_success">Artwork reset</string>
+    <string name="editor_reset_error">Could not reset artwork. Please try again.</string>
+    <string name="editor_unlock_premium_color_title">Unlock Premium Color</string>
+    <string name="editor_unlock_premium_color_message">Watch a rewarded video to unlock this color permanently on this device.</string>
+    <string name="editor_ad_show_error">Unable to show ad right now.</string>
+    <string name="editor_ad_not_completed">Complete the video to unlock this color.</string>
+    <string name="editor_ad_not_ready">Video ad is not ready. Try again shortly.</string>
+    <string name="editor_ad_failed">Unable to show the ad. Please try again.</string>
+    <string name="editor_watch_video">Watch Video</string>
+    <string name="editor_cancel">Cancel</string>
+    <string name="color_picker_select">Select</string>
+    <string name="color_palette_locked">Locked color</string>
+    <string name="mandala_favorite">Favorite</string>
+    <string name="mandala_locked">Locked</string>
+    <string name="mandala_level">Level</string>
+    <string name="mandala_bonus">Bonus</string>
+    <string name="mandala_completed">Completed ✓</string>
+    <plurals name="mandala_region_count">
+        <item quantity="one">%d area</item>
+        <item quantity="other">%d areas</item>
+    </plurals>
 </resources>
