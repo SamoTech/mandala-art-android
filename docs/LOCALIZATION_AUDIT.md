@@ -6,29 +6,31 @@
 
 ## 1. Current localization baseline
 
-- The app has one default resource file: `app/src/main/res/values/strings.xml`.
-- The default resource set is English-only.
-- No `app/src/main/res/values-ar/strings.xml` directory exists yet.
-- The Android manifest already declares `android:supportsRtl="true"`.
-- Several screens already use `stringResource(R.string...)`, but the conversion is incomplete.
-- There is no evidence yet of a complete Arabic locale test suite or screenshot verification.
-- Existing autosave error dialog copy added in PR #39 is currently in the default English resource file and will need Arabic equivalents.
+- The default resource file remains English: `app/src/main/res/values/strings.xml`.
+- Arabic resources now exist at `app/src/main/res/values-ar/strings.xml`.
+- The current baseline contains 164 resource keys: 158 strings and 6 plural resources.
+- The Arabic file contains the same 164 keys and resource types. All six Arabic plural resources define the six Arabic quantity categories: zero, one, two, few, many, and other.
+- A resource integrity test compares English/Arabic key sets and types, checks required plural quantities, and compares formatting placeholders.
+- The Android manifest declares `android:supportsRtl="true"`.
+- Arabic RTL layout, typography, TalkBack traversal, and physical-device screenshots have not yet been verified. Resource parity is not evidence of correct RTL rendering.
 
-## 2. Screen-level hardcoded text inventory
+## 2. Screen-level resource coverage
 
-The following files contain confirmed user-facing hardcoded English text or accessibility descriptions. The examples are representative, not an exhaustive literal-by-literal extraction; implementation PRs must re-scan each file before closing it.
+The following screen and dialog files were inspected after PRs #43–#47. Their visible labels, dialogs, toasts, and identified action descriptions resolve through Android string/plural resources rather than hardcoded English UI copy:
 
-| File | Confirmed hardcoded text / labels | Required work |
-|---|---|---|
-| `MainActivity.kt` | Ad unlock prompts, Watch Video, Later, Keep Coloring, Retry, Explore Free Designs, unlock/failure toasts | Move dialog, button, and toast copy to resources |
-| `HomeScreen.kt` | Featured Artwork, All Mandalas, Tap to color | Convert remaining home labels; retain already resource-backed labels |
-| `GalleryScreen.kt` | Back, Level locked | Resource-backed accessibility labels |
-| `MyArtScreen.kt` | Back, Share, Delete, delete confirmation, artwork-removed toast | Resource-backed dialog, toast, and accessibility labels |
-| `EditorScreen.kt` | Back, premium-color dialog, rewarded-ad feedback, artwork-reset toast | Resource-backed dialog, toast, and accessibility labels |
-| `CustomColorPickerDialog.kt` | Select, Cancel | Resource-backed button labels |
-| `ColorPaletteBar.kt` | Locked color | Resource-backed accessibility label |
-| `MandalaCard.kt` | Favorite, Locked, Level, Bonus, Completed, areas | Resource-backed labels and plural resources |
-| `SettingsScreen.kt` | Privacy/data-safety, licenses, consent, account/sync/import/delete flows, email/password labels, dialogs | Extract all account and settings copy, including conditional button states |
+| File | Current status |
+|---|---|
+| `MainActivity.kt` | Reward prompts, level-lock dialogs, buttons, and feedback messages use resources |
+| `HomeScreen.kt` | Home labels and category filter labels use resources; canonical artwork titles remain unchanged |
+| `GalleryScreen.kt` | Gallery title, level/progress labels, and category labels use resources |
+| `MyArtScreen.kt` | Empty states, filters, actions, delete confirmation, and feedback use resources |
+| `EditorScreen.kt` | Editor hints, autosave/reset/reward dialogs, and feedback use resources |
+| `CustomColorPickerDialog.kt` | Picker title, channel values, and action labels use resources |
+| `ColorPaletteBar.kt` | Palette tab names and color-picker accessibility description use resources |
+| `MandalaCard.kt` | Category/difficulty, state labels, and region counts use resources/plurals |
+| `SettingsScreen.kt` | Settings, privacy/legal, account, cloud-sync, and deletion copy use resources |
+
+This is a targeted source inspection of the files above, not a claim that every string in every source file or third-party SDK is localized. Re-scan newly added UI code in each future PR.
 
 ## 3. Data-driven labels that also need localization
 
@@ -67,11 +69,11 @@ These are not ordinary Compose literals, but they are displayed to users and mus
 5. Add locale/RTL UI tests or screenshot coverage for critical screens, then perform manual device verification with Arabic and English system locales.
 6. Keep artwork IDs, database values, analytics event names, Firebase fields, and other persisted/backend identifiers language-neutral and unchanged.
 
-## 7. Out of scope for the first extraction PR
+## 7. Out of scope for M1
 
 - Translating third-party SDK-owned UI.
 - Changing database identifiers, Firestore field names, analytics event names, or design IDs.
 - Rewriting the visual design system or changing navigation behavior.
 - Assuming that `supportsRtl=true` proves full RTL correctness.
 
-**Exit condition for this audit:** all major user-facing text sources and dynamic labels have been identified and implementation boundaries are explicit. This audit does not claim that Arabic localization is implemented or complete.
+**Current M1 status:** English UI extraction and dynamic-label resource mapping are implemented in merged PRs #43–#47. Arabic translations and resource parity tests are being introduced in the current PR. Full RTL, typography, TalkBack, and physical-device verification remain open.
