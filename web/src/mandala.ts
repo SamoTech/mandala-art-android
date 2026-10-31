@@ -16,7 +16,7 @@ function sector(id: string, inner: number, outer: number, start: number, sweep: 
 }
 function circle(id: string, r: number, angle = 0): Region {
   const p = polar(r, angle);
-  return { id, d: `M ${nfmt(p.x-r/2)} ${nfmt(p.y)} a ${r/2} ${r/2} 0 1 0 ${r} 0 a ${r/2} ${r/2} 0 1 0 -${r} 0` };
+  return { id, d: `M ${nfmt(p.x-r/2)} ${nfmt(p.y)} a ${r/2} ${r/2} 0 1 0 ${r} 0 a ${r/2} ${r/2} 0 1 0 -${r} 0 Z` };
 }
 export function createDesign(id: string, title: string, symmetry: number, category: Design["category"], difficulty: Design["difficulty"], style: number): Design {
   const step = 360 / symmetry, regions: Region[] = [];
