@@ -16,7 +16,9 @@ Literal shell text: $(touch SHOULD_NOT_RUN)'
 
 test -s "$TMP_DIR/release-body.md"
 test -s "$TMP_DIR/github-output"
-grep -Fq '1. Download `Mandala-Art-v1.2.3.apk` from the Assets section.' "$TMP_DIR/release-body.md"
+grep -Fq '1. Download `Mandala-Art-v1.2.3.apk` from the Assets section to install directly on an Android device.' "$TMP_DIR/release-body.md"
+grep -Fq '2. Download `Mandala-Art-v1.2.3.aab` to upload the app bundle to Google Play Console.' "$TMP_DIR/release-body.md"
+grep -Fq 'AAB signature was verified with `jarsigner`.' "$TMP_DIR/release-body.md"
 grep -Fq 'Added support for `draw`.' "$TMP_DIR/release-body.md"
 grep -Fq 'Second line stays on a separate line.' "$TMP_DIR/release-body.md"
 grep -Fq 'Literal shell text: $(touch SHOULD_NOT_RUN)' "$TMP_DIR/release-body.md"

@@ -189,7 +189,7 @@ jobs:
           test -s "$KEYSTORE_PATH"
           echo "KEYSTORE_PATH=$KEYSTORE_PATH" >> "$GITHUB_ENV"
 
-      - name: Build signed release APK
+      - name: Build signed release APK and AAB
         env:
           KEYSTORE_PATH: ${{ runner.temp }}/my-upload-key.jks
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
@@ -200,29 +200,36 @@ jobs:
           test -n "$KEYSTORE_PASSWORD"
           test -n "$KEY_ALIAS"
           test -n "$KEY_PASSWORD"
-          ./gradlew --no-daemon assembleRelease
+          ./gradlew --no-daemon assembleRelease bundleRelease
 
-      - name: Verify APK signature and prepare release assets
+      - name: Verify APK and AAB signatures and prepare release assets
         shell: bash
         env:
           RELEASE_TAG: ${{ steps.version.outputs.release_tag }}
         run: |
           set -euo pipefail
           APK_PATH="$(find app/build/outputs/apk/release -maxdepth 1 -name '*.apk' -print -quit)"
+          AAB_PATH="$(find app/build/outputs/bundle/release -maxdepth 1 -name '*.aab' -print -quit)"
           if [ -z "$APK_PATH" ]; then
             echo "::error::Release APK was not produced"
             exit 1
           fi
+          if [ -z "$AAB_PATH" ]; then
+            echo "::error::Release AAB was not produced"
+            exit 1
+          fi
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$APK_PATH"
+          jarsigner -verify -verbose "$AAB_PATH" > /dev/null
           mkdir -p release-assets
           cp "$APK_PATH" "release-assets/Mandala-Art-${RELEASE_TAG}.apk"
-          (cd release-assets && sha256sum "Mandala-Art-${RELEASE_TAG}.apk" > SHA256SUMS.txt)
+          cp "$AAB_PATH" "release-assets/Mandala-Art-${RELEASE_TAG}.aab"
+          (cd release-assets && sha256sum "Mandala-Art-${RELEASE_TAG}.apk" "Mandala-Art-${RELEASE_TAG}.aab" > SHA256SUMS.txt)
 
       - name: Clean up release keystore
         if: always()
         run: rm -f "${{ runner.temp }}/my-upload-key.jks"
 
-      - name: Upload signed APK artifact as backup
+      - name: Upload signed APK and AAB artifacts as backup
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: mandala-art-signed-release-${{ steps.version.outputs.release_tag }}
@@ -244,7 +251,7 @@ jobs:
             --jq '.body')"
           export NOTES
           bash scripts/compose-release-body.sh
-      - name: Publish GitHub production release with direct APK download
+      - name: Publish GitHub production release with APK and AAB downloads
         uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
         with:
           tag_name: ${{ steps.version.outputs.release_tag }}
@@ -256,5 +263,6 @@ jobs:
           fail_on_unmatched_files: true
           files: |
             release-assets/Mandala-Art-${{ steps.version.outputs.release_tag }}.apk
+            release-assets/Mandala-Art-${{ steps.version.outputs.release_tag }}.aab
             release-assets/SHA256SUMS.txt
           body: ${{ steps.release-notes.outputs.body }}
