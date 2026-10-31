@@ -7,6 +7,7 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.example.data.MandalaDatabase
 import com.example.data.MandalaRepository
+import com.example.generator.MandalaLibrary
 import com.example.util.AppSettings
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
@@ -107,12 +108,7 @@ class EditorAccountSwitchTest {
                     repository.saveProgress(
                         mandalaId = "lotus_bloom",
                         coloredRegions = snapshot,
-                        totalRegions = EditorViewModel(
-                            mandalaId = "lotus_bloom",
-                            repository = repository,
-                            appSettings = settings,
-                            ownerUid = ownerUid
-                        ).design.regionCount,
+                        totalRegions = MandalaLibrary.getDesignById("lotus_bloom").regionCount,
                         ownerUid = ownerUid
                     )
                 }
