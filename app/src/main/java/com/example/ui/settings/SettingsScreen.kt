@@ -587,7 +587,7 @@ fun SettingsScreen(
                             Spacer(modifier = Modifier.width(14.dp))
                             Column {
                                 Text(
-                                    text = "Mandala Art",
+                                    text = stringResource(R.string.app_name),
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 16.sp
                                 )
@@ -636,17 +636,7 @@ fun SettingsScreen(
                         .verticalScroll(rememberScrollState())
                 ) {
                     Text(
-                        text = "1. Optional Cloud Save:\n" +
-                                "Account creation is optional. If you create an account, Firebase Authentication processes your email address. When you manually sync, your coloring progress, colors, favorites, completion status, timestamps, per-field sync revisions, and deletion markers are stored in Cloud Firestore under your account. A random installation identifier is used only to resolve concurrent offline edits; it is stored outside Android backup data. Without signing in, progress remains local.\n\n" +
-                                "2. Advertising & Third-Party SDKs:\n" +
-                                "The app uses Google AdMob (Google Mobile Ads SDK) to show non-intrusive ads and voluntary rewarded video unlocks. Google AdMob may process device identifiers (such as Android Advertising ID), coarse IP address, and interaction diagnostics for ad serving and fraud detection.\n\n" +
-                                "The app also uses Firebase Analytics with a small, fixed set of app events: when a design is opened, when coloring is started, when a rewarded ad is offered, started, or completed, and when premium content is unlocked. These events include only a coarse content category, never artwork images, colors, or coloring progress. Firebase also collects an app instance identifier and standard app lifecycle and technical information.\n\n" +
-                                "3. User Consent (GDPR / CCPA):\n" +
-                                "In regions requiring consent (such as the European Economic Area and UK), Google User Messaging Platform (UMP) requests your consent for personalized ads before ads are requested. You can update your consent at any time in Settings.\n\n" +
-                                "4. Children's Privacy:\n" +
-                                "We treat ads as General Audience (Content Rating G) and do not knowingly collect personal information from children under 13.\n\n" +
-                                "5. Account & Data Deletion:\n" +
-                                "In Settings > Cloud Save > Delete Account & Cloud Data, you can permanently delete your Firebase account, its Firestore mandala progress, and that account's local Room data. The app asks for your password again before deletion. Guest/local-only progress and other accounts on the same device are retained. A minimal UID-based deletion lock remains to stop other devices from recreating saves. Signing out alone does not delete cloud data.",
+                        text = stringResource(R.string.settings_privacy_policy_body),
                         fontSize = 12.sp,
                         lineHeight = 18.sp
                     )
@@ -678,7 +668,7 @@ fun SettingsScreen(
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Text(
-                        "This permanently deletes your Firebase account, its cloud saves, and this account's local progress. Guest progress and other accounts on this device are kept. A minimal UID-based lock remains to prevent stale devices from recreating saves. Enter your password to reauthenticate."
+                        stringResource(R.string.settings_delete_account_confirmation)
                     )
                     OutlinedTextField(
                         value = deleteAccountPassword,
@@ -700,7 +690,7 @@ fun SettingsScreen(
                             cloudMessage = null
                             cloudMessage = try {
                                 cloudSaveManager?.deleteAccount(deleteAccountPassword)
-                                "Account deletion completed."
+                                context.getString(R.string.settings_account_delete_completed)
                             } catch (error: Exception) {
                                 error.localizedMessage ?: context.getString(R.string.settings_account_delete_failed)
                             } finally {
@@ -742,18 +732,7 @@ fun SettingsScreen(
                         .verticalScroll(rememberScrollState())
                 ) {
                     Text(
-                        text = "1. Mandala Art Original Artwork:\n" +
-                                "All 104 mandala artwork patterns and line-art designs in this application are original algorithmic vector works mathematically generated for Mandala Art. Copyright (c) 2026 Mandala Art Project.\n\n" +
-                                "2. Android Jetpack & Libraries:\n" +
-                                "Licensed under the Apache License, Version 2.0 (the 'License').\n" +
-                                "Includes:\n" +
-                                "• AndroidX Core, Activity, Lifecycle, Compose (M3)\n" +
-                                "• AndroidX Room Persistence Library\n" +
-                                "• Kotlin Standard Library and Coroutines\n\n" +
-                                "3. Google Mobile Ads SDK:\n" +
-                                "Provided by Google LLC under Google APIs Terms of Service.\n\n" +
-                                "You may obtain a copy of the Apache License at:\n" +
-                                "http://www.apache.org/licenses/LICENSE-2.0",
+                        text = stringResource(R.string.settings_licenses_body),
                         fontSize = 12.sp,
                         lineHeight = 18.sp
                     )
