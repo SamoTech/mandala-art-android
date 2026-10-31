@@ -92,7 +92,8 @@ Work items:
 - [x] Review pluralization and formatting placeholders; Arabic plural forms and parity checks are included in the current PR. Continue to review new strings as they are added.
 - [ ] Validate RTL mirroring for navigation, gallery, editor controls, progress indicators, dialogs, and settings.
 - [ ] Review font fallback, Arabic shaping, truncation, line wrapping, and large-font scaling.
-- [x] Add resource integrity and Arabic/English locale smoke tests (PRs #48–#49).\n- [ ] Verify rendered Compose layout, typography, TalkBack semantics, and critical screens on physical devices in Arabic and English (see `docs/RTL_DEVICE_TEST_MATRIX.md`).
+- [x] Add resource integrity and Arabic/English locale smoke tests (PRs #48–#49).
+- [ ] Verify rendered Compose layout, typography, TalkBack semantics, and critical screens on physical devices in Arabic and English (see `docs/RTL_DEVICE_TEST_MATRIX.md`).
 
 **Acceptance / exit criteria:**
 
@@ -240,7 +241,7 @@ The following is the working queue. Do not skip ahead because a later feature is
 | 1 | Autosave/account-switch lifecycle audit and regression tests | P0 | Completed — PRs #32, #36, #37, #39; post-merge CI passed |
 | 2 | Favorite timestamp persistence and tombstone edge-case coverage | P0 | Completed — PR #33; post-merge CI passed |
 | 3 | Offline sync and account-isolation regression coverage | P0 | Completed — PR #34; post-merge Android and Firestore CI passed; device verification user-reported |
-| 4 | Arabic resources and RTL pass | P1 | Arabic resources merged in PR #48; locale smoke tests and RTL source review in progress; physical-device verification remains |
+| 4 | Arabic resources and RTL pass | P1 | PRs #48–#49 merged; resource/locale tests passed; physical RTL, typography, and TalkBack verification remains |
 | 5 | Release R8/minification experiment with measured comparison | P1 | Planned |
 | 6 | Profile gallery and share paths; optimize only measured bottlenecks | P1 | Planned |
 | 7 | User-configurable deterministic mandala generator | P2 | Discovery |
@@ -311,4 +312,4 @@ Every change to priority or scope must include a short reason. Do not silently r
 
 ---
 
-**Current next action:** Complete automated Arabic/English locale and RTL smoke coverage, then verify actual Compose layout geometry, typography, TalkBack semantics, and critical screens on a physical device in both locales. Preserve artwork IDs, persisted values, backend fields, and analytics names.
+**Current next action:** Complete physical-device RTL, typography, and TalkBack verification using `docs/RTL_DEVICE_TEST_MATRIX.md`; fix only reproducible issues, then close M1. PR #49 merged at `ab70db9c085410644baee1ba3362fe3d3100b327`; its PR CI passed, but no post-merge workflow run was returned. Preserve artwork IDs, persisted values, backend fields, and analytics names.
