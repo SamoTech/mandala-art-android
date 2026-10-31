@@ -109,6 +109,24 @@ class RevisionedProgressDaoTest {
     }
 
     @Test
+    fun deletingUncachedArtworkCreatesSyncTombstone() = runBlocking {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val database = Room.inMemoryDatabaseBuilder(context, MandalaDatabase::class.java).build()
+        try {
+            val repository = MandalaRepository(database.mandalaDao(), "device-local")
+            repository.deleteProgress("cloud-only-artwork")
+
+            val tombstone = database.mandalaDao().getProgressOnce("cloud-only-artwork")
+            assertNotNull(tombstone)
+            assertTrue(tombstone!!.isDeleted)
+            assertEquals(1L, tombstone.deletionRevision)
+            assertEquals("device-local", tombstone.deletionActor)
+        } finally {
+            database.close()
+        }
+    }
+
+    @Test
     fun installationActorIdIsStableAndStoredOutsideBackupData() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         val first = DeviceIdentity.getOrCreate(context)
