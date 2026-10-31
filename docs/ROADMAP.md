@@ -240,7 +240,7 @@ The following is the working queue. Do not skip ahead because a later feature is
 | 1 | Autosave/account-switch lifecycle audit and regression tests | P0 | Completed — PRs #32, #36, #37, #39; post-merge CI passed |
 | 2 | Favorite timestamp persistence and tombstone edge-case coverage | P0 | Completed — PR #33; post-merge CI passed |
 | 3 | Offline sync and account-isolation regression coverage | P0 | Completed — PR #34; post-merge Android and Firestore CI passed; device verification user-reported |
-| 4 | Arabic resources and RTL pass | P1 | In progress — Arabic resources and parity tests in PR; RTL/device verification remains |
+| 4 | Arabic resources and RTL pass | P1 | Arabic resources merged in PR #48; locale smoke tests and RTL source review in progress; physical-device verification remains |
 | 5 | Release R8/minification experiment with measured comparison | P1 | Planned |
 | 6 | Profile gallery and share paths; optimize only measured bottlenecks | P1 | Planned |
 | 7 | User-configurable deterministic mandala generator | P2 | Discovery |
@@ -311,4 +311,4 @@ Every change to priority or scope must include a short reason. Do not silently r
 
 ---
 
-**Current next action:** Complete the Arabic resource/parity-test PR, then validate RTL layout, typography, TalkBack semantics, and critical screens on Arabic and English locales. Preserve artwork IDs, persisted values, backend fields, and analytics names.
+**Current next action:** Complete automated Arabic/English locale and RTL smoke coverage, then verify actual Compose layout geometry, typography, TalkBack semantics, and critical screens on a physical device in both locales. Preserve artwork IDs, persisted values, backend fields, and analytics names.

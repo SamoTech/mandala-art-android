@@ -52,7 +52,19 @@ These are not ordinary Compose literals, but they are displayed to users and mus
 - Every icon-only actionable control must expose a localized semantic label.
 - Progress indicators and completion state need meaningful semantics, not only visible percentages or color.
 
-## 5. RTL and typography verification targets
+## 5. RTL source review and automated locale smoke coverage
+
+Static review of the primary Compose screens after Arabic resource integration found:
+
+- The manifest opts in with `android:supportsRtl="true"`.
+- Back navigation in Gallery, My Art, Editor, and Settings uses `Icons.AutoMirrored.Filled.ArrowBack`; editor Undo/Redo also use auto-mirrored icons.
+- No explicit `Arrangement.Left/Right`, `Alignment.Left/Right`, or left/right padding modifiers were found in the reviewed Home, Gallery, My Art, Editor, Palette, and Settings screen sources.
+- Rows, horizontal scrolling containers, and lazy horizontal lists rely on Compose's current `LayoutDirection`; this is intentional but still requires rendered UI verification.
+- Reviewed `contentDescription = null` usages are decorative icons or icons nested inside controls that also expose visible text. Icon-only controls in the reviewed flows use localized descriptions.
+
+The current PR adds Robolectric locale smoke tests that verify the manifest RTL flag, Arabic configuration direction and resource resolution, and unchanged English LTR/resource resolution. These tests validate Android locale configuration; they do not prove Compose screenshot geometry, TalkBack traversal, or physical-device typography.
+
+## 6. RTL and typography verification targets
 
 - Home, gallery, My Art, editor toolbar/palette, settings, dialogs, and bottom sheets.
 - Start/end alignment, horizontal scrolling, navigation/back affordances, and any direction-sensitive icons.
@@ -60,7 +72,7 @@ These are not ordinary Compose literals, but they are displayed to users and mus
 - Touch target size and TalkBack traversal order in both locales.
 - Preserve `supportsRtl=true`; verify actual Compose behavior rather than assuming the manifest flag alone guarantees correct layout.
 
-## 6. Recommended implementation sequence
+## 7. Recommended implementation sequence
 
 1. Extract remaining user-visible strings from screen and dialog code into default English resources.
 2. Localize data-driven labels through resource IDs or UI-layer mappings; add plural and formatted resources.
@@ -69,7 +81,7 @@ These are not ordinary Compose literals, but they are displayed to users and mus
 5. Add locale/RTL UI tests or screenshot coverage for critical screens, then perform manual device verification with Arabic and English system locales.
 6. Keep artwork IDs, database values, analytics event names, Firebase fields, and other persisted/backend identifiers language-neutral and unchanged.
 
-## 7. Out of scope for M1
+## 8. Out of scope for M1
 
 - Translating third-party SDK-owned UI.
 - Changing database identifiers, Firestore field names, analytics event names, or design IDs.
