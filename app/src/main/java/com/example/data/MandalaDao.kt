@@ -9,66 +9,153 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MandalaDao {
-    @Query("SELECT * FROM mandala_progress ORDER BY lastEditedTimestamp DESC")
+    @Query("SELECT * FROM mandala_progress WHERE isDeleted = 0 ORDER BY lastEditedTimestamp DESC")
     fun getAllProgress(): Flow<List<MandalaProgressEntity>>
 
-    @Query("SELECT * FROM mandala_progress WHERE mandalaId = :mandalaId LIMIT 1")
+    @Query("SELECT * FROM mandala_progress WHERE mandalaId = :mandalaId AND isDeleted = 0 LIMIT 1")
     fun getProgress(mandalaId: String): Flow<MandalaProgressEntity?>
 
+    // Includes tombstones; sync and repository mutation paths need the full row.
     @Query("SELECT * FROM mandala_progress WHERE mandalaId = :mandalaId LIMIT 1")
     suspend fun getProgressOnce(mandalaId: String): MandalaProgressEntity?
 
+    // Includes tombstones so a deleted record can still be propagated to Firestore.
     @Query("SELECT * FROM mandala_progress ORDER BY lastEditedTimestamp DESC")
     suspend fun getAllProgressOnce(): List<MandalaProgressEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertProgress(entity: MandalaProgressEntity)
 
-    @Query("""
-        UPDATE mandala_progress
-        SET coloredRegionsJson = :coloredRegionsJson,
-            percentCompleted = :percentCompleted,
-            isCompleted = :isCompleted,
-            lastEditedTimestamp = :lastEditedTimestamp
-        WHERE mandalaId = :mandalaId
-    """)
-    suspend fun updateProgressPreservingFavorite(
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun saveProgress(entity: MandalaProgressEntity)
+
+    /**
+     * Apply a remote candidate without replacing a local edit that arrived
+     * after the sync operation initially read the row.
+     */
+    @Transaction
+    suspend fun mergeProgress(incoming: MandalaProgressEntity) {
+        val current = getProgressOnce(incoming.mandalaId)
+        upsertProgress(ProgressSyncMerge.merge(current, incoming) ?: incoming)
+    }
+
+    @Transaction
+    suspend fun updateProgressFields(
         mandalaId: String,
         coloredRegionsJson: String,
         percentCompleted: Float,
         isCompleted: Boolean,
-        lastEditedTimestamp: Long
-    ): Int
+        timestamp: Long,
+        actor: String
+    ) {
+        val existing = getProgressOnce(mandalaId)
+        val revision = existing.nextLocalRevision()
+        val updated = if (existing == null) {
+            MandalaProgressEntity(
+                mandalaId = mandalaId,
+                coloredRegionsJson = coloredRegionsJson,
+                percentCompleted = percentCompleted,
+                isFavorite = false,
+                isCompleted = isCompleted,
+                lastEditedTimestamp = timestamp,
+                progressRevision = revision,
+                progressActor = actor
+            )
+        } else {
+            existing.copy(
+                coloredRegionsJson = coloredRegionsJson,
+                percentCompleted = percentCompleted,
+                isCompleted = isCompleted,
+                lastEditedTimestamp = timestamp,
+                progressRevision = revision,
+                progressActor = actor,
+                isDeleted = false
+            )
+        }
+        upsertProgress(updated)
+    }
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun saveProgress(entity: MandalaProgressEntity)
-
-    @Query("UPDATE mandala_progress SET isFavorite = :isFav, lastEditedTimestamp = :timestamp WHERE mandalaId = :mandalaId")
-    suspend fun updateFavorite(mandalaId: String, isFav: Boolean, timestamp: Long)
-
-    @Query("DELETE FROM mandala_progress WHERE mandalaId = :mandalaId")
-    suspend fun deleteProgress(mandalaId: String)
-
-    /**
-     * Reset an artwork's saved progress without losing a favorite record.
-     *
-     * For favorite artworks the progress fields are cleared and the row is kept
-     * (so the favorite flag and the My Art entry survive a reset); for
-     * non-favorite artworks the row is removed, matching previous behavior.
-     */
     @Transaction
-    suspend fun resetProgress(mandalaId: String) {
-        val existing = getProgressOnce(mandalaId) ?: return
-        if (existing.isFavorite) {
-            updateProgressPreservingFavorite(
+    suspend fun updateFavoriteField(
+        mandalaId: String,
+        isFavorite: Boolean,
+        timestamp: Long,
+        actor: String
+    ) {
+        val existing = getProgressOnce(mandalaId)
+        val revision = existing.nextLocalRevision()
+        val updated = if (existing == null) {
+            MandalaProgressEntity(
                 mandalaId = mandalaId,
                 coloredRegionsJson = "",
                 percentCompleted = 0f,
+                isFavorite = isFavorite,
                 isCompleted = false,
-                lastEditedTimestamp = System.currentTimeMillis()
+                lastEditedTimestamp = timestamp,
+                favoriteRevision = revision,
+                favoriteActor = actor
             )
         } else {
-            deleteProgress(mandalaId)
+            existing.copy(
+                isFavorite = isFavorite,
+                lastEditedTimestamp = timestamp,
+                favoriteRevision = revision,
+                favoriteActor = actor,
+                isDeleted = false
+            )
+        }
+        upsertProgress(updated)
+    }
+
+    @Transaction
+    suspend fun markDeleted(mandalaId: String, timestamp: Long, actor: String) {
+        val existing = getProgressOnce(mandalaId) ?: return
+        val revision = existing.nextLocalRevision()
+        upsertProgress(
+            existing.copy(
+                isDeleted = true,
+                deletionRevision = revision,
+                deletionActor = actor,
+                lastEditedTimestamp = timestamp
+            )
+        )
+    }
+
+    @Transaction
+    suspend fun resetProgress(mandalaId: String, timestamp: Long, actor: String) {
+        val existing = getProgressOnce(mandalaId) ?: return
+        val revision = existing.nextLocalRevision()
+        if (existing.isFavorite) {
+            upsertProgress(
+                existing.copy(
+                    coloredRegionsJson = "",
+                    percentCompleted = 0f,
+                    isCompleted = false,
+                    progressRevision = revision,
+                    progressActor = actor,
+                    lastEditedTimestamp = timestamp,
+                    isDeleted = false
+                )
+            )
+        } else {
+            upsertProgress(
+                existing.copy(
+                    isDeleted = true,
+                    deletionRevision = revision,
+                    deletionActor = actor,
+                    lastEditedTimestamp = timestamp
+                )
+            )
         }
     }
+
+    @Query("DELETE FROM mandala_progress WHERE mandalaId = :mandalaId")
+    suspend fun deleteProgress(mandalaId: String)
+}
+
+private fun MandalaProgressEntity?.nextLocalRevision(): Long {
+    val maxRevision = this?.let {
+        maxOf(it.progressRevision, it.favoriteRevision, it.deletionRevision)
+    } ?: 0L
+    return Math.addExact(maxRevision.coerceAtLeast(0L), 1L)
 }
