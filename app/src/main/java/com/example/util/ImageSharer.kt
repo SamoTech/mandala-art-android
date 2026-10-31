@@ -15,9 +15,12 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.util.UUID
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 
 object ImageSharer {
+
+    private const val CACHE_MAX_AGE_MS = 7L * 24L * 60L * 60L * 1000L
 
     /**
      * Renders the artwork off the main thread, then launches the Android
@@ -56,7 +59,7 @@ object ImageSharer {
                 )
             }
         } catch (error: Exception) {
-            withContext(Dispatchers.IO) { file.delete() }
+            withContext(NonCancellable + Dispatchers.IO) { file.delete() }
             throw error
         }
     }
@@ -105,6 +108,11 @@ object ImageSharer {
             if (!cacheFolder.exists() && !cacheFolder.mkdirs()) {
                 throw IOException("Unable to create artwork cache directory")
             }
+            val expirationTime = System.currentTimeMillis() - CACHE_MAX_AGE_MS
+            cacheFolder.listFiles()
+                ?.filter { it.isFile && it.lastModified() < expirationTime }
+                ?.forEach { it.delete() }
+
             val file = File(cacheFolder, "mandala_${design.id}_${UUID.randomUUID()}.png")
             outputFile = file
             FileOutputStream(file).use { output ->
