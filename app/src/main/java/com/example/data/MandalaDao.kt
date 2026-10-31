@@ -70,7 +70,7 @@ interface MandalaDao {
                 progressRevision = revision,
                 progressActor = actor,
                 isDeleted = false,
-                restoredDeletionRevision = if (existing.isDeleted) existing.deletionRevision else existing.restoredDeletionRevision,
+                restoredDeletionRevision = if (existing.deletionRevision > 0L) existing.deletionRevision else existing.restoredDeletionRevision,
                 restoredDeletionActor = if (existing.deletionRevision > 0L) existing.deletionActor else existing.restoredDeletionActor,
                 restorationEventRevision = if (existing.deletionRevision > 0L) revision else existing.restorationEventRevision,
                 restorationEventActor = if (existing.deletionRevision > 0L) actor else existing.restorationEventActor
