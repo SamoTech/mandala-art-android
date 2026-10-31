@@ -39,6 +39,9 @@ object ProgressSyncMerge {
         require(local.mandalaId == remote.mandalaId) {
             "Cannot merge different mandala IDs."
         }
+        require(local.ownerUid == remote.ownerUid) {
+            "Cannot merge progress owned by different accounts."
+        }
 
         val localProgressRevision = local.progressRevision.toRevision(local.progressActor)
         val remoteProgressRevision = remote.progressRevision.toRevision(remote.progressActor)
@@ -78,9 +81,6 @@ object ProgressSyncMerge {
             localRestoreProof to local.restorationEventRevision.toRevision(local.restorationEventActor),
             remoteRestoreProof to remote.restorationEventRevision.toRevision(remote.restorationEventActor)
         )
-        // Prefer a proof for the currently selected tombstone. A very high
-        // Lamport counter acknowledging an older deletion must not mask a
-        // lower-counter proof for a newer deletion.
         val matchingRestoreCandidates = restoreCandidates.filter { (proof, _) ->
             proof.deletedRevision == deletion.second.counter &&
                 proof.deletedActor == deletion.second.actor
@@ -89,9 +89,6 @@ object ProgressSyncMerge {
             .reduce { best, candidate -> choose(best, candidate) }
             .first
 
-        // A Lamport counter alone is not causal evidence. The proof explicitly
-        // names the exact tombstone observed by the restoring device, and its
-        // event revision must be later than that tombstone.
         val restoreEventRevision = restore.eventRevision.toRevision(restore.eventActor)
         val observedDeletion = restore.deletedRevision == deletion.second.counter &&
             restore.deletedActor == deletion.second.actor
@@ -100,6 +97,7 @@ object ProgressSyncMerge {
 
         return MandalaProgressEntity(
             mandalaId = local.mandalaId,
+            ownerUid = local.ownerUid,
             coloredRegionsJson = progress.first.colorsJson,
             percentCompleted = progress.first.percentCompleted,
             isFavorite = favorite.first,
@@ -128,9 +126,6 @@ object ProgressSyncMerge {
         val revisionOrder = local.second.compareTo(remote.second)
         if (revisionOrder > 0) return local
         if (revisionOrder < 0) return remote
-
-        // Equal revision tuples should represent the same write. This stable
-        // fallback also makes malformed/duplicated tuples converge.
         return if (local.first.toString() >= remote.first.toString()) local else remote
     }
 }
