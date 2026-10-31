@@ -125,7 +125,16 @@ fun EditorScreen(
     val canUndo by viewModel.canUndo.collectAsState()
     val canRedo by viewModel.canRedo.collectAsState()
     val percentCompleted by viewModel.percentCompleted.collectAsState()
+    val hasAutosaveError by viewModel.hasAutosaveError.collectAsState()
+    val autosaveErrorVersion by viewModel.autosaveErrorVersion.collectAsState()
     val outlineColor by appSettings.outlineColor.collectAsState()
+
+    var showAutosaveErrorDialog by remember { mutableStateOf(false) }
+    var isAutosaveRetryInProgress by remember { mutableStateOf(false) }
+    LaunchedEffect(autosaveErrorVersion, hasAutosaveError) {
+        showAutosaveErrorDialog = hasAutosaveError
+        if (!hasAutosaveError) isAutosaveRetryInProgress = false
+    }
 
     var showResetDialog by remember { mutableStateOf(false) }
     var showColorPicker by remember { mutableStateOf(false) }
@@ -341,6 +350,59 @@ fun EditorScreen(
                 }
             }
         }
+    }
+
+    // Keep background autosave failures visible when the editor is in the foreground.
+    if (showAutosaveErrorDialog && hasAutosaveError) {
+        AlertDialog(
+            onDismissRequest = {
+                if (!isAutosaveRetryInProgress) showAutosaveErrorDialog = false
+            },
+            title = {
+                Text(
+                    text = stringResource(R.string.autosave_error_title),
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = { Text(stringResource(R.string.autosave_error_message)) },
+            confirmButton = {
+                Button(
+                    enabled = !isAutosaveRetryInProgress,
+                    onClick = {
+                        if (!isAutosaveRetryInProgress) {
+                            isAutosaveRetryInProgress = true
+                            navigationScope.launch {
+                                try {
+                                    viewModel.flushPendingSave()
+                                } catch (cancelled: CancellationException) {
+                                    throw cancelled
+                                } catch (error: Exception) {
+                                    Log.e("EditorScreen", "Autosave retry failed", error)
+                                } finally {
+                                    isAutosaveRetryInProgress = false
+                                }
+                            }
+                        }
+                    }
+                ) {
+                    Text(
+                        if (isAutosaveRetryInProgress) {
+                            stringResource(R.string.autosave_retrying)
+                        } else {
+                            stringResource(R.string.autosave_retry)
+                        }
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    enabled = !isAutosaveRetryInProgress,
+                    onClick = { showAutosaveErrorDialog = false }
+                ) {
+                    Text(stringResource(R.string.autosave_keep_editing))
+                }
+            }
+        )
     }
 
     // Reset confirmation dialog
