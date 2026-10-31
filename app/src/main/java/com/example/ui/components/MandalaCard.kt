@@ -45,6 +45,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.R
+import com.example.model.Difficulty
+import com.example.model.MandalaCategory
 import com.example.model.LevelSystem
 import com.example.model.MandalaDesign
 import com.example.model.SavedArtwork
@@ -218,7 +220,7 @@ fun MandalaCard(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "${design.difficulty.label} • ${design.category.title}",
+                        text = stringResource(difficultyLabelResource(design.difficulty)) + " • " + stringResource(categoryLabelResource(design.category)),
                         fontSize = 12.sp,
                         color = Color(design.difficulty.color),
                         fontWeight = FontWeight.Bold
@@ -251,4 +253,21 @@ fun MandalaCard(
             }
         }
     }
+}
+
+
+private fun difficultyLabelResource(difficulty: Difficulty): Int = when (difficulty) {
+    Difficulty.EASY -> R.string.category_easy
+    Difficulty.MEDIUM -> R.string.category_medium
+    Difficulty.HARD -> R.string.category_hard
+}
+
+private fun categoryLabelResource(category: MandalaCategory): Int = when (category) {
+    MandalaCategory.ALL -> R.string.category_all
+    MandalaCategory.EASY -> R.string.category_easy
+    MandalaCategory.MEDIUM -> R.string.category_medium
+    MandalaCategory.HARD -> R.string.category_hard
+    MandalaCategory.FLORAL -> R.string.category_floral
+    MandalaCategory.GEOMETRIC -> R.string.category_geometric
+    MandalaCategory.INTRICATE -> R.string.category_intricate
 }
