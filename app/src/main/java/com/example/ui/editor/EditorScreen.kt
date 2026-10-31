@@ -105,15 +105,12 @@ fun EditorScreen(
         }
     }
 
-    DisposableEffect(lifecycleOwner, viewModel, navigationScope) {
-        val observer = EditorLifecycleSaveObserver(
-            lifecycle = lifecycleOwner.lifecycle,
-            scope = navigationScope,
-            flushPendingSave = { viewModel.flushPendingSave() },
-            onFlushError = { error ->
+    DisposableEffect(lifecycleOwner, viewModel) {
+        val observer = EditorLifecycleSaveObserver(lifecycleOwner.lifecycle) {
+            viewModel.flushPendingSaveOnLifecycleStop { error ->
                 Log.e("EditorScreen", "Autosave flush failed when app stopped", error)
             }
-        )
+        }
         onDispose { observer.close() }
     }
 
