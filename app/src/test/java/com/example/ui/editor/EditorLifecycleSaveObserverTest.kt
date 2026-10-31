@@ -13,10 +13,7 @@ import com.example.data.MandalaRepository
 import com.example.generator.MandalaLibrary
 import com.example.util.AppSettings
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -47,7 +44,6 @@ class EditorLifecycleSaveObserverTest {
         val repository = MandalaRepository(database.mandalaDao(), "on-stop-switch-test-device")
         val settings = AppSettings(context)
         val viewModelStore = ViewModelStore()
-        val observerScope = CoroutineScope(SupervisorJob() + dispatcher)
         val saveStarted = CompletableDeferred<Unit>()
         val releaseSave = CompletableDeferred<Unit>()
         val observedOwnerUids = mutableListOf<String>()
@@ -82,9 +78,11 @@ class EditorLifecycleSaveObserverTest {
             editor.onRegionTapped("petal_0", context)
             observer = EditorLifecycleSaveObserver(
                 lifecycle = lifecycleOwner.lifecycle,
-                scope = observerScope,
-                flushPendingSave = { editor.flushPendingSave() },
-                onFlushError = { throw AssertionError("ON_STOP flush failed", it) }
+                onStop = {
+                    editor.flushPendingSaveOnLifecycleStop {
+                        throw AssertionError("ON_STOP flush failed", it)
+                    }
+                }
             )
 
             lifecycleOwner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
@@ -104,7 +102,6 @@ class EditorLifecycleSaveObserverTest {
             assertNull(database.mandalaDao().getProgressOnce("lotus_bloom", "account-b"))
         } finally {
             observer?.close()
-            observerScope.cancel()
             releaseSave.complete(Unit)
             viewModelStore.clear()
             database.close()
@@ -123,8 +120,7 @@ class EditorLifecycleSaveObserverTest {
         val observer = EditorLifecycleSaveObserver(
             lifecycle = lifecycleOwner.lifecycle,
             scope = scope,
-            flushPendingSave = { flushCount++ },
-            onFlushError = { throw AssertionError("Unexpected ON_STOP flush failure", it) }
+            onStop = { flushCount++ }
         )
 
         try {
