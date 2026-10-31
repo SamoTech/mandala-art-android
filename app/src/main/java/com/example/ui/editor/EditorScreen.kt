@@ -44,6 +44,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -72,6 +74,7 @@ fun EditorScreen(
     onNavigateBack: () -> Unit
 ) {
     val context = LocalContext.current
+    val shareScope = rememberCoroutineScope()
     LaunchedEffect(viewModel.design.id) {
         AnalyticsTracker.logEvent("design_opened", "content_type", "mandala")
         AnalyticsTracker.logEvent("coloring_started", "content_type", "mandala")
@@ -174,12 +177,22 @@ fun EditorScreen(
 
                             IconButton(
                                 onClick = {
-                                    ImageSharer.exportAndShare(
-                                        context = context,
-                                        design = viewModel.design,
-                                        coloredRegions = coloredRegions,
-                                        outlineColor = outlineColor
-                                    )
+                                    shareScope.launch {
+                                        try {
+                                            ImageSharer.exportAndShare(
+                                                context = context,
+                                                design = viewModel.design,
+                                                coloredRegions = coloredRegions,
+                                                outlineColor = outlineColor
+                                            )
+                                        } catch (error: Exception) {
+                                            Toast.makeText(
+                                                context,
+                                                "Unable to export artwork. Please try again.",
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                        }
+                                    }
                                 },
                                 modifier = Modifier.testTag("btn_editor_share")
                             ) {
