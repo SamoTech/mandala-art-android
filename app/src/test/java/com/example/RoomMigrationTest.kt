@@ -27,7 +27,7 @@ class RoomMigrationTest {
         val databaseFile: File = context.getDatabasePath(databaseName)
         databaseFile.parentFile?.mkdirs()
 
-        // Build the exact v1 schema exported by Room before opening the v2 DB.
+        // Build the exact v1 schema exported by Room before opening the current DB.
         val legacyDb = SQLiteDatabase.openOrCreateDatabase(databaseFile.absolutePath, null)
         try {
             legacyDb.execSQL(
@@ -63,7 +63,7 @@ class RoomMigrationTest {
         }
 
         val migratedDb = Room.databaseBuilder(context, MandalaDatabase::class.java, databaseName)
-            .addMigrations(MandalaDatabase.MIGRATION_1_2)
+            .addMigrations(MandalaDatabase.MIGRATION_1_2, MandalaDatabase.MIGRATION_2_3, MandalaDatabase.MIGRATION_3_4)
             .allowMainThreadQueries()
             .build()
 
@@ -85,6 +85,10 @@ class RoomMigrationTest {
             assertFalse(restored.isDeleted)
             assertEquals(0L, restored.deletionRevision)
             assertEquals("legacy", restored.deletionActor)
+            assertEquals(0L, restored.restoredDeletionRevision)
+            assertEquals("legacy", restored.restoredDeletionActor)
+            assertEquals(0L, restored.restorationEventRevision)
+            assertEquals("legacy", restored.restorationEventActor)
         } finally {
             migratedDb.close()
             context.deleteDatabase(databaseName)
