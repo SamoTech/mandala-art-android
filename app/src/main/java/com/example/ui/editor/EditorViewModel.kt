@@ -24,7 +24,7 @@ class EditorViewModel(
     val mandalaId: String,
     private val repository: MandalaRepository,
     private val appSettings: AppSettings,
-    private val ownerUid: String
+    private val ownerUid: String = repository.currentOwnerUid
 ) : ViewModel() {
 
     val design: MandalaDesign = MandalaLibrary.getDesignById(mandalaId)
@@ -203,7 +203,7 @@ class EditorViewModel(
         private val mandalaId: String,
         private val repository: MandalaRepository,
         private val appSettings: AppSettings,
-        private val ownerUid: String
+        private val ownerUid: String = repository.currentOwnerUid
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
