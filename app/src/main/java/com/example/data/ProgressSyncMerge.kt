@@ -17,6 +17,12 @@ data class SyncRevision(
 }
 
 object ProgressSyncMerge {
+    private data class ProgressFields(
+        val colorsJson: String,
+        val percentCompleted: Float,
+        val isCompleted: Boolean
+    )
+
     fun merge(
         local: MandalaProgressEntity?,
         remote: MandalaProgressEntity?
@@ -35,16 +41,8 @@ object ProgressSyncMerge {
         val remoteDeletionRevision = remote.deletionRevision.toRevision(remote.deletionActor)
 
         val progress = choose(
-            local.coloredRegionsJson to localProgressRevision,
-            remote.coloredRegionsJson to remoteProgressRevision
-        )
-        val percent = choose(
-            local.percentCompleted to localProgressRevision,
-            remote.percentCompleted to remoteProgressRevision
-        )
-        val completed = choose(
-            local.isCompleted to localProgressRevision,
-            remote.isCompleted to remoteProgressRevision
+            ProgressFields(local.coloredRegionsJson, local.percentCompleted, local.isCompleted) to localProgressRevision,
+            ProgressFields(remote.coloredRegionsJson, remote.percentCompleted, remote.isCompleted) to remoteProgressRevision
         )
         val favorite = choose(
             local.isFavorite to localFavoriteRevision,
@@ -75,10 +73,10 @@ object ProgressSyncMerge {
 
         return MandalaProgressEntity(
             mandalaId = local.mandalaId,
-            coloredRegionsJson = progress.first,
-            percentCompleted = percent.first,
+            coloredRegionsJson = progress.first.colorsJson,
+            percentCompleted = progress.first.percentCompleted,
             isFavorite = favorite.first,
-            isCompleted = completed.first,
+            isCompleted = progress.first.isCompleted,
             lastEditedTimestamp = maxOf(local.lastEditedTimestamp, remote.lastEditedTimestamp),
             progressRevision = progress.second.counter,
             progressActor = progress.second.actor,
