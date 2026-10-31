@@ -32,7 +32,8 @@ interface MandalaDao {
     @Transaction
     suspend fun mergeProgress(incoming: MandalaProgressEntity) {
         val current = getProgressOnce(incoming.mandalaId, incoming.ownerUid)
-        upsertProgress(ProgressSyncMerge.merge(current, incoming) ?: incoming)
+        val merged = ProgressSyncMerge.merge(current, incoming) ?: incoming
+        upsertProgress(merged.copy(ownerUid = incoming.ownerUid))
     }
 
     @Transaction
