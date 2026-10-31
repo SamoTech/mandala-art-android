@@ -227,7 +227,7 @@ fun MandalaApp(
 
             is Screen.Editor -> {
                 val editorViewModel: EditorViewModel = viewModel(
-                    key = screen.mandalaId,
+                    key = "${repository.currentOwnerUid}:${screen.mandalaId}",
                     factory = EditorViewModel.Factory(
                         mandalaId = screen.mandalaId,
                         repository = repository,
