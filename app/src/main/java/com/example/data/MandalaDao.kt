@@ -181,6 +181,9 @@ interface MandalaDao {
 
     @Query("DELETE FROM mandala_progress WHERE mandalaId = :mandalaId AND ownerUid = :ownerUid")
     suspend fun deleteProgress(mandalaId: String, ownerUid: String = "")
+
+    @Query("DELETE FROM mandala_progress WHERE ownerUid = :ownerUid")
+    suspend fun deleteAllProgress(ownerUid: String)
 }
 
 private fun MandalaProgressEntity?.nextLocalRevision(): Long {
