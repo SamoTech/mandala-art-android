@@ -24,6 +24,19 @@ class CloudSaveManager(
 
     val currentUser: FirebaseUser? get() = auth.currentUser
 
+    /**
+     * Keeps the local Room partition aligned with Firebase Authentication.
+     * The returned disposer must be called when the observing UI is removed.
+     */
+    fun observeAuthState(onChanged: (String) -> Unit): () -> Unit {
+        onChanged(auth.currentUser?.uid.orEmpty())
+        val listener = FirebaseAuth.AuthStateListener { firebaseAuth ->
+            onChanged(firebaseAuth.currentUser?.uid.orEmpty())
+        }
+        auth.addAuthStateListener(listener)
+        return { auth.removeAuthStateListener(listener) }
+    }
+
     suspend fun createAccount(email: String, password: String) {
         auth.createUserWithEmailAndPassword(email.trim(), password).await()
         syncProgress()
@@ -44,12 +57,14 @@ class CloudSaveManager(
         // transaction before its merge/write, avoiding stale snapshot overwrites.
         val remoteSnapshot = collection.get().await()
         ensureSameAccount(uid)
-        val ids = (dao.getAllProgressOnce().map { it.mandalaId } +
+        // Only this Firebase UID's local partition participates in this sync.
+        // Anonymous and other-account rows are never candidates for upload.
+        val ids = (dao.getAllProgressOnce(uid).map { it.mandalaId } +
             remoteSnapshot.documents.map { it.id }).toSet()
 
         for (id in ids) {
             ensureSameAccount(uid)
-            val localCandidate = dao.getProgressOnce(id)
+            val localCandidate = dao.getProgressOnce(id, uid)
             val document = collection.document(id)
 
             val serverMerged = firestore.runTransaction { transaction ->
@@ -57,7 +72,7 @@ class CloudSaveManager(
                     "Account changed during cloud sync; retry with the active account."
                 }
                 val snapshot = transaction.get(document)
-                val remote = if (snapshot.exists()) snapshot.toProgressEntity() else null
+                val remote = if (snapshot.exists()) snapshot.toProgressEntity(uid) else null
                 val merged = ProgressSyncMerge.merge(localCandidate, remote)
                 if (merged != null) transaction.set(document, merged.toCloudMap())
                 merged
@@ -67,7 +82,42 @@ class CloudSaveManager(
             if (serverMerged != null) {
                 // This DAO transaction re-reads the current local row, so a
                 // concurrent editor write is not replaced by our stale candidate.
-                dao.mergeProgress(serverMerged)
+                dao.mergeProgress(serverMerged.copy(ownerUid = uid))
+            }
+        }
+        ensureSameAccount(uid)
+    }
+
+    /**
+     * Explicitly imports anonymous/local-only saves into the signed-in account.
+     * The anonymous partition is retained unchanged, so users can review or
+     * keep using their local data after signing out. Nothing is imported
+     * automatically because a shared device may contain another person's work.
+     */
+    suspend fun importAnonymousProgress() = syncMutex.withLock {
+        val uid = auth.currentUser?.uid ?: error("Sign in before importing local progress.")
+        val collection = firestore.collection("users").document(uid).collection("mandalaProgress")
+        val anonymousRows = dao.getAllProgressOnce(ownerUid = "")
+
+        for (anonymousRow in anonymousRows) {
+            ensureSameAccount(uid)
+            val localCandidate = anonymousRow.copy(ownerUid = uid)
+            val document = collection.document(anonymousRow.mandalaId)
+
+            val serverMerged = firestore.runTransaction { transaction ->
+                check(auth.currentUser?.uid == uid) {
+                    "Account changed during local import; retry with the active account."
+                }
+                val snapshot = transaction.get(document)
+                val remote = if (snapshot.exists()) snapshot.toProgressEntity(uid) else null
+                val merged = ProgressSyncMerge.merge(localCandidate, remote)
+                if (merged != null) transaction.set(document, merged.toCloudMap())
+                merged
+            }.await()
+
+            ensureSameAccount(uid)
+            if (serverMerged != null) {
+                dao.mergeProgress(serverMerged.copy(ownerUid = uid))
             }
         }
         ensureSameAccount(uid)
@@ -79,10 +129,11 @@ class CloudSaveManager(
         }
     }
 
-    private fun DocumentSnapshot.toProgressEntity(): MandalaProgressEntity {
+    private fun DocumentSnapshot.toProgressEntity(ownerUid: String): MandalaProgressEntity {
         val legacyTimestamp = (getLong("lastEditedTimestamp") ?: 0L).coerceAtLeast(0L)
         return MandalaProgressEntity(
             mandalaId = id,
+            ownerUid = ownerUid,
             coloredRegionsJson = getString("coloredRegionsJson").orEmpty(),
             percentCompleted = ((get("percentCompleted") as? Number)?.toFloat() ?: 0f),
             isFavorite = getBoolean("isFavorite") ?: false,

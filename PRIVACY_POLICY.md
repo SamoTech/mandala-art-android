@@ -9,8 +9,9 @@ Mandala Art ("the Application") is an offline-first coloring app. This policy ex
 ### 1. Information Stored by the Application
 
 - Account creation is optional. Users who choose Cloud Save can create an account with an email address and password through Firebase Authentication.
-- Without signing in, coloring progress and favorites remain stored locally on the device using Android Room / SQLite.
-- If a user signs in and manually syncs, saved mandala progress, color-region data, completion percentage, favorite/completion flags, and edit timestamps are sent to Cloud Firestore under that Firebase user ID so the progress can be restored on another device.
+- Without signing in, coloring progress and favorites remain stored in a local-only partition on the device using Android Room / SQLite.
+- When a user signs in, the app reads and writes only the local partition associated with that Firebase user ID. Manual Cloud Save sync sends that account's saved mandala progress, color-region data, completion percentage, favorite/completion flags, edit timestamps, sync revisions, and deletion markers to Cloud Firestore under the same Firebase user ID.
+- Older local-only progress is not automatically assigned to an account. A signed-in user may explicitly choose **Import Local Progress** in Settings. This merges the anonymous local records into the signed-in account while retaining the original local-only records on the device. This opt-in is important on shared devices.
 - Firebase processes account credentials and cloud-save data under Google's applicable terms and privacy documentation. Cloud Save does not require contacts, physical address, or payment details.
 - Exported mandala PNG images are prepared in the app's private cache and shared only when you choose to use Android's system share interface. Once shared, the receiving app or service handles the image under its own policies.
 

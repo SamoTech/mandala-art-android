@@ -9,19 +9,18 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MandalaDao {
-    @Query("SELECT * FROM mandala_progress WHERE isDeleted = 0 ORDER BY lastEditedTimestamp DESC")
-    fun getAllProgress(): Flow<List<MandalaProgressEntity>>
+    @Query("SELECT * FROM mandala_progress WHERE ownerUid = :ownerUid AND isDeleted = 0 ORDER BY lastEditedTimestamp DESC")
+    fun getAllProgress(ownerUid: String = ""): Flow<List<MandalaProgressEntity>>
 
-    @Query("SELECT * FROM mandala_progress WHERE mandalaId = :mandalaId AND isDeleted = 0 LIMIT 1")
-    fun getProgress(mandalaId: String): Flow<MandalaProgressEntity?>
+    @Query("SELECT * FROM mandala_progress WHERE mandalaId = :mandalaId AND ownerUid = :ownerUid AND isDeleted = 0 LIMIT 1")
+    fun getProgress(mandalaId: String, ownerUid: String = ""): Flow<MandalaProgressEntity?>
 
-    // Includes tombstones; sync and repository mutation paths need the full row.
-    @Query("SELECT * FROM mandala_progress WHERE mandalaId = :mandalaId LIMIT 1")
-    suspend fun getProgressOnce(mandalaId: String): MandalaProgressEntity?
+    // Includes tombstones; every read is scoped to one local account partition.
+    @Query("SELECT * FROM mandala_progress WHERE mandalaId = :mandalaId AND ownerUid = :ownerUid LIMIT 1")
+    suspend fun getProgressOnce(mandalaId: String, ownerUid: String = ""): MandalaProgressEntity?
 
-    // Includes tombstones so a deleted record can still be propagated to Firestore.
-    @Query("SELECT * FROM mandala_progress ORDER BY lastEditedTimestamp DESC")
-    suspend fun getAllProgressOnce(): List<MandalaProgressEntity>
+    @Query("SELECT * FROM mandala_progress WHERE ownerUid = :ownerUid ORDER BY lastEditedTimestamp DESC")
+    suspend fun getAllProgressOnce(ownerUid: String = ""): List<MandalaProgressEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertProgress(entity: MandalaProgressEntity)
@@ -29,14 +28,12 @@ interface MandalaDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun saveProgress(entity: MandalaProgressEntity)
 
-    /**
-     * Apply a remote candidate without replacing a local edit that arrived
-     * after the sync operation initially read the row.
-     */
+    /** Apply a remote candidate without replacing a newer local edit. */
     @Transaction
     suspend fun mergeProgress(incoming: MandalaProgressEntity) {
-        val current = getProgressOnce(incoming.mandalaId)
-        upsertProgress(ProgressSyncMerge.merge(current, incoming) ?: incoming)
+        val current = getProgressOnce(incoming.mandalaId, incoming.ownerUid)
+        val merged = ProgressSyncMerge.merge(current, incoming) ?: incoming
+        upsertProgress(merged.copy(ownerUid = incoming.ownerUid))
     }
 
     @Transaction
@@ -46,13 +43,15 @@ interface MandalaDao {
         percentCompleted: Float,
         isCompleted: Boolean,
         timestamp: Long,
-        actor: String
+        actor: String,
+        ownerUid: String = ""
     ) {
-        val existing = getProgressOnce(mandalaId)
+        val existing = getProgressOnce(mandalaId, ownerUid)
         val revision = existing.nextLocalRevision()
         val updated = if (existing == null) {
             MandalaProgressEntity(
                 mandalaId = mandalaId,
+                ownerUid = ownerUid,
                 coloredRegionsJson = coloredRegionsJson,
                 percentCompleted = percentCompleted,
                 isFavorite = false,
@@ -84,13 +83,15 @@ interface MandalaDao {
         mandalaId: String,
         isFavorite: Boolean,
         timestamp: Long,
-        actor: String
+        actor: String,
+        ownerUid: String = ""
     ) {
-        val existing = getProgressOnce(mandalaId)
+        val existing = getProgressOnce(mandalaId, ownerUid)
         val revision = existing.nextLocalRevision()
         val updated = if (existing == null) {
             MandalaProgressEntity(
                 mandalaId = mandalaId,
+                ownerUid = ownerUid,
                 coloredRegionsJson = "",
                 percentCompleted = 0f,
                 isFavorite = isFavorite,
@@ -119,12 +120,13 @@ interface MandalaDao {
     }
 
     @Transaction
-    suspend fun markDeleted(mandalaId: String, timestamp: Long, actor: String) {
-        val existing = getProgressOnce(mandalaId)
+    suspend fun markDeleted(mandalaId: String, timestamp: Long, actor: String, ownerUid: String = "") {
+        val existing = getProgressOnce(mandalaId, ownerUid)
         val revision = existing.nextLocalRevision()
         val tombstone = if (existing == null) {
             MandalaProgressEntity(
                 mandalaId = mandalaId,
+                ownerUid = ownerUid,
                 coloredRegionsJson = "",
                 percentCompleted = 0f,
                 isFavorite = false,
@@ -146,8 +148,8 @@ interface MandalaDao {
     }
 
     @Transaction
-    suspend fun resetProgress(mandalaId: String, timestamp: Long, actor: String) {
-        val existing = getProgressOnce(mandalaId) ?: return
+    suspend fun resetProgress(mandalaId: String, timestamp: Long, actor: String, ownerUid: String = "") {
+        val existing = getProgressOnce(mandalaId, ownerUid) ?: return
         val revision = existing.nextLocalRevision()
         if (existing.isFavorite) {
             upsertProgress(
@@ -177,8 +179,8 @@ interface MandalaDao {
         }
     }
 
-    @Query("DELETE FROM mandala_progress WHERE mandalaId = :mandalaId")
-    suspend fun deleteProgress(mandalaId: String)
+    @Query("DELETE FROM mandala_progress WHERE mandalaId = :mandalaId AND ownerUid = :ownerUid")
+    suspend fun deleteProgress(mandalaId: String, ownerUid: String = "")
 }
 
 private fun MandalaProgressEntity?.nextLocalRevision(): Long {

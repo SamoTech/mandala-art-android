@@ -22,7 +22,7 @@ class RoomMigrationTest {
     @Test
     fun migrationFromV1PreservesRowsAndSeedsLegacyRevisions() = runBlocking {
         val context = ApplicationProvider.getApplicationContext<Context>()
-        val databaseName = "room_migration_v1_v2_test.db"
+        val databaseName = "room_migration_v1_v4_test.db"
         context.deleteDatabase(databaseName)
         val databaseFile: File = context.getDatabasePath(databaseName)
         databaseFile.parentFile?.mkdirs()
@@ -63,7 +63,7 @@ class RoomMigrationTest {
         }
 
         val migratedDb = Room.databaseBuilder(context, MandalaDatabase::class.java, databaseName)
-            .addMigrations(MandalaDatabase.MIGRATION_1_2, MandalaDatabase.MIGRATION_2_3)
+            .addMigrations(MandalaDatabase.MIGRATION_1_2, MandalaDatabase.MIGRATION_2_3, MandalaDatabase.MIGRATION_3_4)
             .allowMainThreadQueries()
             .build()
 
@@ -72,6 +72,7 @@ class RoomMigrationTest {
             assertNotNull("Existing artwork row must survive migration", restored)
             restored!!
 
+            assertEquals("", restored.ownerUid)
             assertEquals("petal_0:4278190335", restored.coloredRegionsJson)
             assertEquals(0.25f, restored.percentCompleted, 0.0001f)
             assertEquals(true, restored.isFavorite)

@@ -27,6 +27,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -127,7 +128,21 @@ fun MandalaApp(
     cloudSaveManager: CloudSaveManager
 ) {
     val context = LocalContext.current
+
     val screenStack = remember { mutableStateListOf<Screen>(Screen.Home) }
+    var observedOwnerUid by remember { mutableStateOf(repository.currentOwnerUid) }
+
+    DisposableEffect(repository, cloudSaveManager) {
+        val stopObserving = cloudSaveManager.observeAuthState { uid ->
+            repository.setOwnerUid(uid)
+            if (uid != observedOwnerUid) {
+                observedOwnerUid = uid
+                screenStack.clear()
+                screenStack.add(Screen.Home)
+            }
+        }
+        onDispose { stopObserving() }
+    }
     val currentScreen = screenStack.lastOrNull() ?: Screen.Home
 
     val scope = rememberCoroutineScope()
@@ -212,11 +227,12 @@ fun MandalaApp(
 
             is Screen.Editor -> {
                 val editorViewModel: EditorViewModel = viewModel(
-                    key = screen.mandalaId,
+                    key = "${repository.currentOwnerUid}:${screen.mandalaId}",
                     factory = EditorViewModel.Factory(
                         mandalaId = screen.mandalaId,
                         repository = repository,
-                        appSettings = appSettings
+                        appSettings = appSettings,
+                        ownerUid = repository.currentOwnerUid
                     )
                 )
 

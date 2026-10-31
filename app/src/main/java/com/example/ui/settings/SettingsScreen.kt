@@ -447,6 +447,28 @@ fun SettingsScreen(
                                     enabled = !cloudBusy,
                                     modifier = Modifier.fillMaxWidth().testTag("btn_cloud_sync")
                                 ) { Text(if (cloudBusy) "Syncing..." else "Sync Progress") }
+                                Text(
+                                    "This is an optional one-time merge of local-only saves into this account. The original local copy is retained. Use it only when the local work belongs to you.",
+                                    fontSize = 12.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                OutlinedButton(
+                                    onClick = {
+                                        cloudScope.launch {
+                                            cloudBusy = true
+                                            cloudMessage = null
+                                            cloudMessage = try {
+                                                cloudSaveManager.importAnonymousProgress()
+                                                "Local progress imported; the local copy remains available."
+                                            } catch (error: Exception) {
+                                                error.localizedMessage ?: "Import failed."
+                                            }
+                                            cloudBusy = false
+                                        }
+                                    },
+                                    enabled = !cloudBusy,
+                                    modifier = Modifier.fillMaxWidth().testTag("btn_cloud_import_local")
+                                ) { Text(if (cloudBusy) "Importing..." else "Import Local Progress") }
                                 OutlinedButton(
                                     onClick = {
                                         cloudSaveManager.signOut()
