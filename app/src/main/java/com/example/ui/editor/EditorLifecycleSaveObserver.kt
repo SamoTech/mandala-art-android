@@ -7,7 +7,7 @@ import androidx.lifecycle.LifecycleEventObserver
  * Connects the host lifecycle's ON_STOP event to the editor's ViewModel-owned flush.
  */
 internal class EditorLifecycleSaveObserver(
-    lifecycle: Lifecycle,
+    private val lifecycle: Lifecycle,
     private val onStop: () -> Unit
 ) : AutoCloseable {
     private val observer = LifecycleEventObserver { _, event ->
