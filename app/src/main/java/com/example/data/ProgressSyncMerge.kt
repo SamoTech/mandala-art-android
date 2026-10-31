@@ -50,6 +50,13 @@ object ProgressSyncMerge {
             local.isFavorite to localFavoriteRevision,
             remote.isFavorite to remoteFavoriteRevision
         )
+        val localRestoreRevision = local.restoredDeletionRevision.toRevision(local.restoredDeletionActor)
+        val remoteRestoreRevision = remote.restoredDeletionRevision.toRevision(remote.restoredDeletionActor)
+        val restore = choose(
+            local.restoredDeletionRevision to localRestoreRevision,
+            remote.restoredDeletionRevision to remoteRestoreRevision
+        ).let { it.first to it.second }
+
         val deletionOrder = localDeletionRevision.compareTo(remoteDeletionRevision)
         val deletion = when {
             deletionOrder > 0 -> local.isDeleted to localDeletionRevision
@@ -57,10 +64,14 @@ object ProgressSyncMerge {
             else -> (local.isDeleted || remote.isDeleted) to localDeletionRevision
         }
 
-        // A tombstone wins over fields at the same or older revision. A later
-        // field edit can revive the record after observing the tombstone.
+        // A higher Lamport counter alone does not prove causality: an offline
+        // device may have advanced its clock without ever seeing this deletion.
+        // Revival therefore requires an explicit acknowledgement of this exact
+        // tombstone plus a field mutation newer than it.
         val newestFieldRevision = maxOf(progress.second, favorite.second)
-        val deleted = deletion.first && deletion.second.counter >= newestFieldRevision.counter
+        val observedDeletion = restore.second == deletion.second
+        val hasPostDeletionMutation = newestFieldRevision.counter > deletion.second.counter
+        val deleted = deletion.first && !(observedDeletion && hasPostDeletionMutation)
 
         return MandalaProgressEntity(
             mandalaId = local.mandalaId,
@@ -75,7 +86,9 @@ object ProgressSyncMerge {
             favoriteActor = favorite.second.actor,
             isDeleted = deleted,
             deletionRevision = deletion.second.counter,
-            deletionActor = deletion.second.actor
+            deletionActor = deletion.second.actor,
+            restoredDeletionRevision = restore.first,
+            restoredDeletionActor = restore.second.actor
         )
     }
 
