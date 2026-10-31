@@ -147,7 +147,7 @@ class ExampleRobolectricTest {
     }
 
     @Test
-    fun verifyEditorViewModelUndoRedoOperations() {
+    fun verifyEditorViewModelUndoRedoOperations() = runBlocking {
         val context = ApplicationProvider.getApplicationContext<Context>()
         val inMemoryDb = Room.inMemoryDatabaseBuilder(context, MandalaDatabase::class.java)
             .allowMainThreadQueries()
