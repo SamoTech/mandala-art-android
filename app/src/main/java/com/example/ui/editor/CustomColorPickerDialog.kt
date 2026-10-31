@@ -33,9 +33,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.R
 import com.example.ui.theme.PinkAccent
 
 @Composable
@@ -57,7 +59,7 @@ fun CustomColorPickerDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = "Pick Custom Color",
+                text = stringResource(R.string.color_picker_title),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -68,7 +70,6 @@ fun CustomColorPickerDialog(
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
             ) {
-                // Color preview swatch
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -86,9 +87,8 @@ fun CustomColorPickerDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Red slider
                 Text(
-                    text = "Red: ${(red * 255).toInt()}",
+                    text = stringResource(R.string.color_picker_red, (red * 255).toInt()),
                     fontSize = 13.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color(0xFFE53935)
@@ -104,9 +104,8 @@ fun CustomColorPickerDialog(
                     modifier = Modifier.testTag("slider_red")
                 )
 
-                // Green slider
                 Text(
-                    text = "Green: ${(green * 255).toInt()}",
+                    text = stringResource(R.string.color_picker_green, (green * 255).toInt()),
                     fontSize = 13.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color(0xFF43A047)
@@ -122,9 +121,8 @@ fun CustomColorPickerDialog(
                     modifier = Modifier.testTag("slider_green")
                 )
 
-                // Blue slider
                 Text(
-                    text = "Blue: ${(blue * 255).toInt()}",
+                    text = stringResource(R.string.color_picker_blue, (blue * 255).toInt()),
                     fontSize = 13.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color(0xFF1E88E5)
@@ -151,7 +149,7 @@ fun CustomColorPickerDialog(
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.testTag("custom_color_apply_btn")
             ) {
-                Text("Select", fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.color_picker_select), fontWeight = FontWeight.Bold)
             }
         },
         dismissButton = {
@@ -159,7 +157,7 @@ fun CustomColorPickerDialog(
                 onClick = onDismiss,
                 modifier = Modifier.testTag("custom_color_cancel_btn")
             ) {
-                Text("Cancel")
+                Text(stringResource(R.string.dialog_cancel))
             }
         }
     )
