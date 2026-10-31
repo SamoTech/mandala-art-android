@@ -72,6 +72,7 @@ class RoomMigrationTest {
             assertNotNull("Existing artwork row must survive migration", restored)
             restored!!
 
+            assertEquals("", restored.ownerUid)
             assertEquals("petal_0:4278190335", restored.coloredRegionsJson)
             assertEquals(0.25f, restored.percentCompleted, 0.0001f)
             assertEquals(true, restored.isFavorite)
