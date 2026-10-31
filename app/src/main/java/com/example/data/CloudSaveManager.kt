@@ -1,5 +1,6 @@
 package com.example.data
 
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.DocumentSnapshot
@@ -48,6 +49,50 @@ class CloudSaveManager(
     }
 
     fun signOut() = auth.signOut()
+
+    /**
+     * Deletes the signed-in email/password account and its cloud/local progress.
+     * Reauthentication is required by Firebase for this sensitive operation.
+     * Firestore documents are deleted in bounded batches before the Auth user,
+     * because the client loses permission to the account's Firestore path after
+     * the Firebase Authentication account is deleted.
+     */
+    suspend fun deleteAccount(password: String) = syncMutex.withLock {
+        val user = auth.currentUser ?: error("Sign in before deleting your account.")
+        val uid = user.uid
+        val email = user.email ?: error("This account has no email/password sign-in method.")
+        require(password.isNotBlank()) { "Enter your password to confirm account deletion." }
+
+        user.reauthenticate(EmailAuthProvider.getCredential(email, password)).await()
+        ensureSameAccount(uid)
+
+        val collection = firestore.collection("users").document(uid).collection("mandalaProgress")
+        while (true) {
+            ensureSameAccount(uid)
+            val page = collection.limit(400).get().await()
+            ensureSameAccount(uid)
+            if (page.isEmpty) break
+
+            val batch = firestore.batch()
+            page.documents.forEach { document -> batch.delete(document.reference) }
+            batch.commit().await()
+        }
+
+        // Remove only this UID's local partition. Guest data and other accounts
+        // on the same installation are intentionally preserved.
+        ensureSameAccount(uid)
+        dao.deleteAllProgress(uid)
+
+        ensureSameAccount(uid)
+        try {
+            user.delete().await()
+        } catch (error: Exception) {
+            throw IllegalStateException(
+                "Cloud and local progress were deleted, but Firebase account removal failed. Sign in again and retry account deletion.",
+                error
+            )
+        }
+    }
 
     suspend fun syncProgress() = syncMutex.withLock {
         val uid = auth.currentUser?.uid ?: error("Sign in to sync your progress.")
