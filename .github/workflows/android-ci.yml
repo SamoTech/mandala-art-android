@@ -229,7 +229,7 @@ jobs:
         if: always()
         run: rm -f "${{ runner.temp }}/my-upload-key.jks"
 
-      - name: Upload signed APK artifact as backup
+      - name: Upload signed APK and AAB artifacts as backup
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: mandala-art-signed-release-${{ steps.version.outputs.release_tag }}
