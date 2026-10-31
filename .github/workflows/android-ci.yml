@@ -70,6 +70,15 @@ jobs:
       - name: Build debug APK
         run: ./gradlew --no-daemon assembleDebug
 
+      - name: Upload generated Room schema baseline
+        if: success()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: mandala-art-room-schema-baseline
+          path: app/schemas/**/*.json
+          if-no-files-found: error
+          retention-days: 30
+
       - name: Run unit tests
         run: ./gradlew --no-daemon testDebugUnitTest
 
