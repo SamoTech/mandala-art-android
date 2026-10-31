@@ -67,6 +67,13 @@ class CloudSaveManager(
         user.reauthenticate(EmailAuthProvider.getCredential(email, password)).await()
         ensureSameAccount(uid)
 
+        // Lock writes from every device before scanning. The server-side rule
+        // blocks create/update while still allowing this client to read/delete.
+        firestore.collection("accountDeletionLocks").document(uid)
+            .set(mapOf("deletionRequested" to true))
+            .await()
+        ensureSameAccount(uid)
+
         val collection = firestore.collection("users").document(uid).collection("mandalaProgress")
         while (true) {
             ensureSameAccount(uid)
