@@ -57,6 +57,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -164,7 +165,7 @@ fun EditorScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Back"
+                                contentDescription = stringResource(R.string.navigation_back)
                             )
                         }
 
@@ -176,7 +177,15 @@ fun EditorScreen(
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                text = "${(percentCompleted * 100).toInt()}% Colored • ${viewModel.design.regionCount} Regions",
+                                text = stringResource(
+                                    R.string.editor_progress_summary,
+                                    (percentCompleted * 100).toInt(),
+                                    pluralStringResource(
+                                        R.plurals.editor_region_count,
+                                        viewModel.design.regionCount,
+                                        viewModel.design.regionCount
+                                    )
+                                ),
                                 fontSize = 11.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -234,7 +243,7 @@ fun EditorScreen(
                                         } catch (error: Exception) {
                                             Toast.makeText(
                                                 context,
-                                                "Unable to export artwork. Please try again.",
+                                                context.getString(R.string.editor_export_error),
                                                 Toast.LENGTH_LONG
                                             ).show()
                                         }
@@ -320,7 +329,7 @@ fun EditorScreen(
                         color = PurplePrimary.copy(alpha = 0.9f)
                     ) {
                         Text(
-                            text = "Zoom & Pan Mode: Drag to move • Pinch to zoom",
+                            text = stringResource(R.string.editor_zoom_pan_hint),
                             color = Color.White,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Medium,
@@ -336,7 +345,7 @@ fun EditorScreen(
                         color = PinkAccent.copy(alpha = 0.9f)
                     ) {
                         Text(
-                            text = "Eraser Active: Tap any region to clear color",
+                            text = stringResource(R.string.editor_eraser_hint),
                             color = Color.White,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Medium,
@@ -421,14 +430,14 @@ fun EditorScreen(
                             try {
                                 viewModel.reset()
                                 showResetDialog = false
-                                Toast.makeText(context, "Artwork reset", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(R.string.editor_reset_success), Toast.LENGTH_SHORT).show()
                             } catch (cancelled: CancellationException) {
                                 throw cancelled
                             } catch (error: Exception) {
                                 Log.e("EditorScreen", "Unable to reset artwork", error)
                                 Toast.makeText(
                                     context,
-                                    "Could not reset artwork. Please try again.",
+                                    context.getString(R.string.editor_reset_error),
                                     Toast.LENGTH_LONG
                                 ).show()
                             }
@@ -458,13 +467,13 @@ fun EditorScreen(
         }
         AlertDialog(
             onDismissRequest = { if (!colorAdInProgress) lockedColorToUnlock = null },
-            title = { Text("Unlock Premium Color", fontWeight = FontWeight.Bold) },
-            text = { Text("Watch a rewarded video to unlock this color permanently on this device.") },
+            title = { Text(stringResource(R.string.editor_unlock_premium_color_title), fontWeight = FontWeight.Bold) },
+            text = { Text(stringResource(R.string.editor_unlock_premium_color_message)) },
             confirmButton = {
                 Button(enabled = !colorAdInProgress, onClick = {
                     val activity = context as? android.app.Activity
                     if (activity == null) {
-                        Toast.makeText(context, "Unable to show ad right now.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.editor_ad_show_error), Toast.LENGTH_SHORT).show()
                     } else {
                         colorAdInProgress = true
                         AnalyticsTracker.logEvent("rewarded_ad_started", "content_type", "color")
@@ -479,21 +488,21 @@ fun EditorScreen(
                             },
                             onAdClosed = { earned ->
                                 colorAdInProgress = false
-                                if (!earned) Toast.makeText(context, "Complete the video to unlock this color.", Toast.LENGTH_SHORT).show()
+                                if (!earned) Toast.makeText(context, context.getString(R.string.editor_ad_not_completed), Toast.LENGTH_SHORT).show()
                             },
                             onAdUnavailable = {
                                 colorAdInProgress = false
-                                Toast.makeText(context, "Video ad is not ready. Try again shortly.", Toast.LENGTH_LONG).show()
+                                Toast.makeText(context, context.getString(R.string.editor_ad_not_ready), Toast.LENGTH_LONG).show()
                             },
                             onAdFailedToShow = { _ ->
                                 colorAdInProgress = false
-                                Toast.makeText(context, "Unable to show the ad. Please try again.", Toast.LENGTH_LONG).show()
+                                Toast.makeText(context, context.getString(R.string.editor_ad_failed), Toast.LENGTH_LONG).show()
                             }
                         )
                     }
-                }, colors = ButtonDefaults.buttonColors(containerColor = PinkAccent)) { Text("Watch Video") }
+                }, colors = ButtonDefaults.buttonColors(containerColor = PinkAccent)) { Text(stringResource(R.string.editor_watch_video)) }
             },
-            dismissButton = { TextButton(onClick = { if (!colorAdInProgress) lockedColorToUnlock = null }) { Text("Cancel") } }
+            dismissButton = { TextButton(onClick = { if (!colorAdInProgress) lockedColorToUnlock = null }) { Text(stringResource(R.string.editor_cancel)) } }
         )
     }
 
