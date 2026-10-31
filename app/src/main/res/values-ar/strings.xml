@@ -148,6 +148,16 @@
         <item quantity="many">%1$d مساحة</item>
         <item quantity="other">%1$d مساحة</item>
     </plurals>
+
+    <string name="settings_language_section">لغة التطبيق</string>
+    <string name="settings_language_description">اختر اللغة المستخدمة في تطبيق ماندالا آرت. لن يتغير إعداد لغة الجهاز.</string>
+    <string name="settings_language_english">English</string>
+    <string name="settings_language_arabic">العربية</string>
+    <string name="settings_cloud_restore_title">جارٍ استعادة أعمالك الفنية</string>
+    <string name="settings_cloud_restore_message">تتم الآن مزامنة الحساب المسجل دخوله. تظل أعمالك المحفوظة محليًا متاحة.</string>
+    <string name="settings_cloud_restore_failed_title">تعذرت الاستعادة السحابية</string>
+    <string name="settings_cloud_restore_failed_message">لا تزال أعمالك المحلية متاحة. تحقق من اتصالك ثم أعد محاولة الاستعادة السحابية من هذه الرسالة.</string>
+
     <string name="settings_feedback_section">التفاعل وتجربة الاستخدام</string>
     <string name="settings_sound_description">نقرة صوتية خفيفة عند تلوين منطقة</string>
     <string name="settings_haptics_description">اهتزاز لمسي لطيف عند الضغط</string>
