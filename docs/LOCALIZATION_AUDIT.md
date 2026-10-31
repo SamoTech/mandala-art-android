@@ -1,6 +1,6 @@
 # M1 Localization & Accessibility Audit
 
-**Repository baseline:** `main` at `95bb4d659d015681cc94ddd58568ab8884c75cfa`  
+**Repository baseline:** `main` at `ab70db9c085410644baee1ba3362fe3d3100b327`  
 **Audit date:** 2026-10-31  
 **Scope:** Android user-visible text, locale resources, accessibility labels, and RTL-sensitive UI.
 
@@ -47,10 +47,11 @@ These are not ordinary Compose literals, but they are displayed to users and mus
 
 ## 4. Accessibility inventory
 
-- Several navigation and action descriptions are hardcoded English (Back, Favorite, Share, Delete, Locked, Locked color, Level locked).
-- Decorative artwork and visual-only icons currently use `contentDescription = null` in multiple places; verify that each is genuinely decorative and that its containing control has an accessible label.
-- Every icon-only actionable control must expose a localized semantic label.
-- Progress indicators and completion state need meaningful semantics, not only visible percentages or color.
+- The identified navigation/action descriptions (Back, Favorite, Share, Delete, Locked, Locked color, Level locked) were migrated to Android string resources in PRs #43–#47; Arabic translations are supplied by `values-ar` and are covered by resource-key/placeholder parity checks.
+- Static source review found `contentDescription = null` on decorative icons or icons paired with visible control text in the reviewed flows. This is not a substitute for TalkBack traversal testing.
+- Icon-only actionable controls must retain localized semantic labels as new UI is added.
+- Progress indicators and completion state still require runtime verification with TalkBack and non-color cues.
+- Touch target sizes, traversal order, focus behavior, and announcements have not been validated on a physical device.
 
 ## 5. RTL source review and automated locale smoke coverage
 
@@ -62,7 +63,7 @@ Static review of the primary Compose screens after Arabic resource integration f
 - Rows, horizontal scrolling containers, and lazy horizontal lists rely on Compose's current `LayoutDirection`; this is intentional but still requires rendered UI verification.
 - Reviewed `contentDescription = null` usages are decorative icons or icons nested inside controls that also expose visible text. Icon-only controls in the reviewed flows use localized descriptions.
 
-The current PR adds Robolectric locale smoke tests that verify the manifest RTL flag, Arabic configuration direction and resource resolution, and unchanged English LTR/resource resolution. These tests validate Android locale configuration; they do not prove Compose screenshot geometry, TalkBack traversal, or physical-device typography.
+PR #49 merged Robolectric locale smoke tests that verify the manifest RTL flag, Arabic configuration direction and resource resolution, and unchanged English LTR/resource resolution. The PR's Android debug build, unit tests, Android lint, and Firestore security rules all passed on head `f0db056696d91cd578836e91e73cc5172da4aefa`; Codex review completed with no findings and no open review threads. These tests validate Android locale configuration; they do not prove Compose screenshot geometry, TalkBack traversal, or physical-device typography. No post-merge workflow run was returned for merge commit `ab70db9c085410644baee1ba3362fe3d3100b327`.
 
 ## 6. RTL and typography verification targets
 
@@ -72,13 +73,13 @@ The current PR adds Robolectric locale smoke tests that verify the manifest RTL 
 - Touch target size and TalkBack traversal order in both locales.
 - Preserve `supportsRtl=true`; verify actual Compose behavior rather than assuming the manifest flag alone guarantees correct layout.
 
-## 7. Recommended implementation sequence
+## 7. Remaining implementation and verification sequence
 
-1. Extract remaining user-visible strings from screen and dialog code into default English resources.
-2. Localize data-driven labels through resource IDs or UI-layer mappings; add plural and formatted resources.
-3. Add `values-ar/strings.xml` with matching keys and valid placeholders.
-4. Add resource integrity tests that compare required keys and validate formatting/plural definitions.
-5. Add locale/RTL UI tests or screenshot coverage for critical screens, then perform manual device verification with Arabic and English system locales.
+1. Keep English/Arabic resource parity and placeholder/plural tests mandatory for every future string change.
+2. Run `connectedAndroidTest` on a representative physical Android device; current instrumented-test infrastructure is minimal and the existing PR #49 tests are Robolectric locale smoke tests, not full screen UI tests.
+3. Execute the manual matrix in `docs/RTL_DEVICE_TEST_MATRIX.md` in Arabic and English, including screen geometry, horizontal scrolling, shaping, mixed-direction text, font scaling, and TalkBack.
+4. Record device model, Android version, locale, font scale, screenshots, observed defects, and retest results. Fix reproducible issues in focused PRs.
+5. Re-scan future UI additions for hardcoded strings, missing semantics, and directional assumptions.
 6. Keep artwork IDs, database values, analytics event names, Firebase fields, and other persisted/backend identifiers language-neutral and unchanged.
 
 ## 8. Out of scope for M1
@@ -88,4 +89,4 @@ The current PR adds Robolectric locale smoke tests that verify the manifest RTL 
 - Rewriting the visual design system or changing navigation behavior.
 - Assuming that `supportsRtl=true` proves full RTL correctness.
 
-**Current M1 status:** English UI extraction and dynamic-label resource mapping are implemented in merged PRs #43–#47. Arabic translations and resource parity tests are being introduced in the current PR. Full RTL, typography, TalkBack, and physical-device verification remain open.
+**Current M1 status:** English UI extraction and dynamic-label resource mapping are merged in PRs #43–#47. Arabic translations and 164-key resource parity checks are merged in PR #48. Arabic RTL/English LTR locale smoke tests and static RTL source review are merged in PR #49. PR #49 CI passed on its exact head SHA and Codex reported no findings. Full rendered Compose RTL, typography, TalkBack, and physical-device verification remain open; M1 is not complete.

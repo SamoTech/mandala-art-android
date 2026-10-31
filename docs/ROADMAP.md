@@ -3,7 +3,7 @@
 > **Status:** Living execution plan  
 > **Baseline reviewed:** 2026-10-31  
 > **Repository:** [SamoTech/mandala-art-android](https://github.com/SamoTech/mandala-art-android)  
-> **Current planning baseline:** `main` at `f09fecfc0655feb273beac937a8737ae6ee7a305`
+> **Current planning baseline:** `main` at `ab70db9c085410644baee1ba3362fe3d3100b327`
 
 This document is the canonical roadmap for product and engineering work on Mandala Art. New work should follow the sequence, dependencies, acceptance criteria, and delivery rules below. It is intentionally milestone-based rather than date-based: a milestone advances only when its exit criteria are demonstrated.
 
@@ -36,7 +36,7 @@ The following reflects a source review of `main` on 2026-10-31. “Implemented�
 | Autosave | Conflated worker, debounce, explicit flush, background error callback, owner-bound ViewModel persistence, ON_STOP flush in ViewModel scope | M0 regression coverage merged in PRs #32, #36, and #37; lifecycle test covers ON_STOP, not process death |
 | Daily Inspiration | Stable date-based design selection; Home screen keys it by local date | Implemented; verify timezone/day-boundary behavior |
 | Share image rendering | Bitmap rendering on IO dispatcher; age-based cache cleanup | Implemented; verify memory and cleanup behavior |
-| Arabic localization | English default resources plus Arabic `values-ar/strings.xml` (164 matching keys); RTL/device verification pending | In progress — current PR adds resource parity tests |
+| Arabic localization | English default resources plus Arabic `values-ar/strings.xml` (164 matching keys); resource integrity and locale smoke tests merged in PRs #48–#49; rendered RTL/device verification pending | In progress — physical UI/accessibility validation remains |
 | Release minification | Release `isMinifyEnabled = false` | Not implemented |
 | Gallery caching | No dedicated image/card cache established in reviewed source | Profile first; do not add speculative cache |
 | Random design controls | Existing algorithmic design library/generator | User-facing parameter controls not yet established |
@@ -92,7 +92,8 @@ Work items:
 - [x] Review pluralization and formatting placeholders; Arabic plural forms and parity checks are included in the current PR. Continue to review new strings as they are added.
 - [ ] Validate RTL mirroring for navigation, gallery, editor controls, progress indicators, dialogs, and settings.
 - [ ] Review font fallback, Arabic shaping, truncation, line wrapping, and large-font scaling.
-- [ ] Add resource/locale tests and screenshot or manual verification for Arabic and English.
+- [x] Add resource integrity and Arabic/English locale smoke tests (PRs #48–#49).
+- [ ] Verify rendered Compose layout, typography, TalkBack semantics, and critical screens on physical devices in Arabic and English (see `docs/RTL_DEVICE_TEST_MATRIX.md`).
 
 **Acceptance / exit criteria:**
 
@@ -240,7 +241,7 @@ The following is the working queue. Do not skip ahead because a later feature is
 | 1 | Autosave/account-switch lifecycle audit and regression tests | P0 | Completed — PRs #32, #36, #37, #39; post-merge CI passed |
 | 2 | Favorite timestamp persistence and tombstone edge-case coverage | P0 | Completed — PR #33; post-merge CI passed |
 | 3 | Offline sync and account-isolation regression coverage | P0 | Completed — PR #34; post-merge Android and Firestore CI passed; device verification user-reported |
-| 4 | Arabic resources and RTL pass | P1 | Arabic resources merged in PR #48; locale smoke tests and RTL source review in progress; physical-device verification remains |
+| 4 | Arabic resources and RTL pass | P1 | PRs #48–#49 merged; resource/locale tests passed; physical RTL, typography, and TalkBack verification remains |
 | 5 | Release R8/minification experiment with measured comparison | P1 | Planned |
 | 6 | Profile gallery and share paths; optimize only measured bottlenecks | P1 | Planned |
 | 7 | User-configurable deterministic mandala generator | P2 | Discovery |
@@ -311,4 +312,4 @@ Every change to priority or scope must include a short reason. Do not silently r
 
 ---
 
-**Current next action:** Complete automated Arabic/English locale and RTL smoke coverage, then verify actual Compose layout geometry, typography, TalkBack semantics, and critical screens on a physical device in both locales. Preserve artwork IDs, persisted values, backend fields, and analytics names.
+**Current next action:** Complete physical-device RTL, typography, and TalkBack verification using `docs/RTL_DEVICE_TEST_MATRIX.md`; fix only reproducible issues, then close M1. PR #49 merged at `ab70db9c085410644baee1ba3362fe3d3100b327`; its PR CI passed, but no post-merge workflow run was returned. Preserve artwork IDs, persisted values, backend fields, and analytics names.
