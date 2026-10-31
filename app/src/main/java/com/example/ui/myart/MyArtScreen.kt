@@ -53,6 +53,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -337,6 +338,8 @@ fun MyArtScreen(
                                                             coloredRegions = saved?.coloredRegions ?: emptyMap(),
                                                             outlineColor = outlineColor
                                                         )
+                                                    } catch (cancelled: CancellationException) {
+                                                        throw cancelled
                                                     } catch (error: Exception) {
                                                         Toast.makeText(
                                                             context,
