@@ -39,7 +39,9 @@ These are not ordinary Compose literals, but they are displayed to users and mus
 - Level names in `model/LevelSystem.kt`.
 - Category/difficulty strings assembled in `MandalaCard.kt`.
 - Region-count text such as `N areas`, which requires a plural resource rather than string concatenation.
-- Generator design titles in `generator/MandalaLibrary.kt`. Treat these as editorial artwork titles; decide explicitly whether to localize them or retain them as canonical artwork names. Do not silently translate IDs or persisted identifiers.
+- Generator design titles in `generator/MandalaLibrary.kt`. These are canonical editorial artwork titles (for example, “Lotus Bloom” and “Golden Peacock”), not UI category labels. Keep them unchanged across locales in this milestone so artwork identity and user references remain stable; revisit translated display aliases only as a separate product decision. Never translate design IDs or persisted identifiers.
+
+**Dynamic-label implementation note (PR #47):** category and difficulty labels, palette tab labels, and level-pack names are now resolved through Android string resources in the UI layer. Model enums and level progression logic no longer own English display strings. Palette identifiers remain stable for test tags. Canonical artwork titles remain intentionally untranslated.
 
 ## 4. Accessibility inventory
 
