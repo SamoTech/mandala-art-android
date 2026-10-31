@@ -186,5 +186,6 @@
     <string name="gallery_level_name_blossom_path">Blossom Path</string>
     <string name="gallery_level_name_golden_flow">Golden Flow</string>
     <string name="gallery_level_name_master_circle">Master Circle</string>
+    <string name="gallery_level_name_fallback">Level %1$d</string>
 
 </resources>
